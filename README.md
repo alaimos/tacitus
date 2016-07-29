@@ -1,2 +1,2 @@
-# tacitus
-TACITuS: Transcriptomic dAta Collector, InTegrator, and Selector
+# TACITuS
+### Transcriptomic dAta Collector, InTegrator, and Selector
