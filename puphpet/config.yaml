@@ -19,18 +19,15 @@ vagrantfile:
                         check_guest_tools: 0
                         update_guest_tools: 0
                 machines:
-                    vflm_zyoakywsm72d:
+                    vflm_w0aryidjvpfh:
                         id: tacitus
                         hostname: tacitus.puphpet
                         network:
                             private_network: 192.168.56.106
                             forwarded_port:
-                                vflmnfp_1e6s2s5md0qf:
+                                vflmnfp_dlfylu3ns4d7:
                                     host: '6288'
                                     guest: '22'
-                                vflmnfp_1e6s2s5md0ff:
-                                    host: '2480'
-                                    guest: '2480'
                         memory: '2048'
                         cpus: '2'
         provision:
@@ -41,7 +38,7 @@ vagrantfile:
                     - '--verbose'
                     - '--hiera_config /vagrant/puphpet/puppet/hiera.yaml'
         synced_folder:
-            vflsf_o2uv7wvsy2cs:
+            vflsf_vyuei317o55y:
                 source: ./www
                 target: /var/www
                 sync_type: default
@@ -89,6 +86,10 @@ server:
     install: '1'
     packages:
         - htop
+        - libcurl4-openssl-dev
+        - pkg-config
+        - libssl-dev
+        - libsslcommon2-dev
 users_groups:
     install: '1'
     groups: {  }
@@ -120,7 +121,7 @@ nginx:
         names_hash_bucket_size: 128
     upstreams: {  }
     vhosts:
-        nxv_da2yfe4gx8n2:
+        nxv_2cgapi92c9r9:
             server_name: awesome.dev
             server_aliases:
                 - www.awesome.dev
@@ -140,7 +141,7 @@ nginx:
             rewrite_to_https: '1'
             spdy: '1'
             locations:
-                nxvl_yedhxjgyif9j:
+                nxvl_hk43otka2ou7:
                     location: /
                     try_files:
                         - $uri
@@ -151,7 +152,7 @@ nginx:
                     fastcgi_split_path: ''
                     proxy: ''
                     proxy_redirect: ''
-                nxvl_22gv23nhngmh:
+                nxvl_xfvozpgsd732:
                     location: '~ \.php$'
                     try_files:
                         - $uri
@@ -182,7 +183,7 @@ apache:
         - proxy_fcgi
         - rewrite
     vhosts:
-        av_uff1h834dmnj:
+        av_mw4ghgplnhl8:
             servername: tacitus.local
             docroot: /var/www/tacitus/public
             port: '80'
@@ -199,7 +200,7 @@ apache:
             ssl_protocol: ''
             ssl_cipher: ''
             directories:
-                avd_xs1irjmnz8kx:
+                avd_4154i0hl3dou:
                     path: /var/www/tacitus/public
                     options:
                         - Indexes
@@ -211,7 +212,7 @@ apache:
                         - 'all granted'
                     custom_fragment: ''
                     files_match:
-                        avdfm_6ihov633izo5:
+                        avdfm_qy7ovng5slsv:
                             path: \.php$
                             sethandler: 'proxy:fcgi://127.0.0.1:9000'
                             custom_fragment: ''
@@ -241,6 +242,7 @@ php:
         pear: {  }
         pecl:
             - zip
+            - mongodb
     ini:
         display_errors: 'On'
         error_reporting: '-1'
@@ -249,7 +251,7 @@ php:
     fpm_ini:
         error_log: /vagrant/logs/php_error.log
     fpm_pools:
-        phpfp_mrepns5we73w:
+        phpfp_i0f4edagl45n:
             ini:
                 prefix: www
                 listen: '127.0.0.1:9000'
@@ -292,7 +294,7 @@ drush:
 ruby:
     install: '1'
     versions:
-        rv_a1jg7cxkdrt2:
+        rv_rgei2gy7q7yy:
             default: '1'
             bundler: '1'
             version: 1.9.3
@@ -310,6 +312,7 @@ nodejs:
         version: '5'
     npm_packages:
         - gulp-cli
+        - typescript
 hhvm:
     install: '0'
     nightly: 0
@@ -326,23 +329,23 @@ hhvm:
         error_reporting: '-1'
         date.timezone: UTC
 mariadb:
-    install: '0'
+    install: '1'
     settings:
         version: '10.1'
         root_password: '123'
         override_options: {  }
     adminer: 0
     users:
-        mariadbnu_g3z43sshxnw0:
-            name: dbuser
+        mariadbnu_qi4920fxi8zg:
+            name: tacitus
             password: '123'
     databases:
-        mariadbnd_nmdklnjl26lo:
-            name: dbname
+        mariadbnd_bvmdl6pj537s:
+            name: tacitus
             sql: ''
     grants:
-        mariadbng_sho3f869lm4j:
-            user: dbuser
+        mariadbng_j1toiegrmx40:
+            user: tacitus
             table: '*.*'
             privileges:
                 - ALL
@@ -354,16 +357,16 @@ mysql:
         override_options: {  }
     adminer: 0
     users:
-        mysqlnu_5xjg4fapo147:
-            name: dbuser
+        mysqlnu_dne2rkqg3dv9:
+            name: tacitus
             password: '123'
     databases:
-        mysqlnd_za56lk0s99wh:
-            name: dbname
+        mysqlnd_gcswgpujtlc9:
+            name: tacitus
             sql: ''
     grants:
-        mysqlng_85v800u92mxv:
-            user: dbuser
+        mysqlng_rw0i1xniw01k:
+            user: tacitus
             table: '*.*'
             privileges:
                 - ALL
@@ -380,13 +383,17 @@ postgresql:
     grants: {  }
     adminer: 0
 mongodb:
-    install: '0'
+    install: '1'
     settings:
         bind_ip: 127.0.0.1
         port: '27017'
     globals:
         version: 2.6.0
-    databases: {  }
+    databases:
+        mongodbnuad_nh6wutcyismb:
+            name: tacitus
+            user: tacitus
+            password: '123'
 redis:
     install: '1'
     settings:
@@ -413,7 +420,7 @@ beanstalkd:
         binlogdir: /var/lib/beanstalkd/binlog
         binlogfsync: null
         binlogsize: '10485760'
-    beanstalk_console: 0
+    beanstalk_console: '1'
 rabbitmq:
     install: '0'
     settings:
@@ -427,7 +434,7 @@ elastic_search:
         version: 2.3.1
         java_install: true
     instances:
-        esi_i85b5pieplmz:
+        esi_q7qdq8cmq14w:
             name: es-01
 solr:
     install: '0'

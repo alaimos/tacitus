@@ -96,11 +96,11 @@ class puphpet_mongodb (
     })
   }
 
-  if array_true($php, 'install') and ! defined(Puphpet::Php::Pecl['mongo']) {
-    puphpet::php::pecl { 'mongo':
-      service_autorestart => $webserver_restart,
-      require             => Class['mongodb::server']
-    }
-  }
+  #if array_true($php, 'install') and ! defined(Puphpet::Php::Pecl['mongo']) {
+  #  puphpet::php::pecl { 'mongodb':
+  #    service_autorestart => $webserver_restart,
+  #    require             => Class['mongodb::server']
+  #  }
+  #}
 
 }
