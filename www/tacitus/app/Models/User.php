@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Fenos\Notifynder\Notifable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laratrust\Traits\LaratrustUserTrait;
 
@@ -25,10 +26,12 @@ use Laratrust\Traits\LaratrustUserTrait;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereRoleIs($role = '')
  * @mixin \Eloquent
+ * @property-read \Fenos\Notifynder\Models\NotifynderCollection|\Fenos\Notifynder\Models\Notification[] $notifications
  */
 class User extends Authenticatable
 {
     use LaratrustUserTrait;
+    use Notifable;
 
     /**
      * The attributes that are mass assignable.

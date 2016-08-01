@@ -1,11 +1,8 @@
 {
-  "name": "laravel/laravel",
-  "description": "The Laravel Framework.",
-  "keywords": [
-    "framework",
-    "laravel"
-  ],
-  "license": "MIT",
+  "name": "alaimos/tacitus",
+  "description": "TACITuS - Transcriptomic dAta Collector, InTegrator, and Selector",
+  "keywords": [],
+  "license": "GPL-3.0",
   "type": "project",
   "require": {
     "php": ">=5.5.9",
@@ -14,7 +11,13 @@
     "pda/pheanstalk": "~3.0",
     "barryvdh/laravel-ide-helper": "2.*",
     "jenssegers/mongodb": "~3.0",
-    "santigarcor/laratrust": "3.0.*"
+    "santigarcor/laratrust": "3.0.*",
+    "davejamesmiller/laravel-breadcrumbs": "~3.0",
+    "spatie/laravel-backup": "~3.8",
+    "sun/laravel-flash": "~1.4",
+    "larablocks/pigeon": "~5.2",
+    "greggilbert/recaptcha": "~2.1",
+    "fenos/notifynder": "3.*"
   },
   "require-dev": {
     "fzaninotto/faker": "~1.4",
@@ -46,10 +49,18 @@
     ],
     "post-install-cmd": [
       "Illuminate\\Foundation\\ComposerScripts::postInstall",
+      "php artisan clear-compiled",
+      "php artisan ide-helper:generate",
+      "php artisan ide-helper:meta",
+      "php artisan ide-helper:models -W",
       "php artisan optimize"
     ],
     "post-update-cmd": [
       "Illuminate\\Foundation\\ComposerScripts::postUpdate",
+      "php artisan clear-compiled",
+      "php artisan ide-helper:generate",
+      "php artisan ide-helper:meta",
+      "php artisan ide-helper:models -W",
       "php artisan optimize"
     ]
   },

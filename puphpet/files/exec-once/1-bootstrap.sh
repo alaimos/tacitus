@@ -12,15 +12,4 @@ export BOOTSTRAP_DIR="/vagrant/puphpet/files/exec-once"
 
 find /vagrant/puphpet -type f -name "*.sh" -exec touch '{}' \;
 
-### make sure php error log file exists
-
-touch /vagrant/logs/php_error.log
-chmod 777 /vagrant/logs/php_error.log
-
-### install notifier
-
-sudo apt-add-repository ppa:izx/askubuntu
-sudo apt-get update
-sudo apt-get install libnotify-bin
-
 echo "------------ END SYSTEM BOOTSTRAP ------------"

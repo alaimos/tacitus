@@ -29,6 +29,6 @@ class PermissionsTableSeeder extends Seeder
      */
     public function run()
     {
-        //
+        $this->makePermission('user-panels', 'View user panels');
     }
 }

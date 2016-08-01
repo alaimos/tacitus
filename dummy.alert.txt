@@ -1,0 +1,3 @@
+php artisan notifynder:create:category "notification" '<i class="fa fa-{extra.icon} fa-fw"></i> {extra.message}'
+
+php artisan notification admin@tacitus user "Hello World3."

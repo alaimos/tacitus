@@ -58,7 +58,7 @@ vagrantfile:
                         - .vagrant/
                         - .git/
                     auto: 'true'
-                owner: www-data
+                owner: vagrant
                 group: www-data
         usable_port_range:
             start: 10200
@@ -311,8 +311,17 @@ nodejs:
     settings:
         version: '5'
     npm_packages:
+        - gulp
         - gulp-cli
-        - typescript
+        - gulp-ext-replace
+        - gulp-imagemin
+        - gulp-postcss
+        - gulp-sourcemaps
+        - gulp-uglify
+        - gulp-bower
+        - main-bower-files
+        - stream-browserify
+        - laravel-elixir
 hhvm:
     install: '0'
     nightly: 0

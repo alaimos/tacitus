@@ -18,3 +18,9 @@ Route::get('/', function () {
 Route::auth();
 
 Route::get('/home', 'HomeController@index');
+
+Route::group(['as' => 'user::', 'prefix' => 'user', 'middleware' => ['permission:user-panels']],
+    function (\Illuminate\Routing\Router $router) {
+        $router->get('/alerts', ['as' => 'alerts', 'uses' => 'UserController@alerts']);
+    }
+);
