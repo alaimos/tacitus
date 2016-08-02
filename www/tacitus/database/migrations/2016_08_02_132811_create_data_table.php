@@ -1,0 +1,33 @@
+<?php
+
+use Jenssegers\Mongodb\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
+
+class CreateDataTable extends Migration
+{
+    /**
+     * Run the migrations.
+     *
+     * @return void
+     */
+    public function up()
+    {
+        Schema::connection('mongodb')->create('data', function (Blueprint $table) {
+            $table->increments('id');
+            $table->integer('sample_id')->unsigned()->index();
+            $table->foreign('sample_id')->references('id')->on('samples')->onDelete('cascade')->onUpdate('cascade');
+            $table->string('probe_id')->index();
+            $table->double('value')->index();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     *
+     * @return void
+     */
+    public function down()
+    {
+        Schema::connection('mongodb')->drop('data');
+    }
+}
