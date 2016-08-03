@@ -10,10 +10,10 @@ use Jenssegers\Mongodb\Eloquent\Model as Model;
  * @mixin \Eloquent
  * @property string                  $name
  * @property string                  $value
+ * @property-read \App\Models\Sample $sample
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Metadata whereName($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Metadata whereValue($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Metadata whereSampleId($value)
- * @property-read \App\Models\Sample $sample
  */
 class Metadata extends Model
 {
@@ -24,7 +24,8 @@ class Metadata extends Model
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    public function sample() {
+    public function sample()
+    {
         return $this->belongsTo('App\Models\Sample');
     }
 

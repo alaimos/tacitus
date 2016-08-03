@@ -17,7 +17,10 @@
     "sun/laravel-flash": "~1.4",
     "larablocks/pigeon": "~5.2",
     "greggilbert/recaptcha": "~2.1",
-    "fenos/notifynder": "3.*"
+    "fenos/notifynder": "3.*",
+    "laravelcollective/html": "~5.2",
+    "yajra/laravel-datatables-oracle": "~6.16",
+    "barryvdh/laravel-debugbar": "~2.2"
   },
   "require-dev": {
     "fzaninotto/faker": "~1.4",

@@ -12,10 +12,4 @@ export BOOTSTRAP_DIR="/vagrant/puphpet/files/exec-once"
 
 find /vagrant/puphpet -type f -name "*.sh" -exec touch '{}' \;
 
-### setup mongo pid file
-
-touch /var/run/mongod.pid
-
-chmod 777 /var/run/mongod.pid
-
 echo "------------ END SYSTEM BOOTSTRAP ------------"

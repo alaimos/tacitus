@@ -8,9 +8,9 @@ use Jenssegers\Mongodb\Eloquent\Model as Model;
  * App\Models\Data
  *
  * @mixin \Eloquent
- * @property string                  $probe_id
+ * @property string                  $probe
  * @property double                  $value
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Metadata whereProbeId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Metadata whereProbe($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Metadata whereValue($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Metadata whereSampleId($value)
  * @property-read \App\Models\Sample $sample

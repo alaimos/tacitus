@@ -16,7 +16,9 @@ use Laratrust\Traits\LaratrustUserTrait;
  * @property string                                                                                     $remember_token
  * @property \Carbon\Carbon                                                                             $created_at
  * @property \Carbon\Carbon                                                                             $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Dataset[]                        $datasets
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Role[]                           $roles
+ * @property-read \Fenos\Notifynder\Models\NotifynderCollection|\Fenos\Notifynder\Models\Notification[] $notifications
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereName($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereEmail($value)
@@ -26,8 +28,6 @@ use Laratrust\Traits\LaratrustUserTrait;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereRoleIs($role = '')
  * @mixin \Eloquent
- * @property-read \Fenos\Notifynder\Models\NotifynderCollection|\Fenos\Notifynder\Models\Notification[] $notifications
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Dataset[]                        $datasets
  */
 class User extends Authenticatable
 {

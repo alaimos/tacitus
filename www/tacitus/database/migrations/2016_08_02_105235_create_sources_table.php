@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateMappingTypesTable extends Migration
+class CreateSourcesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,9 +12,10 @@ class CreateMappingTypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('mapping_types', function (Blueprint $table) {
+        Schema::create('sources', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
+            $table->string('name')->index();
+            $table->string('display_name');
             $table->timestamps();
         });
     }
@@ -26,6 +27,6 @@ class CreateMappingTypesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('mapping_types');
+        Schema::drop('dataset_sources');
     }
 }

@@ -15,7 +15,8 @@ class CreateSamplesTable extends Migration
         Schema::connection('mongodb')->create('samples', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->integer('dataset_id')->unsigned()->index();
+            $table->integer('dataset_id')->unsigned();
+            $table->index('dataset_id', ['name' => 'samples_dataset_id_index']);
             $table->foreign('dataset_id')->references('id')->on('datasets')->onDelete('cascade')->onUpdate('cascade');
         });
     }

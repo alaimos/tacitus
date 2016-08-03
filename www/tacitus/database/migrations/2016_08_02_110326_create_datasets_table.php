@@ -14,19 +14,15 @@ class CreateDatasetsTable extends Migration
     {
         Schema::create('datasets', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('id_source')->index();
+            $table->string('original_id')->index();
             $table->integer('source_id')->unsigned()->index();
-            $table->foreign('source_id')->references('id')->on('supported_sources')->onDelete('cascade')
-                ->onUpdate('cascade');
-            $table->integer('platform_id')->unsigned()->index();
-            $table->foreign('platform_id')->references('id')->on('platforms')->onDelete('cascade')
+            $table->foreign('source_id')->references('id')->on('sources')->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->integer('user_id')->unsigned()->index();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')
                 ->onUpdate('cascade');
             $table->string('title');
             $table->boolean('private')->default(true);
-            $table->boolean('guest_access')->default(false);
             $table->timestamps();
         });
     }

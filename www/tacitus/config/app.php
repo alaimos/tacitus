@@ -164,7 +164,11 @@ return [
         Sun\Flash\FlashServiceProvider::class,
         Larablocks\Pigeon\PigeonServiceProvider::class,
         Greggilbert\Recaptcha\RecaptchaServiceProvider::class,
-        Fenos\Notifynder\NotifynderServiceProvider::class
+        Fenos\Notifynder\NotifynderServiceProvider::class,
+        Yajra\Datatables\DatatablesServiceProvider::class,
+        Collective\Html\HtmlServiceProvider::class,
+
+        Barryvdh\Debugbar\ServiceProvider::class,
 
     ],
 
@@ -216,7 +220,13 @@ return [
         'Flash'       => Sun\Flash\FlashFacade::class,
         'Pigeon'      => Larablocks\Pigeon\Pigeon::class,
         'Recaptcha'   => Greggilbert\Recaptcha\Facades\Recaptcha::class,
-        'Notifynder'  => Fenos\Notifynder\Facades\Notifynder::class
+        'Notifynder'  => Fenos\Notifynder\Facades\Notifynder::class,
+        'Datatables'  => Yajra\Datatables\Facades\Datatables::class,
+        'Form'        => Collective\Html\FormFacade::class,
+        'Html'        => Collective\Html\HtmlFacade::class,
+
+        'Debugbar' => Barryvdh\Debugbar\Facade::class,
+
     ],
 
 ];

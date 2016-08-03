@@ -9,11 +9,11 @@ use Jenssegers\Mongodb\Eloquent\Model as Model;
  *
  * @mixin \Eloquent
  * @property string                                                               $name
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Sample whereName($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\Sample whereDatasetId($value)
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Metadata[] $metadata
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Data[]     $data
  * @property-read \App\Models\Dataset                                             $dataset
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Sample whereName($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Sample whereDatasetId($value)
  */
 class Sample extends Model
 {

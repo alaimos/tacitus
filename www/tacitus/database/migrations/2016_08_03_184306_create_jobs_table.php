@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAnnotationsTable extends Migration
+class CreateJobsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,13 +12,12 @@ class CreateAnnotationsTable extends Migration
      */
     public function up()
     {
-        Schema::create('annotations', function (Blueprint $table) {
+        Schema::create('jobs', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('platform_id')->unsigned()->index();
-            $table->string('probe_id');
+            $table->string('job_type');
+            $table->enum('status', ['queued', 'pending', 'completed']);
+            $table->text('job_data');
             $table->timestamps();
-            $table->foreign('platform_id')->references('id')->on('platforms')->onDelete('cascade')
-                ->onUpdate('cascade');
         });
     }
 
@@ -29,6 +28,6 @@ class CreateAnnotationsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('annotations');
+        Schema::drop('jobs');
     }
 }
