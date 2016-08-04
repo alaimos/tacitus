@@ -21,6 +21,7 @@ interface DownloaderInterface
      * Set the logger callback
      *
      * @param callable $callback
+     *
      * @return \App\Dataset\Downloader\DownloaderInterface
      */
     public function setLogCallback(callable $callback);
@@ -29,6 +30,7 @@ interface DownloaderInterface
      * Set the path where downloaded files will be stored
      *
      * @param string $directory
+     *
      * @return \App\Dataset\Downloader\DownloaderInterface
      */
     public function setDownloadDirectory($directory);
@@ -37,6 +39,7 @@ interface DownloaderInterface
      * Set the job data object
      *
      * @param \App\Models\Job $jobData
+     *
      * @return \App\Dataset\Downloader\DownloaderInterface
      */
     public function setJobData(JobData $jobData);

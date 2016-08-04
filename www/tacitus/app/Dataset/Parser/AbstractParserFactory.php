@@ -7,12 +7,13 @@
 
 namespace App\Dataset\Parser;
 
-
-use App\Dataset\Descriptor;
-use App\Models\Job as JobData;
+use App\Dataset\UseDescriptor;
+use App\Dataset\UseJobData;
 
 abstract class AbstractParserFactory implements ParserFactoryInterface
 {
+
+    use UseJobData, UseDescriptor;
 
     /**
      * Class name of the downloader object
@@ -43,20 +44,6 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
     protected $datasetWriterClass;
 
     /**
-     * Job data object
-     *
-     * @var \App\Models\Job
-     */
-    protected $jobData;
-
-    /**
-     * A data descriptor object
-     *
-     * @var \App\Dataset\Descriptor
-     */
-    protected $descriptor;
-
-    /**
      * Log callback
      *
      * @var callable
@@ -69,30 +56,6 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
      * @var bool
      */
     protected $uncommitedLog = false;
-
-    /**
-     * Set the job data object
-     *
-     * @param \App\Models\Job $jobData
-     * @return \App\Dataset\Parser\ParserFactoryInterface
-     */
-    public function setJobData(JobData $jobData)
-    {
-        $this->jobData = $jobData;
-        return $this;
-    }
-
-    /**
-     * Set a data descriptor object
-     *
-     * @param Descriptor $descriptor
-     * @return \App\Dataset\Parser\ParserFactoryInterface
-     */
-    public function setDescriptor(Descriptor $descriptor)
-    {
-        $this->descriptor = $descriptor;
-        return $this;
-    }
 
     /**
      * Get a log callback
@@ -130,7 +93,7 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
     /**
      * Get a data parser object
      *
-     * @return \App\Dataset\Parser\Data\DataParserInterface
+     * @return \App\Dataset\Parser\DataParserInterface
      */
     public function getDataParser()
     {

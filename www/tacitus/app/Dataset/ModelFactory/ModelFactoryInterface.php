@@ -9,6 +9,7 @@ namespace App\Dataset\ModelFactory;
 
 use App\Dataset\Descriptor;
 use App\Models\Job as JobData;
+use App\Models\Sample;
 
 /**
  * Interface ModelFactoryInterface
@@ -22,6 +23,7 @@ interface ModelFactoryInterface
      * Set the job data object
      *
      * @param \App\Models\Job $jobData
+     *
      * @return \App\Dataset\ModelFactory\ModelFactoryInterface
      */
     public function setJobData(JobData $jobData);
@@ -30,8 +32,57 @@ interface ModelFactoryInterface
      * Set a data descriptor object
      *
      * @param Descriptor $descriptor
+     *
      * @return \App\Dataset\ModelFactory\ModelFactoryInterface
      */
     public function setDescriptor(Descriptor $descriptor);
+
+    /**
+     * Get a Dataset object associated with the current descriptor.
+     * If no Dataset object is available, it will be instantiated.
+     *
+     * @return \App\Models\Dataset
+     */
+    public function getDataset();
+
+    /**
+     * Create a new Data model
+     *
+     * @param string             $probe
+     * @param string             $value
+     * @param \App\Models\Sample $sample
+     *
+     * @return \App\Models\Data
+     */
+    public function getData($probe, $value, Sample $sample);
+
+    /**
+     * Create a new Metadata Model
+     *
+     * @param string             $name
+     * @param string             $value
+     * @param \App\Models\Sample $sample
+     *
+     * @return \App\Models\Metadata
+     */
+    public function getMetadata($name, $value, Sample $sample);
+
+    /**
+     * Create a new Metadata Index Model
+     *
+     * @param string $name
+     *
+     * @return \App\Models\MetadataIndex
+     */
+    public function getMetadataIndex($name);
+
+    /**
+     * Create a new Sample Model
+     *
+     * @param string $name
+     *
+     * @return \App\Models\Sample
+     */
+    public function getSample($name);
 
 }

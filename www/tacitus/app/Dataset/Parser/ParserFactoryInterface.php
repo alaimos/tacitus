@@ -31,6 +31,7 @@ interface ParserFactoryInterface
      * Set the job data object
      *
      * @param \App\Models\Job $jobData
+     *
      * @return \App\Dataset\Parser\ParserFactoryInterface
      */
     public function setJobData(JobData $jobData);
@@ -39,6 +40,7 @@ interface ParserFactoryInterface
      * Set a data descriptor object
      *
      * @param Descriptor $descriptor
+     *
      * @return \App\Dataset\Parser\ParserFactoryInterface
      */
     public function setDescriptor(Descriptor $descriptor);
@@ -53,7 +55,7 @@ interface ParserFactoryInterface
     /**
      * Get a data parser object
      *
-     * @return \App\Dataset\Parser\Data\DataParserInterface
+     * @return \App\Dataset\Parser\DataParserInterface
      */
     public function getDataParser();
 
@@ -67,7 +69,6 @@ interface ParserFactoryInterface
     /**
      * Get a dataset writer object
      *
-     * @param Descriptor $descriptor
      * @return \App\Dataset\Writer\DatasetWriterInterface
      */
     public function getDatasetWriter();
