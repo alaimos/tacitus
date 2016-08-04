@@ -17,16 +17,36 @@ use Jenssegers\Mongodb\Eloquent\Model as Model;
  */
 class Sample extends Model
 {
+
+    /**
+     * The connection name for the model.
+     *
+     * @var string
+     */
     protected $connection = 'mongodb';
 
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
     public $timestamps = false;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
+    protected $fillable = [
+        'name', 'dataset_id'
+    ];
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function dataset()
     {
-        return $this->belongsTo('App\Models\Dataset');
+        return $this->belongsTo('App\Models\Dataset', 'dataset_id');
     }
 
     /**
@@ -34,7 +54,7 @@ class Sample extends Model
      */
     public function metadata()
     {
-        return $this->hasMany('App\Models\Metadata');
+        return $this->hasMany('App\Models\Metadata', 'sample_id');
     }
 
     /**
@@ -42,6 +62,6 @@ class Sample extends Model
      */
     public function data()
     {
-        return $this->hasMany('App\Models\Data');
+        return $this->hasMany('App\Models\Data', 'sample_id');
     }
 }

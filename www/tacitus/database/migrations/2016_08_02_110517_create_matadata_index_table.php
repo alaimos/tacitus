@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateAvailableDatasetMetadatasTable extends Migration
+class CreateMatadataIndexTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,7 +12,7 @@ class CreateAvailableDatasetMetadatasTable extends Migration
      */
     public function up()
     {
-        Schema::create('available_dataset_metadatas', function (Blueprint $table) {
+        Schema::create('metadata_index', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
             $table->integer('dataset_id')->unsigned()->index();
@@ -28,6 +28,6 @@ class CreateAvailableDatasetMetadatasTable extends Migration
      */
     public function down()
     {
-        Schema::drop('available_dataset_metadatas');
+        Schema::drop('metadata_index');
     }
 }

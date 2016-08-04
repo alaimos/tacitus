@@ -23,6 +23,8 @@ class CreateDatasetsTable extends Migration
                 ->onUpdate('cascade');
             $table->string('title');
             $table->boolean('private')->default(true);
+            $table->enum('status', ['pending', 'ready', 'failed']);
+            $table->text('error');
             $table->timestamps();
         });
     }
