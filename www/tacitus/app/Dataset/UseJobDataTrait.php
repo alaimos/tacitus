@@ -11,9 +11,10 @@ use App\Models\Job as JobData;
 
 /**
  * Class UseJobData
+ *
  * @package App\Dataset
  */
-trait UseJobData
+trait UseJobDataTrait
 {
 
     /**
@@ -33,5 +34,16 @@ trait UseJobData
         $this->jobData = $jobData;
         return $this;
     }
+
+    /**
+     * Get the job data object
+     *
+     * @return JobData
+     */
+    public function getJobData()
+    {
+        return $this->jobData;
+    }
+
 
 }

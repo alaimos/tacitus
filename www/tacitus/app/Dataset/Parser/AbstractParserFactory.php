@@ -7,13 +7,17 @@
 
 namespace App\Dataset\Parser;
 
-use App\Dataset\UseDescriptor;
-use App\Dataset\UseJobData;
+use App\Dataset\DescriptorAwareInterface;
+use App\Dataset\JobDataAwareInterface;
+use App\Dataset\LogCallbackAwareInterface;
+use App\Dataset\ModelFactoryAwareInterface;
+use App\Dataset\UseDescriptorTrait;
+use App\Dataset\UseJobDataTrait;
 
 abstract class AbstractParserFactory implements ParserFactoryInterface
 {
 
-    use UseJobData, UseDescriptor;
+    use UseJobDataTrait, UseDescriptorTrait;
 
     /**
      * Class name of the downloader object
@@ -58,6 +62,41 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
     protected $uncommitedLog = false;
 
     /**
+     * A list of instances for singleton-like access
+     *
+     * @var array
+     */
+    protected $instances = [];
+
+    protected $supportedAware = [
+        DescriptorAwareInterface::class   => ['getDescriptor', 'setDescriptor'],
+        JobDataAwareInterface::class      => ['getJobData', 'setJobData'],
+        LogCallbackAwareInterface::class  => ['getLogCallback', 'setLogCallback'],
+        ModelFactoryAwareInterface::class => ['getDatasetModelFactory', 'setModelFactory'],
+    ];
+
+
+    /**
+     * Build an object from its class name
+     *
+     * @param string $class
+     * @return object
+     */
+    protected function buildObject($class)
+    {
+        if (isset($this->instances[$class]) && $this->instances[$class] instanceof $class) {
+            return $this->instances[$class];
+        }
+        $this->instances[$class] = new $class();
+        foreach ($this->supportedAware as $interface => $methods) {
+            if ($this->instances[$class] instanceof $interface) {
+                call_user_func([$this->instances[$class], $methods[1]], call_user_func([$this, $methods[0]]));
+            }
+        }
+        return $this->instances[$class];
+    }
+
+    /**
      * Get a log callback
      *
      * @return callable
@@ -65,7 +104,7 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
     public function getLogCallback()
     {
         if ($this->logCallback === null) {
-            $this->logCallback = function ($message, $autoCommit = false) use ($this) {
+            $this->logCallback = function ($message, $autoCommit = false) {
                 $this->jobData->log = $this->jobData->log . $message;
                 if (!$autoCommit) {
                     $this->uncommitedLog = true;
@@ -84,10 +123,7 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
      */
     public function getDatasetDownloader()
     {
-        $class = $this->downloaderClass;
-        /** @var \App\Dataset\Downloader\DownloaderInterface $object */
-        $object = new $class();
-        return $object->setJobData($this->jobData)->setLogCallback($this->logCallback);
+        return $this->buildObject($this->downloaderClass);
     }
 
     /**
@@ -97,11 +133,7 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
      */
     public function getDataParser()
     {
-        $class = $this->dataParserClass;
-        /** @var \App\Dataset\Parser\Data\DataParserInterface $object */
-        $object = new $class();
-        return $object->setJobData($this->jobData)->setLogCallback($this->logCallback)
-            ->setDescriptor($this->descriptor);
+        return $this->buildObject($this->dataParserClass);
     }
 
     /**
@@ -111,10 +143,7 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
      */
     public function getDatasetModelFactory()
     {
-        $class = $this->modelFactoryClass;
-        /** @var \App\Dataset\ModelFactory\ModelFactoryInterface $object */
-        $object = new $class();
-        return $object->setJobData($this->jobData)->setDescriptor($this->descriptor);
+        return $this->buildObject($this->modelFactoryClass);
     }
 
     /**
@@ -124,11 +153,7 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
      */
     public function getDatasetWriter()
     {
-        $class = $this->datasetWriterClass;
-        /** @var \App\Dataset\Writer\DatasetWriterInterface $object */
-        $object = new $class();
-        return $object->setJobData($this->jobData)->setLogCallback($this->logCallback)
-            ->setDescriptor($this->descriptor);
+        return $this->buildObject($this->datasetWriterClass);
     }
 
     /**

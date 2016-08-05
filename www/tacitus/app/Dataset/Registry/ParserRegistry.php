@@ -5,7 +5,7 @@
  * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset\Parser;
+namespace App\Dataset\Registry;
 
 
 use App\Models\Source;

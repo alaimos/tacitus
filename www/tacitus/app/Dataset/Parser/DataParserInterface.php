@@ -7,43 +7,49 @@
 
 namespace App\Dataset\Parser;
 
-use App\Dataset\Descriptor;
-use App\Models\Job as JobData;
+use App\Dataset\DescriptorAwareInterface;
+use App\Dataset\JobDataAwareInterface;
+use App\Dataset\LogCallbackAwareInterface;
 
 /**
  * Interface DataParserInterface
  *
  * @package App\Dataset\Parser
  */
-interface DataParserInterface
+interface DataParserInterface extends DescriptorAwareInterface
 {
 
     /**
-     * Set the logger callback
+     * Initializes the parsing of all data files associated with a specific type
      *
-     * @param callable $callback
-     *
+     * @param string $type
      * @return \App\Dataset\Parser\DataParserInterface
+     * @throws \App\Dataset\Parser\Exception\DataParserException
      */
-    public function setLogCallback(callable $callback);
+    public function start($type);
 
     /**
-     * Set the job data object
+     * Parse one element. This function returns something until all the files have been parsed.
+     * A null output occurs when nothing to parse remain.
      *
-     * @param \App\Models\Job $jobData
-     *
-     * @return \App\Dataset\Parser\DataParserInterface
+     * @return mixed|null
+     * @throws \App\Dataset\Parser\Exception\DataParserException
      */
-    public function setJobData(JobData $jobData);
+    public function parse();
 
     /**
-     * Set a data descriptor object
+     * The total number of elements to parse in the current type or null if no element is being parsed.
      *
-     * @param Descriptor $descriptor
-     *
-     * @return \App\Dataset\Parser\DataParserInterface
+     * @return integer|null
      */
-    public function setDescriptor(Descriptor $descriptor);
+    public function count();
+
+    /**
+     * The index of the current element being parsed or null if no element is being parsed.
+     *
+     * @return integer|null
+     */
+    public function current();
 
 
 }

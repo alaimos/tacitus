@@ -7,8 +7,8 @@
 
 namespace App\Dataset\ModelFactory;
 
-use App\Dataset\Descriptor;
-use App\Models\Job as JobData;
+use App\Dataset\DescriptorAwareInterface;
+use App\Dataset\JobDataAwareInterface;
 use App\Models\Sample;
 
 /**
@@ -16,26 +16,8 @@ use App\Models\Sample;
  *
  * @package App\Dataset\Parser\Data
  */
-interface ModelFactoryInterface
+interface ModelFactoryInterface extends DescriptorAwareInterface, JobDataAwareInterface
 {
-
-    /**
-     * Set the job data object
-     *
-     * @param \App\Models\Job $jobData
-     *
-     * @return \App\Dataset\ModelFactory\ModelFactoryInterface
-     */
-    public function setJobData(JobData $jobData);
-
-    /**
-     * Set a data descriptor object
-     *
-     * @param Descriptor $descriptor
-     *
-     * @return \App\Dataset\ModelFactory\ModelFactoryInterface
-     */
-    public function setDescriptor(Descriptor $descriptor);
 
     /**
      * Get a Dataset object associated with the current descriptor.

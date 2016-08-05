@@ -7,24 +7,16 @@
 
 namespace App\Dataset\Downloader;
 
-use App\Models\Job as JobData;
+use App\Dataset\JobDataAwareInterface;
+use App\Dataset\LogCallbackAwareInterface;
 
 /**
  * Interface DownloaderInterface
  *
  * @package App\Dataset\Downloader
  */
-interface DownloaderInterface
+interface DownloaderInterface extends JobDataAwareInterface, LogCallbackAwareInterface
 {
-
-    /**
-     * Set the logger callback
-     *
-     * @param callable $callback
-     *
-     * @return \App\Dataset\Downloader\DownloaderInterface
-     */
-    public function setLogCallback(callable $callback);
 
     /**
      * Set the path where downloaded files will be stored
@@ -36,18 +28,10 @@ interface DownloaderInterface
     public function setDownloadDirectory($directory);
 
     /**
-     * Set the job data object
-     *
-     * @param \App\Models\Job $jobData
-     *
-     * @return \App\Dataset\Downloader\DownloaderInterface
-     */
-    public function setJobData(JobData $jobData);
-
-    /**
      * Run dataset download
      *
      * @return \App\Dataset\Descriptor
+     * @throws \App\Dataset\Downloader\Exception\DownloaderException
      */
     public function download();
 

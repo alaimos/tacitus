@@ -7,39 +7,33 @@
 
 namespace App\Dataset\Writer;
 
-use App\Dataset\Descriptor;
-use App\Models\Job as JobData;
+use App\Dataset\ModelFactoryAwareInterface;
 
 /**
  * Interface DatasetWriterInterface
  *
  * @package App\Dataset\ModelFactory
  */
-interface DatasetWriterInterface
+interface DatasetWriterInterface extends ModelFactoryAwareInterface
 {
 
     /**
-     * Set the logger callback
+     * Create and store a dataset in the database
      *
-     * @param callable $callback
-     * @return \App\Dataset\Writer\DatasetWriterInterface
+     * @return \App\Models\Dataset
+     * @throws \App\Dataset\Writer\Exception\DatasetWriterException
      */
-    public function setLogCallback(callable $callback);
+    public function writeDataset();
 
     /**
-     * Set the job data object
+     * Create and store something in the database
      *
-     * @param \App\Models\Job $jobData
-     * @return \App\Dataset\Writer\DatasetWriterInterface
+     * @param string $type
+     * @param mixed  $data
+     * @return object
+     * @throws \App\Dataset\Writer\Exception\DatasetWriterException
      */
-    public function setJobData(JobData $jobData);
+    public function write($type, $data);
 
-    /**
-     * Set a data descriptor object
-     *
-     * @param Descriptor $descriptor
-     * @return \App\Dataset\Writer\DatasetWriterInterface
-     */
-    public function setDescriptor(Descriptor $descriptor);
 
 }

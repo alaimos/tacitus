@@ -8,8 +8,8 @@
 namespace App\Dataset\ModelFactory;
 
 use App\Dataset\Descriptor;
-use App\Dataset\UseDescriptor;
-use App\Dataset\UseJobData;
+use App\Dataset\UseDescriptorTrait;
+use App\Dataset\UseJobDataTrait;
 use App\Models\Data;
 use App\Models\Job as JobData;
 use App\Models\Metadata;
@@ -18,12 +18,13 @@ use App\Models\Sample;
 
 /**
  * Class AbstractModelFactory
+ *
  * @package App\Dataset\ModelFactory
  */
 abstract class AbstractModelFactory implements ModelFactoryInterface
 {
 
-    use UseJobData, UseDescriptor;
+    use UseJobDataTrait, UseDescriptorTrait;
 
     /**
      * Create a new Data model

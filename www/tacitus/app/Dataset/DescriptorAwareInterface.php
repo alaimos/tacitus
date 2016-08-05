@@ -8,16 +8,12 @@
 namespace App\Dataset;
 
 /**
- * Class UseDescriptor
+ * Interface DescriptorAwareInterface
+ *
  * @package App\Dataset
  */
-trait UseDescriptor
+interface DescriptorAwareInterface
 {
-
-    /**
-     * @var \App\Dataset\Descriptor
-     */
-    protected $descriptor;
 
     /**
      * Set a data descriptor object
@@ -26,10 +22,13 @@ trait UseDescriptor
      *
      * @return $this
      */
-    public function setDescriptor(Descriptor $descriptor)
-    {
-        $this->descriptor = $descriptor;
-        return $this;
-    }
+    public function setDescriptor(Descriptor $descriptor);
+
+    /**
+     * Get the data descriptor object
+     *
+     * @return Descriptor
+     */
+    public function getDescriptor();
 
 }

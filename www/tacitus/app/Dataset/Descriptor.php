@@ -17,8 +17,10 @@ use \App\Models\Job as JobData;
 class Descriptor
 {
 
+    const TYPE_SAMPLE = 'sample';
     const TYPE_DATA = 'data';
     const TYPE_METADATA = 'metadata';
+    const TYPE_METADATA_INDEX = 'metadataIndex';
 
     /**
      * The job data model object
