@@ -24,7 +24,7 @@ class ParserFactoryRegistry
      * @var array
      */
     protected $classes = [
-
+        \App\Dataset\Factory\Parser\ArrayExpressParserFactory::class,
     ];
 
     /**
