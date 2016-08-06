@@ -89,7 +89,9 @@ abstract class AbstractDownloader implements DownloaderInterface
             mkdir($outputDirectory);
         }
         exec('unzip -d "' . $outputDirectory . '" "' . $fileName . '"');
-        return array_diff(scandir($outputDirectory), ['.', '..']);
+        return array_map(function ($x) use ($outputDirectory) {
+            return $outputDirectory . '/' . $x;
+        }, array_diff(scandir($outputDirectory), ['.', '..']));
     }
 
     /**
