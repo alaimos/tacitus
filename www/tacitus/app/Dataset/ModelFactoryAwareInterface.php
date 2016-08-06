@@ -7,7 +7,7 @@
 
 namespace App\Dataset;
 
-use App\Dataset\ModelFactory\ModelFactoryInterface;
+use App\Dataset\Factory\ModelFactoryInterface;
 
 
 /**
@@ -21,7 +21,7 @@ interface ModelFactoryAwareInterface
     /**
      * Set a model factory object
      *
-     * @param \App\Dataset\ModelFactory\ModelFactoryInterface $modelFactory
+     * @param \App\Dataset\Factory\ModelFactoryInterface $modelFactory
      * @return $this
      */
     public function setModelFactory(ModelFactoryInterface $modelFactory);
@@ -29,7 +29,7 @@ interface ModelFactoryAwareInterface
     /**
      * Get the model factory object
      *
-     * @return \App\Dataset\ModelFactory\ModelFactoryInterface
+     * @return \App\Dataset\Factory\ModelFactoryInterface
      */
     public function getModelFactory();
 

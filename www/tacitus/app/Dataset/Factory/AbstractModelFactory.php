@@ -5,7 +5,7 @@
  * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset\ModelFactory;
+namespace App\Dataset\Factory;
 
 use App\Dataset\Descriptor;
 use App\Dataset\UseDescriptorTrait;

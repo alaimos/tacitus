@@ -5,7 +5,7 @@
  * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset\Parser\Exception;
+namespace App\Dataset\Factory\Exception;
 
 /**
  * Class DataParserException

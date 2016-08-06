@@ -5,7 +5,7 @@
  * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset\Parser;
+namespace App\Dataset\Factory;
 
 
 use App\Dataset\Descriptor;
@@ -32,7 +32,7 @@ interface ParserFactoryInterface
      *
      * @param \App\Models\Job $jobData
      *
-     * @return \App\Dataset\Parser\ParserFactoryInterface
+     * @return \App\Dataset\Factory\ParserFactoryInterface
      */
     public function setJobData(JobData $jobData);
 
@@ -41,7 +41,7 @@ interface ParserFactoryInterface
      *
      * @param Descriptor $descriptor
      *
-     * @return \App\Dataset\Parser\ParserFactoryInterface
+     * @return \App\Dataset\Factory\ParserFactoryInterface
      */
     public function setDescriptor(Descriptor $descriptor);
 
@@ -55,14 +55,14 @@ interface ParserFactoryInterface
     /**
      * Get a data parser object
      *
-     * @return \App\Dataset\Parser\DataParserInterface
+     * @return \App\Dataset\Factory\DataParserInterface
      */
     public function getDataParser();
 
     /**
      * Get a model factory object
      *
-     * @return \App\Dataset\ModelFactory\ModelFactoryInterface
+     * @return \App\Dataset\Factory\ModelFactoryInterface
      */
     public function getDatasetModelFactory();
 
@@ -79,5 +79,12 @@ interface ParserFactoryInterface
      * @return callable
      */
     public function getLogCallback();
+
+    /**
+     * Get a sample registry object
+     *
+     * @return \App\Dataset\Registry\SampleRegistry
+     */
+    public function getSampleRegistry();
 
 }

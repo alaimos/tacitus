@@ -5,12 +5,14 @@
  * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset\Parser;
+namespace App\Dataset\Factory;
 
 use App\Dataset\DescriptorAwareInterface;
 use App\Dataset\JobDataAwareInterface;
 use App\Dataset\LogCallbackAwareInterface;
 use App\Dataset\ModelFactoryAwareInterface;
+use App\Dataset\Registry\SampleRegistry;
+use App\Dataset\SampleRegistryAwareInterface;
 use App\Dataset\UseDescriptorTrait;
 use App\Dataset\UseJobDataTrait;
 
@@ -55,6 +57,13 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
     protected $logCallback = null;
 
     /**
+     * Sample Registry
+     *
+     * @var null|\App\Dataset\Registry\SampleRegistry
+     */
+    protected $sampleRegistry = null;
+
+    /**
      * Are there uncommited logs?
      *
      * @var bool
@@ -68,11 +77,17 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
      */
     protected $instances = [];
 
+    /**
+     * A list of supported aware interfaces for automated dependency injection
+     *
+     * @var array
+     */
     protected $supportedAware = [
-        DescriptorAwareInterface::class   => ['getDescriptor', 'setDescriptor'],
-        JobDataAwareInterface::class      => ['getJobData', 'setJobData'],
-        LogCallbackAwareInterface::class  => ['getLogCallback', 'setLogCallback'],
-        ModelFactoryAwareInterface::class => ['getDatasetModelFactory', 'setModelFactory'],
+        DescriptorAwareInterface::class     => ['getDescriptor', 'setDescriptor'],
+        JobDataAwareInterface::class        => ['getJobData', 'setJobData'],
+        LogCallbackAwareInterface::class    => ['getLogCallback', 'setLogCallback'],
+        ModelFactoryAwareInterface::class   => ['getDatasetModelFactory', 'setModelFactory'],
+        SampleRegistryAwareInterface::class => ['getSampleRegistry', 'setSampleRegistry'],
     ];
 
 
@@ -117,6 +132,20 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
     }
 
     /**
+     * Get a sample registry object
+     *
+     * @return \App\Dataset\Registry\SampleRegistry
+     */
+    public function getSampleRegistry()
+    {
+        if ($this->sampleRegistry === null) {
+            $this->sampleRegistry = new SampleRegistry();
+        }
+        return $this->sampleRegistry;
+    }
+
+
+    /**
      * Get dataset downloader object
      *
      * @return \App\Dataset\Downloader\DownloaderInterface
@@ -129,7 +158,7 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
     /**
      * Get a data parser object
      *
-     * @return \App\Dataset\Parser\DataParserInterface
+     * @return \App\Dataset\Factory\DataParserInterface
      */
     public function getDataParser()
     {
@@ -139,7 +168,7 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
     /**
      * Get a model factory object
      *
-     * @return \App\Dataset\ModelFactory\ModelFactoryInterface
+     * @return \App\Dataset\Factory\ModelFactoryInterface
      */
     public function getDatasetModelFactory()
     {

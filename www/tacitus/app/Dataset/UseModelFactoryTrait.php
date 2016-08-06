@@ -6,7 +6,7 @@
  */
 
 namespace App\Dataset;
-use App\Dataset\ModelFactory\ModelFactoryInterface;
+use App\Dataset\Factory\ModelFactoryInterface;
 
 /**
  * Class UseModelFactory
@@ -19,14 +19,14 @@ trait UseModelFactoryTrait
     /**
      * Model factory
      *
-     * @var \App\Dataset\ModelFactory\ModelFactoryInterface
+     * @var \App\Dataset\Factory\ModelFactoryInterface
      */
     protected $modelFactory;
 
     /**
      * Set a model factory object
      *
-     * @param \App\Dataset\ModelFactory\ModelFactoryInterface $modelFactory
+     * @param \App\Dataset\Factory\ModelFactoryInterface $modelFactory
      * @return $this
      */
     public function setModelFactory(ModelFactoryInterface $modelFactory)
@@ -38,7 +38,7 @@ trait UseModelFactoryTrait
     /**
      * Get the model factory object
      *
-     * @return \App\Dataset\ModelFactory\ModelFactoryInterface
+     * @return \App\Dataset\Factory\ModelFactoryInterface
      */
     public function getModelFactory()
     {

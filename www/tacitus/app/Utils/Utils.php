@@ -7,40 +7,26 @@ class Utils
 {
 
     /**
-     * @param string        $source
-     * @param string        $target
-     * @param null|callable $outputCallback
+     * Delete a file or a directory
+     *
+     * @param string $path something to delete
      * @return bool
      */
-    public static function download($source, $target, $outputCallback = null)
+    public static function delete($path)
     {
-        $rh = fopen($source, 'rb');
-        $wh = fopen($target, 'w+b');
-        if (!$rh || !$wh) {
+        if (!file_exists($path)) {
             return false;
         }
-        $prev = 'Downloading';
-        $i = 1;
-        while (!feof($rh)) {
-            if (fwrite($wh, fread($rh, 4096)) === false) {
-                return false;
+        if (is_file($path)) {
+            return unlink($path);
+        } elseif (is_dir($path)) {
+            $files = array_diff(scandir($path), ['.', '..']);
+            foreach ($files as $file) {
+                self::delete($path . DIRECTORY_SEPARATOR . $file);
             }
-            if (is_callable($outputCallback)) {
-                if (($i % 3) == 0) {
-                    $prev = 'Downloading';
-                    $i = 1;
-                } else {
-                    $prev .= '.';
-                    $i++;
-                }
-                $outputCallback($prev . "\r");
-            }
-            flush();
+            return rmdir($path);
         }
-        $outputCallback('\n');
-        fclose($rh);
-        fclose($wh);
-        return true;
+        return false;
     }
 
 }

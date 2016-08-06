@@ -10,7 +10,12 @@ namespace App\Dataset\Registry;
 
 use App\Models\Source;
 
-class ParserRegistry
+/**
+ * Class ParserFactoryRegistry
+ *
+ * @package App\Dataset\Registry
+ */
+class ParserFactoryRegistry
 {
 
     /**
@@ -78,7 +83,7 @@ class ParserRegistry
      * Get parsers for a specific source
      *
      * @param Source|string $source
-     * @return \App\Dataset\Parser\ParserFactoryInterface[]|null
+     * @return \App\Dataset\Factory\ParserFactoryInterface[]|null
      */
     public function getParsers($source)
     {

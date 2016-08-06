@@ -8,13 +8,14 @@
 namespace App\Dataset\Writer;
 
 use App\Dataset\ModelFactoryAwareInterface;
+use App\Dataset\SampleRegistryAwareInterface;
 
 /**
  * Interface DatasetWriterInterface
  *
  * @package App\Dataset\ModelFactory
  */
-interface DatasetWriterInterface extends ModelFactoryAwareInterface
+interface DatasetWriterInterface extends ModelFactoryAwareInterface, SampleRegistryAwareInterface
 {
 
     /**

@@ -49,12 +49,13 @@ trait UseLogCallbackTrait
      * Write a message to the log
      *
      * @param string $message
+     * @param bool   $autoCommit
      * @return $this
      */
-    public function log($message)
+    public function log($message, $autoCommit = false)
     {
         if (is_callable($this->logCallback)) {
-            call_user_func($this->logCallback, $message);
+            call_user_func($this->logCallback, $message, $autoCommit);
         }
         return $this;
     }

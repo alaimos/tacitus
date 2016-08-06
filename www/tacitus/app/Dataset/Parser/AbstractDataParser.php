@@ -5,12 +5,12 @@
  * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset\Parser;
+namespace App\Dataset\Factory;
 
 use App\Dataset\DescriptorAwareInterface;
 use App\Dataset\JobDataAwareInterface;
 use App\Dataset\LogCallbackAwareInterface;
-use App\Dataset\Parser\Exception\DataParserException;
+use App\Dataset\Factory\Exception\DataParserException;
 use App\Dataset\UseDescriptorTrait;
 use App\Dataset\UseJobDataTrait;
 use App\Dataset\UseLogCallbackTrait;
@@ -205,8 +205,8 @@ abstract class AbstractDataParser implements DataParserInterface
      * Initializes the parsing of all data files associated with a specific type
      *
      * @param string $type
-     * @return \App\Dataset\Parser\DataParserInterface
-     * @throws \App\Dataset\Parser\Exception\DataParserException
+     * @return \App\Dataset\Factory\DataParserInterface
+     * @throws \App\Dataset\Factory\Exception\DataParserException
      */
     public function start($type)
     {
@@ -218,7 +218,7 @@ abstract class AbstractDataParser implements DataParserInterface
      * A null output occurs when nothing to parse remain.
      *
      * @return mixed|null
-     * @throws \App\Dataset\Parser\Exception\DataParserException
+     * @throws \App\Dataset\Factory\Exception\DataParserException
      */
     public function parse()
     {
@@ -260,7 +260,7 @@ abstract class AbstractDataParser implements DataParserInterface
      *
      * @param string $row
      * @return mixed
-     * @throws \App\Dataset\Parser\Exception\DataParserException
+     * @throws \App\Dataset\Factory\Exception\DataParserException
      */
     protected abstract function parser($row);
 

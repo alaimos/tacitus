@@ -27,16 +27,29 @@ class SampleRegistry
     protected $indexByName = [];
 
     /**
+     * A map from sample position to sample id
+     *
+     * @var array
+     */
+    protected $indexByPosition = [];
+
+    /**
      * Register a sample
      *
-     * @param Sample $sample
-     * @return \App\Dataset\Registry\SampleRegistry
+     * @param Sample       $sample
+     * @param null|integer $position
+     * @return SampleRegistry
      */
-    public function register(Sample $sample)
+    public function register(Sample $sample, $position = null)
     {
         $key = $sample->getKey();
         $this->samples[$key] = $sample;
         $this->indexByName[$sample->name] = $key;
+        if ($position !== null) {
+            $this->indexByPosition[$position] = $key;
+        } else {
+            $this->indexByPosition[] = $key;
+        }
         return $this;
     }
 
@@ -44,7 +57,7 @@ class SampleRegistry
      * Get a sample by its identifier
      *
      * @param integer $sampleId
-     * @return Sample|null
+     * @return \App\Models\Sample|null
      */
     public function get($sampleId)
     {
@@ -55,11 +68,22 @@ class SampleRegistry
      * Get a sample by its name
      *
      * @param string $sampleName
-     * @return Sample|null
+     * @return \App\Models\Sample|null
      */
     public function getByName($sampleName)
     {
         return (isset($this->indexByName[$sampleName])) ? $this->get($this->indexByName[$sampleName]) : null;
+    }
+
+    /**
+     * Get a sample by its position
+     *
+     * @param integer $position
+     * @return \App\Models\Sample|null
+     */
+    public function getByPosition($position)
+    {
+        return (isset($this->indexByPosition[$position])) ? $this->get($this->indexByPosition[$position]) : null;
     }
 
 }

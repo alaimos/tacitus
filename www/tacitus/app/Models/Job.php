@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use app\Utils\Utils;
 use Illuminate\Database\Eloquent\Model;
+use League\Flysystem\Util;
 
 /**
  * App\Models\Job
@@ -48,5 +50,29 @@ class Job extends Model
     protected $fillable = [
         'job_type', 'status', 'job_data'
     ];
+
+    /**
+     * Returns the path of the job storage directory
+     *
+     * @return string
+     */
+    public function getJobDirectory()
+    {
+        $path = storage_path('app/jobs/' . $this->id);
+        if (!file_exists($path)) {
+            mkdir($path, 0777, true);
+        }
+        return $path;
+    }
+
+    /**
+     * Delete the job directory
+     *
+     * @return bool
+     */
+    public function deleteJobDirectory()
+    {
+        return Utils::delete($this->getJobDirectory());
+    }
 
 }
