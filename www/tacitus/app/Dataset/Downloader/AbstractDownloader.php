@@ -105,7 +105,7 @@ abstract class AbstractDownloader implements DownloaderInterface
         if (!file_exists($outputDirectory)) {
             mkdir($outputDirectory);
         }
-        //exec('unzip -o -d ' . escapeshellarg($outputDirectory) . ' ' . escapeshellarg($fileName)); //@TODO remove
+        //exec('unzip -o -d ' . escapeshellarg($outputDirectory) . ' ' . escapeshellarg($fileName));
         return array_map(function ($x) use ($outputDirectory) {
             return $outputDirectory . '/' . $x;
         }, array_diff(scandir($outputDirectory), ['.', '..']));

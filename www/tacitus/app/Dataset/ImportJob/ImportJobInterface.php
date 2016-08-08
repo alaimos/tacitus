@@ -39,7 +39,7 @@ interface ImportJobInterface extends JobDataAwareInterface, LogCallbackAwareInte
     /**
      * Runs an import job.
      *
-     * @return void
+     * @return boolean
      * @throws \App\Dataset\Downloader\Exception\DownloaderException
      * @throws \App\Dataset\Writer\Exception\DatasetWriterException
      * @throws \App\Dataset\Parser\Exception\DataParserException

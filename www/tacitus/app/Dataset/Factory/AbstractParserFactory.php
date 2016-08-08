@@ -21,6 +21,8 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
 
     use UseJobDataTrait, UseDescriptorTrait;
 
+    const DEBUG = true;
+
     /**
      * Class name of the downloader object
      *
@@ -132,6 +134,9 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
                     $this->uncommitedLog = true;
                 } else {
                     $this->jobData->save();
+                }
+                if (self::DEBUG) {
+                    echo $message;
                 }
             };
         }

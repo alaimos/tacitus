@@ -28,7 +28,7 @@ class DefaultDatasetWriter extends AbstractDatasetWriter
      */
     public function writeSample($data)
     {
-        if (!$this->is2DArray($data)) {
+        if ($this->is2DArray($data)) {
             throw new DatasetWriterException('Bulk insertion is not supported for samples.');
         }
         $this->currentSample = $this->modelFactory->getSample($data['name']);
@@ -54,11 +54,12 @@ class DefaultDatasetWriter extends AbstractDatasetWriter
                 $sample = $this->getSample($item);
                 $this->removeSample($item);
                 $item['sample_id'] = $sample->getKey();
+                return $item;
             }, array_filter($data, function ($item) {
                 return (is_array($item) && isset($item['probe']) && isset($item['value'])
                         && $this->getSample($item) !== null);
             }));
-            return Data::insertMany($data);
+            return with(new Data)->insertMany($data);
         }
     }
 
@@ -80,11 +81,12 @@ class DefaultDatasetWriter extends AbstractDatasetWriter
                 $sample = $this->getSample($item);
                 $this->removeSample($item);
                 $item['sample_id'] = $sample->getKey();
+                return $item;
             }, array_filter($data, function ($item) {
                 return (is_array($item) && isset($item['name']) && isset($item['value'])
                         && $this->getSample($item) !== null);
             }));
-            return Metadata::insertMany($data);
+            return with(new Metadata)->insertMany($data);
         }
     }
 
@@ -104,10 +106,11 @@ class DefaultDatasetWriter extends AbstractDatasetWriter
             $data = array_map(function ($item) {
                 $this->removeSample($item);
                 $item['dataset_id'] = $this->dataset->id;
+                return $item;
             }, array_filter($data, function ($item) {
                 return (is_array($item) && isset($item['name']));
             }));
-            return MetadataIndex::insertMany($data);
+            return with(new MetadataIndex)->insertMany($data);
         }
     }
 

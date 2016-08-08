@@ -53,7 +53,6 @@ class ArrayExpressDownloader extends AbstractDownloader
     {
         $url = sprintf(self::DATASET_INFO_URL, $this->getDatasetId());
         $this->log('Loading dataset description', true);
-        echo $url;
         $data = json_decode(file_get_contents($url), true);
         if (is_array($data) && isset($data['experiments']) && is_array($data['experiments'])
             && isset($data['experiments']['experiment'])
