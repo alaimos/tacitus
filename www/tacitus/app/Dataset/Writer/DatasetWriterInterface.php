@@ -27,11 +27,13 @@ interface DatasetWriterInterface extends ModelFactoryAwareInterface, SampleRegis
     public function writeDataset();
 
     /**
-     * Create and store something in the database
+     * Create and store something in the database.
+     * Returns a model object if only one element has to be written. Otherwise it will return a boolean indicating
+     * whether the operation was successful or not.
      *
      * @param string $type
      * @param mixed  $data
-     * @return object
+     * @return object|boolean
      * @throws \App\Dataset\Writer\Exception\DatasetWriterException
      */
     public function write($type, $data);

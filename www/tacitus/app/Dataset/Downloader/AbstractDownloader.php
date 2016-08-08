@@ -10,6 +10,7 @@ namespace App\Dataset\Downloader;
 use App\Dataset\Downloader\Exception\DownloaderException;
 use App\Dataset\UseJobDataTrait;
 use App\Dataset\UseLogCallbackTrait;
+use App\Utils\Utils;
 
 /**
  * Class AbstractDownloader
@@ -50,20 +51,36 @@ abstract class AbstractDownloader implements DownloaderInterface
      */
     protected function downloadFile($source, $targetFileName)
     {
-        $this->log('Downloading "' . $targetFileName . '" from "' . $source . '"', true);
+        $targetFileName = $this->downloadDirectory . '/' . $targetFileName;
+        $size = Utils::getDownloadSize($source);
+        $displaySize = Utils::displaySize($size);
+        $this->log('Downloading "' . $targetFileName . '" from "' . $source . '" (' . $displaySize . ')', true);
+        if (file_exists($targetFileName)) { //File caching
+            $this->log("...Already downloaded!\n", true);
+            return true;
+        }
         $rh = fopen($source, 'rb');
-        $wh = fopen($this->downloadDirectory . '/' . $targetFileName, 'w+b');
+        $wh = fopen($targetFileName, 'w+b');
         if (!$rh) {
             throw new DownloaderException("Unable to open source file");
         }
         if (!$wh) {
             throw new DownloaderException("Unable to open destination file");
         }
+        $size = (float)$size;
+        $currentByte = 0;
+        $prevPercentage = 0;
         while (!feof($rh)) {
-            if ($tmp = fread($rh, 4096) !== false) {
-                if (fwrite($wh, $tmp) === false) {
+            if (($tmp = fread($rh, 8192)) !== false) {
+                if (fwrite($wh, $tmp, 8192) === false) {
                     throw new DownloaderException("Unable to write to destination");
                 }
+                $currentByte += strlen($tmp);
+                $percentage = floor(min(100, ((float)$currentByte / $size) * 100));
+                if (($percentage % 10) == 0 && $percentage != 100 && $percentage != $prevPercentage) {
+                    $this->log('...' . $percentage . '%', true);
+                }
+                $prevPercentage = $percentage;
             } else {
                 throw new DownloaderException("Unable to read from source");
             }
@@ -88,7 +105,7 @@ abstract class AbstractDownloader implements DownloaderInterface
         if (!file_exists($outputDirectory)) {
             mkdir($outputDirectory);
         }
-        exec('unzip -d "' . $outputDirectory . '" "' . $fileName . '"');
+        //exec('unzip -o -d ' . escapeshellarg($outputDirectory) . ' ' . escapeshellarg($fileName)); //@TODO remove
         return array_map(function ($x) use ($outputDirectory) {
             return $outputDirectory . '/' . $x;
         }, array_diff(scandir($outputDirectory), ['.', '..']));
@@ -105,7 +122,7 @@ abstract class AbstractDownloader implements DownloaderInterface
         $fileName = $this->downloadDirectory . '/' . $fileName;
         $outputDirectory = dirname($fileName);
         $base = scandir($outputDirectory);
-        exec('gunzip "' . $fileName . '"');
+        exec('gunzip -f ' . escapeshellarg($fileName));
         return array_diff(scandir($outputDirectory), $base);
     }
 

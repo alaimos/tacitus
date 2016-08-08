@@ -5,7 +5,7 @@
  * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset\Factory;
+namespace App\Dataset\Parser;
 
 use App\Dataset\DescriptorAwareInterface;
 use App\Dataset\JobDataAwareInterface;
@@ -23,8 +23,8 @@ interface DataParserInterface extends DescriptorAwareInterface
      * Initializes the parsing of all data files associated with a specific type
      *
      * @param string $type
-     * @return \App\Dataset\Factory\DataParserInterface
-     * @throws \App\Dataset\Factory\Exception\DataParserException
+     * @return \App\Dataset\Parser\DataParserInterface
+     * @throws \App\Dataset\Parser\Exception\DataParserException
      */
     public function start($type);
 
@@ -33,7 +33,7 @@ interface DataParserInterface extends DescriptorAwareInterface
      * A null output occurs when nothing to parse remain.
      *
      * @return mixed|null
-     * @throws \App\Dataset\Factory\Exception\DataParserException
+     * @throws \App\Dataset\Parser\Exception\DataParserException
      */
     public function parse();
 

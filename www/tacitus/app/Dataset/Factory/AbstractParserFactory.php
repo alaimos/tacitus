@@ -50,6 +50,13 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
     protected $datasetWriterClass;
 
     /**
+     * Class name of the real importer object
+     *
+     * @var string
+     */
+    protected $importJobClass;
+
+    /**
      * Log callback
      *
      * @var callable
@@ -158,7 +165,7 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
     /**
      * Get a data parser object
      *
-     * @return \App\Dataset\Factory\DataParserInterface
+     * @return \App\Dataset\Parser\DataParserInterface
      */
     public function getDataParser()
     {
@@ -184,6 +191,17 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
     {
         return $this->buildObject($this->datasetWriterClass);
     }
+
+    /**
+     * Get the real handler for the import job
+     *
+     * @return \App\Dataset\ImportJob\ImportJobInterface
+     */
+    public function getRealImporter()
+    {
+        return $this->buildObject($this->importJobClass)->setParserFactory($this);
+    }
+
 
     /**
      * Commit uncommited logs

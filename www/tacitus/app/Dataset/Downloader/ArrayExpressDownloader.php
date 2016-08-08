@@ -53,6 +53,7 @@ class ArrayExpressDownloader extends AbstractDownloader
     {
         $url = sprintf(self::DATASET_INFO_URL, $this->getDatasetId());
         $this->log('Loading dataset description', true);
+        echo $url;
         $data = json_decode(file_get_contents($url), true);
         if (is_array($data) && isset($data['experiments']) && is_array($data['experiments'])
             && isset($data['experiments']['experiment'])
@@ -83,6 +84,8 @@ class ArrayExpressDownloader extends AbstractDownloader
         if (is_array($data) && isset($data['files']) && is_array($data['files'])
             && isset($data['files']['experiment'])
             && is_array($data['files']['experiment'])
+            && isset($data['files']['experiment']['file'])
+            && is_array($data['files']['experiment']['file'])
         ) {
             $experiment = $data['files']['experiment'];
             $files = [
@@ -132,7 +135,7 @@ class ArrayExpressDownloader extends AbstractDownloader
                 $this->downloadFile($file['url'], $file['name']);
                 if ($file['extension'] == 'zip') {
                     $this->log('Extracting "' . $file['name'] . '"', true);
-                    $extracted = $this->unzipFile($file['name'], basename($files['name']) . '_out');
+                    $extracted = $this->unzipFile($file['name'], basename($file['name']) . '_out');
                     if (!count($extracted)) {
                         throw new DownloaderException('Unable to extract file content.');
                     }
@@ -143,10 +146,12 @@ class ArrayExpressDownloader extends AbstractDownloader
                         }
                     }
                 } else {
-                    $descriptor->addFile($file['name'], $this->kindsToTypeMap[$kind]);
+                    $path = $this->downloadDirectory . '/' . $file['name'];
+                    $descriptor->addFile($path, $this->kindsToTypeMap[$kind]);
                 }
             }
         }
+        $descriptor->addFile($descriptor->getFiles(Descriptor::TYPE_METADATA), Descriptor::TYPE_METADATA_INDEX);
         return $descriptor;
     }
 }

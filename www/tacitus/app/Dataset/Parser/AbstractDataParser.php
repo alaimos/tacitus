@@ -5,15 +5,10 @@
  * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset\Factory;
+namespace App\Dataset\Parser;
 
-use App\Dataset\DescriptorAwareInterface;
-use App\Dataset\JobDataAwareInterface;
-use App\Dataset\LogCallbackAwareInterface;
-use App\Dataset\Factory\Exception\DataParserException;
+use App\Dataset\Parser\Exception\DataParserException;
 use App\Dataset\UseDescriptorTrait;
-use App\Dataset\UseJobDataTrait;
-use App\Dataset\UseLogCallbackTrait;
 
 /**
  * Class AbstractDataParser
@@ -68,6 +63,13 @@ abstract class AbstractDataParser implements DataParserInterface
     protected $skipToNextFile = false;
 
     /**
+     * Signal parser to skip the first line of each file
+     *
+     * @var bool
+     */
+    protected $skipFirstLine = false;
+
+    /**
      * The current file pointer
      *
      * @var null|resource
@@ -80,15 +82,19 @@ abstract class AbstractDataParser implements DataParserInterface
      * @param string $file
      * @return integer
      */
-    protected static function countLines($file)
+    protected function countLines($file)
     {
-        $f = fopen($file, 'rb');
+        return intval(exec('wc -l ' . escapeshellarg($file)));
+        /*$f = fopen($file, 'rb');
         $lines = 0;
         while (!feof($f)) {
             $lines += substr_count(fread($f, 8192), "\n");
         }
         fclose($f);
-        return $lines;
+        if ($lines > 0 && $this->skipFirstLine) {
+            $lines -= 1;
+        }
+        return $lines;*/
     }
 
     /**
@@ -145,7 +151,7 @@ abstract class AbstractDataParser implements DataParserInterface
     {
         $this->totalCount = 0;
         foreach ($this->files as $file) {
-            $this->totalCount += self::countLines($file);
+            $this->totalCount += $this->countLines($file);
         }
         $this->currentIndex = 0;
         return $this;
@@ -161,6 +167,7 @@ abstract class AbstractDataParser implements DataParserInterface
         if ($this->currentFilePointer !== null && is_resource($this->currentFilePointer)) {
             @fclose($this->currentFilePointer);
         }
+        $this->skipToNextFile = false;
         $this->currentFilePointer = null;
         return $this;
     }
@@ -196,6 +203,9 @@ abstract class AbstractDataParser implements DataParserInterface
             if (!$this->currentFilePointer) {
                 throw new DataParserException('Unable to open file "' . $this->currentFile . '".');
             }
+            if ($this->skipFirstLine) {
+                fgets($this->currentFilePointer);
+            }
             return $this->currentFilePointer;
         }
         return null;
@@ -205,8 +215,8 @@ abstract class AbstractDataParser implements DataParserInterface
      * Initializes the parsing of all data files associated with a specific type
      *
      * @param string $type
-     * @return \App\Dataset\Factory\DataParserInterface
-     * @throws \App\Dataset\Factory\Exception\DataParserException
+     * @return \App\Dataset\Parser\DataParserInterface
+     * @throws \App\Dataset\Parser\Exception\DataParserException
      */
     public function start($type)
     {
@@ -218,7 +228,7 @@ abstract class AbstractDataParser implements DataParserInterface
      * A null output occurs when nothing to parse remain.
      *
      * @return mixed|null
-     * @throws \App\Dataset\Factory\Exception\DataParserException
+     * @throws \App\Dataset\Parser\Exception\DataParserException
      */
     public function parse()
     {
@@ -228,8 +238,6 @@ abstract class AbstractDataParser implements DataParserInterface
             if ($row !== false) {
                 $this->currentIndex++;
                 return $this->parser($row);
-            } else {
-                throw new DataParserException('Unexpected empty result of fgets for file "' . $this->currentFile . '".');
             }
         }
         return null;
@@ -260,8 +268,19 @@ abstract class AbstractDataParser implements DataParserInterface
      *
      * @param string $row
      * @return mixed
-     * @throws \App\Dataset\Factory\Exception\DataParserException
+     * @throws \App\Dataset\Parser\Exception\DataParserException
      */
     protected abstract function parser($row);
+
+    /**
+     * Class Destructor
+     *
+     * @return void
+     */
+    function __destruct()
+    {
+        $this->closeCurrentFilePointer();
+    }
+
 
 }

@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Utils\BulkInsertableInterface;
+use App\Utils\BulkModelInsertTrait;
 use Jenssegers\Mongodb\Eloquent\Model as Model;
 
 /**
@@ -16,8 +18,10 @@ use Jenssegers\Mongodb\Eloquent\Model as Model;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Metadata whereValue($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Metadata whereSampleId($value)
  */
-class Data extends Model
+class Data extends Model implements BulkInsertableInterface
 {
+
+    use BulkModelInsertTrait;
 
     /**
      * The connection name for the model.

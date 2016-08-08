@@ -34,6 +34,8 @@ class RolesTableSeeder extends Seeder
     {
         $this->makeRole('admin', 'Administrator', [
             'user-panels',
+            'view-all-datasets',
+            'use-all-datasets'
         ], 'WebApp Administrator')->makeRole('user', 'User', [
             'user-panels',
         ], 'WebApp User');

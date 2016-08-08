@@ -7,18 +7,11 @@
 
 namespace App\Dataset\Factory\Parser;
 
-use App\Dataset\DescriptorAwareInterface;
 use App\Dataset\Downloader\ArrayExpressDownloader;
 use App\Dataset\Factory\AbstractParserFactory;
-use App\Dataset\Factory\ArrayExpressDataParser;
 use App\Dataset\Factory\Model\ArrayExpressModelFactory;
-use App\Dataset\JobDataAwareInterface;
-use App\Dataset\LogCallbackAwareInterface;
-use App\Dataset\ModelFactoryAwareInterface;
-use App\Dataset\Registry\SampleRegistry;
-use App\Dataset\SampleRegistryAwareInterface;
-use App\Dataset\UseDescriptorTrait;
-use App\Dataset\UseJobDataTrait;
+use App\Dataset\ImportJob\ArrayExpressImportJob;
+use App\Dataset\Parser\ArrayExpressDataParser;
 use App\Dataset\Writer\DefaultDatasetWriter;
 
 class ArrayExpressParserFactory extends AbstractParserFactory
@@ -51,6 +44,13 @@ class ArrayExpressParserFactory extends AbstractParserFactory
      * @var string
      */
     protected $datasetWriterClass = DefaultDatasetWriter::class;
+
+    /**
+     * Class name of the real importer object
+     *
+     * @var string
+     */
+    protected $importJobClass = ArrayExpressImportJob::class;
 
     /**
      * Register this object. Returns the list of data sources this parser is able to handle.

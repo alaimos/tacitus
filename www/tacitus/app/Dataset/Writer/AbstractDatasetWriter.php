@@ -52,6 +52,17 @@ abstract class AbstractDatasetWriter implements DatasetWriterInterface
     }
 
     /**
+     * Checks if an array appears to be 2-dimensional
+     *
+     * @param array $data
+     * @return bool
+     */
+    protected function is2DArray(array $data)
+    {
+        return (is_array(reset($data)));
+    }
+
+    /**
      * Get a sample object from a data array, looking up at the sample registry if needed.
      *
      * @param array $data
@@ -79,6 +90,28 @@ abstract class AbstractDatasetWriter implements DatasetWriterInterface
             $sample = $this->sampleRegistry->getByPosition($data['samplePosition']);
         }
         return ($sample === null) ? $this->currentSample : $sample;
+    }
+
+    /**
+     * Remove sample object from a data array
+     *
+     * @param array $data
+     * @return void
+     */
+    protected function removeSample(array &$data)
+    {
+        if (isset($data['sample'])) {
+            unset($data['sample']);
+        }
+        if (isset($data['sampleId'])) {
+            unset($data['sampleId']);
+        }
+        if (isset($data['sampleName'])) {
+            unset($data['sampleName']);
+        }
+        if (isset($data['samplePosition'])) {
+            unset($data['samplePosition']);
+        }
     }
 
     /**

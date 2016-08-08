@@ -29,6 +29,8 @@ class PermissionsTableSeeder extends Seeder
      */
     public function run()
     {
-        $this->makePermission('user-panels', 'View user panels');
+        $this->makePermission('user-panels', 'View user panels')
+            ->makePermission('view-all-datasets', 'View all datasets')
+            ->makePermission('use-all-datasets', 'Use all datasets');
     }
 }

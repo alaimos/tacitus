@@ -83,8 +83,11 @@ class Descriptor
             if (!isset($this->files[$type])) {
                 $this->files[$type] = [];
             }
-            $this->files[$type][] = realpath($localPath);
-            $this->files[$type] = array_unique($this->files[$type]);
+            $localPath = realpath($localPath);
+            if ($localPath) {
+                $this->files[$type][] = $localPath;
+                $this->files[$type] = array_unique($this->files[$type]);
+            }
         }
         return $this;
     }

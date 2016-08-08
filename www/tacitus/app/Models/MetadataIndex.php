@@ -2,6 +2,8 @@
 
 namespace App\Models;
 
+use App\Utils\BulkInsertableInterface;
+use App\Utils\BulkModelInsertTrait;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -10,8 +12,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property integer                  $id
  * @property string                   $name
  * @property integer                  $dataset_id
- * @property \Carbon\Carbon           $created_at
- * @property \Carbon\Carbon           $updated_at
  * @property-read \App\Models\Dataset $dataset
  * @method static \Illuminate\Database\Query\Builder|\App\Models\MetadataIndex whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\MetadataIndex whereName($value)
@@ -20,8 +20,17 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\MetadataIndex whereUpdatedAt($value)
  * @mixin \Eloquent
  */
-class MetadataIndex extends Model
+class MetadataIndex extends Model implements BulkInsertableInterface
 {
+
+    use BulkModelInsertTrait;
+
+    /**
+     * Indicates if the model should be timestamped.
+     *
+     * @var bool
+     */
+    public $timestamps = false;
 
     /**
      * The table associated with the model.

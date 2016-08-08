@@ -55,7 +55,7 @@ interface ParserFactoryInterface
     /**
      * Get a data parser object
      *
-     * @return \App\Dataset\Factory\DataParserInterface
+     * @return \App\Dataset\Parser\DataParserInterface
      */
     public function getDataParser();
 
@@ -86,5 +86,12 @@ interface ParserFactoryInterface
      * @return \App\Dataset\Registry\SampleRegistry
      */
     public function getSampleRegistry();
+
+    /**
+     * Get the real handler for the import job
+     *
+     * @return \App\Dataset\ImportJob\ImportJobInterface
+     */
+    public function getRealImporter();
 
 }

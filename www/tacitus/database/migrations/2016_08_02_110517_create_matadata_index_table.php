@@ -17,7 +17,6 @@ class CreateMatadataIndexTable extends Migration
             $table->string('name');
             $table->integer('dataset_id')->unsigned()->index();
             $table->foreign('dataset_id')->references('id')->on('datasets')->onDelete('cascade')->onUpdate('cascade');
-            $table->timestamps();
         });
     }
 

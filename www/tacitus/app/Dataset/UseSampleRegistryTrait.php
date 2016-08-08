@@ -41,7 +41,7 @@ trait UseSampleRegistryTrait
      *
      * @return \App\Dataset\Registry\SampleRegistry
      */
-    public function getModelFactory()
+    public function getSampleRegistry()
     {
         return $this->sampleRegistry;
     }

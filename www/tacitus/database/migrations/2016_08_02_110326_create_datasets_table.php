@@ -18,6 +18,7 @@ class CreateDatasetsTable extends Migration
             $table->integer('source_id')->unsigned()->index();
             $table->foreign('source_id')->references('id')->on('sources')->onDelete('cascade')
                 ->onUpdate('cascade');
+            $table->index(['original_id', 'source_id'], 'original_and_source_id_index');
             $table->integer('user_id')->unsigned()->index();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade')
                 ->onUpdate('cascade');
