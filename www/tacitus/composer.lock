@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "c1fdc8bccf91dcb565048cad9f66b50a",
-    "content-hash": "8cb267e0d6d8c4d2d62c6d6cf47c43bf",
+    "hash": "7d860ee4f8c807cedb530bbfebdee017",
+    "content-hash": "1e405395134ede7f9e8abbd011c850b0",
     "packages": [
         {
             "name": "barryvdh/laravel-debugbar",
@@ -1240,16 +1240,16 @@
         },
         {
             "name": "laravel/framework",
-            "version": "5.2.41",
+            "version": "v5.2.42",
             "source": {
                 "type": "git",
                 "url": "https://github.com/laravel/framework.git",
-                "reference": "29ba2e310cfeb42ab6545bcd81ff4c2ec1f6b5c2"
+                "reference": "d1bf46f359d2ede2d4ef847fb79d3758d868f2b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/laravel/framework/zipball/29ba2e310cfeb42ab6545bcd81ff4c2ec1f6b5c2",
-                "reference": "29ba2e310cfeb42ab6545bcd81ff4c2ec1f6b5c2",
+                "url": "https://api.github.com/repos/laravel/framework/zipball/d1bf46f359d2ede2d4ef847fb79d3758d868f2b7",
+                "reference": "d1bf46f359d2ede2d4ef847fb79d3758d868f2b7",
                 "shasum": ""
             },
             "require": {
@@ -1366,7 +1366,7 @@
                 "framework",
                 "laravel"
             ],
-            "time": "2016-07-20 13:13:06"
+            "time": "2016-08-08 13:39:44"
         },
         {
             "name": "laravelcollective/html",
@@ -2450,16 +2450,16 @@
         },
         {
             "name": "spatie/laravel-backup",
-            "version": "3.8.2",
+            "version": "3.9.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-backup.git",
-                "reference": "8ba56fe3cc540430f71df0a4382dbe4bb95acdfe"
+                "reference": "89750fb1a836d829caa8f9b1851608c31094848b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-backup/zipball/8ba56fe3cc540430f71df0a4382dbe4bb95acdfe",
-                "reference": "8ba56fe3cc540430f71df0a4382dbe4bb95acdfe",
+                "url": "https://api.github.com/repos/spatie/laravel-backup/zipball/89750fb1a836d829caa8f9b1851608c31094848b",
+                "reference": "89750fb1a836d829caa8f9b1851608c31094848b",
                 "shasum": ""
             },
             "require": {
@@ -2477,6 +2477,7 @@
                 "phpunit/phpunit": "^4.8"
             },
             "suggest": {
+                "irazasyed/telegram-bot-sdk": "Allows notifications to be sent using Telegram Bot",
                 "maknz/slack": "Allows notifications to be sent via Slack"
             },
             "type": "library",
@@ -2508,7 +2509,7 @@
                 "laravel-backup",
                 "spatie"
             ],
-            "time": "2016-07-27 15:39:22"
+            "time": "2016-08-07 10:37:03"
         },
         {
             "name": "sun/laravel-flash",

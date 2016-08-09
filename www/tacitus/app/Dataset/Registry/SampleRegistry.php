@@ -47,8 +47,12 @@ class SampleRegistry
         $this->indexByName[$sample->name] = $key;
         if ($position !== null) {
             $this->indexByPosition[$position] = $key;
+            $sample->position = $position;
+            $sample->save();
         } else {
             $this->indexByPosition[] = $key;
+            $sample->position = count($this->indexByPosition) - 1;
+            $sample->save();
         }
         return $this;
     }

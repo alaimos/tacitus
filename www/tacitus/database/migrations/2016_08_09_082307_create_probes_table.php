@@ -3,7 +3,7 @@
 use Jenssegers\Mongodb\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateSamplesTable extends Migration
+class CreateProbesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,10 +12,11 @@ class CreateSamplesTable extends Migration
      */
     public function up()
     {
-        Schema::connection('mongodb')->create('samples', function (Blueprint $table) {
+        Schema::connection('mongodb')->create('probes', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name');
-            $table->integer('position');
+            $table->index('name', ['name' => 'probe_name_index']);
+            $table->json('data');
             $table->integer('dataset_id')->unsigned();
             $table->index('dataset_id', ['name' => 'samples_dataset_id_index']);
             $table->foreign('dataset_id')->references('id')->on('datasets')->onDelete('cascade')->onUpdate('cascade');
@@ -29,6 +30,6 @@ class CreateSamplesTable extends Migration
      */
     public function down()
     {
-        Schema::connection('mongodb')->drop('samples');
+        Schema::connection('mongodb')->drop('probes');
     }
 }

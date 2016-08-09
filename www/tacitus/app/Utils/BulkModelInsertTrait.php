@@ -31,7 +31,7 @@ trait BulkModelInsertTrait
                 $item[self::UPDATED_AT] = $now;
             });
         }
-        return $this->getConnection()->table($this->getTable())->insert($items);
+        $this->getConnection()->table($this->getTable())->insert($items);
     }
 
 }

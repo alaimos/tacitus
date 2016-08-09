@@ -33,6 +33,7 @@ class DefaultDatasetWriter extends AbstractDatasetWriter
         }
         $this->currentSample = $this->modelFactory->getSample($data['name']);
         $this->currentSample->save();
+        $this->sampleRegistry->register($this->currentSample);
         return $this->currentSample;
     }
 
@@ -40,27 +41,21 @@ class DefaultDatasetWriter extends AbstractDatasetWriter
      * Write a Data object
      *
      * @param mixed $data
-     * @return \App\Models\Data|boolean
+     * @return \App\Models\Probe|boolean
      */
     public function writeData($data)
     {
-        if (!$this->is2DArray($data)) {
-            $sample = $this->getSample($data);
-            $dataModel = $this->modelFactory->getData($data['probe'], $data['value'], $sample);
-            $dataModel->save();
-            return $dataModel;
-        } else {
-            $data = array_map(function ($item) {
-                $sample = $this->getSample($item);
-                $this->removeSample($item);
-                $item['sample_id'] = $sample->getKey();
-                return $item;
-            }, array_filter($data, function ($item) {
-                return (is_array($item) && isset($item['probe']) && isset($item['value'])
-                        && $this->getSample($item) !== null);
-            }));
-            return with(new Data)->insertMany($data);
+        if ($this->is2DArray($data)) {
+            foreach ($data as $probe) {
+                if (is_array($probe) && isset($probe['name']) && isset($probe['data']) && is_array($probe['data'])) {
+                    $this->writeData($probe);
+                }
+            }
+            return true;
         }
+        $probe = $this->modelFactory->getProbe($data['name'], $data['data']);
+        $probe->save();
+        return $probe;
     }
 
     /**

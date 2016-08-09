@@ -9,6 +9,7 @@ use Jenssegers\Mongodb\Eloquent\Model as Model;
  *
  * @mixin \Eloquent
  * @property string                                                               $name
+ * @property integer                                                              $position
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Metadata[] $metadata
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Data[]     $data
  * @property-read \App\Models\Dataset                                             $dataset
@@ -38,7 +39,7 @@ class Sample extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'dataset_id'
+        'name', 'position', 'dataset_id'
     ];
 
     /**

@@ -9,6 +9,7 @@ namespace App\Dataset\Factory;
 
 use App\Dataset\DescriptorAwareInterface;
 use App\Dataset\JobDataAwareInterface;
+use App\Models\Dataset;
 use App\Models\Sample;
 
 /**
@@ -28,15 +29,13 @@ interface ModelFactoryInterface extends DescriptorAwareInterface, JobDataAwareIn
     public function getDataset();
 
     /**
-     * Create a new Data model
+     * Create a new Probe model
      *
-     * @param string             $probe
-     * @param string             $value
-     * @param \App\Models\Sample $sample
-     *
-     * @return \App\Models\Data
+     * @param string $name
+     * @param array  $data
+     * @return \App\Models\Probe
      */
-    public function getData($probe, $value, Sample $sample);
+    public function getProbe($name, $data);
 
     /**
      * Create a new Metadata Model

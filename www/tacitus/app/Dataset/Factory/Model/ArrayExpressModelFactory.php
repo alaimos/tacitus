@@ -28,6 +28,11 @@ class ArrayExpressModelFactory extends AbstractModelFactory
     protected $source;
 
     /**
+     * @var \App\Models\Dataset
+     */
+    protected $dataset = null;
+
+    /**
      * ArrayExpressModelFactory constructor.
      */
     public function __construct()
@@ -43,31 +48,34 @@ class ArrayExpressModelFactory extends AbstractModelFactory
      */
     public function getDataset()
     {
-        $descriptors = $this->descriptor->getDescriptors();
-        $dataset = Dataset::whereOriginalId($descriptors['id'])->whereOriginalId($this->source->id)->first();
-        if ($dataset !== null && $dataset instanceof Dataset) {
-            if (!$dataset->private
-                || $dataset->user_id == $this->jobData->job_data['user_id']
-                || $dataset->user->can('use-all-datasets')
-            ) {
-                if ($dataset->status == Dataset::READY) {
-                    throw new FactoryException('A dataset has already been created from the same source.');
-                } elseif ($dataset->status == Dataset::PENDING) {
-                    throw new FactoryException('A dataset from the same source is being parsed.');
-                } elseif ($dataset->status == Dataset::FAILED) {
-                    $dataset->status = Dataset::PENDING;
-                    return $dataset;
+        if ($this->dataset === null) {
+            $descriptors = $this->descriptor->getDescriptors();
+            $dataset = Dataset::whereOriginalId($descriptors['id'])->whereSourceId($this->source->id)->first();
+            if ($dataset !== null && $dataset instanceof Dataset) {
+                if (!$dataset->private
+                    || $dataset->user_id == $this->jobData->job_data['user_id']
+                    || $dataset->user->can('use-all-datasets')
+                ) {
+                    if ($dataset->status == Dataset::READY) {
+                        throw new FactoryException('A dataset has already been created from the same source.');
+                    } elseif ($dataset->status == Dataset::PENDING) {
+                        throw new FactoryException('A dataset from the same source is being parsed.');
+                    } elseif ($dataset->status == Dataset::FAILED) {
+                        $dataset->status = Dataset::PENDING;
+                        return $dataset;
+                    }
                 }
             }
+            $dataset = new Dataset([
+                'original_id' => $descriptors['id'],
+                'source_id'   => $this->source->id,
+                'user_id'     => $this->jobData->job_data['user_id'],
+                'title'       => $descriptors['name'],
+                'private'     => $this->jobData->job_data['private'],
+                'status'      => Dataset::PENDING
+            ]);
+            $this->dataset = $dataset;
         }
-        $dataset = new Dataset([
-            'original_id' => $descriptors['id'],
-            'source_id'   => $this->source->id,
-            'user_id'     => $this->jobData->job_data['user_id'],
-            'title'       => $descriptors['name'],
-            'private'     => $this->jobData->job_data['private'],
-            'status'      => Dataset::PENDING
-        ]);
-        return $dataset;
+        return $this->dataset;
     }
 }

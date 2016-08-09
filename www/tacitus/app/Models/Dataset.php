@@ -22,6 +22,7 @@ use Jenssegers\Mongodb\Eloquent\HybridRelations;
  * @property-read \App\Models\User                                                     $user
  * @property-read \App\Models\Source                                                   $source
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Sample[]        $samples
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Probe[]         $probes
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Dataset whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Dataset whereOriginalId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Dataset whereSourceId($value)
@@ -106,6 +107,14 @@ class Dataset extends Model
     public function samples()
     {
         return $this->hasMany('App\Models\Sample');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function probes()
+    {
+        return $this->hasMany('App\Models\Probe');
     }
 
 }

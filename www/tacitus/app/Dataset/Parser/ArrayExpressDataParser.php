@@ -50,6 +50,13 @@ class ArrayExpressDataParser extends AbstractDataParser
     protected $sampleIndex = null;
 
     /**
+     * The number of the last sample
+     *
+     * @var integer|null
+     */
+    protected $lastSample = null;
+
+    /**
      * Internal method to set the current type in order to use a fluent interface
      *
      * @param string $type
@@ -65,6 +72,9 @@ class ArrayExpressDataParser extends AbstractDataParser
         if ($type == Descriptor::TYPE_METADATA_INDEX) {
             $this->identifierIndex = null;
             $this->supportedMetadataIndex = null;
+        }
+        if ($type == Descriptor::TYPE_DATA) {
+            $this->lastSample = -1;
         }
         return parent::setCurrentType($type);
     }
@@ -173,22 +183,24 @@ class ArrayExpressDataParser extends AbstractDataParser
             if (!count($row)) {
                 throw new DataParserException('No sample identified in the current file (' . $this->currentFile . ').');
             }
-            $this->sampleIndex = $row;
+            $this->sampleIndex = [];
+            for ($i = 0; $i < count($row); $i++) {
+                $this->sampleIndex[$i] = ++$this->lastSample;
+            }
             return [];
         }
         $probe = array_shift($row);
         if (!count($row)) {
             throw new DataParserException('No sample identified in the current file (' . $this->currentFile . ').');
         }
-        $result = [];
+        $data = [];
         for ($i = 0; $i < count($row); $i++) {
-            $result[] = [
-                'probe'      => $probe,
-                'value'      => doubleval($row[$i]),
-                'sampleName' => $this->sampleIndex[$i],
-            ];
+            $data[$this->sampleIndex[$i]] = doubleval($row[$i]);
         }
-        return $result;
+        return [
+            'name' => $probe,
+            'data' => $data,
+        ];
     }
 
     /**

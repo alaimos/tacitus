@@ -8,6 +8,7 @@
 namespace App\Dataset\ImportJob;
 
 use App\Dataset\Descriptor;
+use App\Models\Data;
 use App\Models\Dataset;
 
 /**
@@ -32,13 +33,7 @@ class ArrayExpressImportJob extends AbstractImportJob
      */
     protected function logProgress($current, $total, $b = false)
     {
-        if ($b) {
-            echo '...' . $current . ' of ' . $total;
-        }
         $percentage = floor(min(100, ((float)$current / (float)$total) * 100));
-        if ($percentage != $this->prevPercentage) {
-            echo '...' . $percentage . '%';
-        }
         if (($percentage % 10) == 0 && $percentage != 100 && $percentage != $this->prevPercentage) {
             $this->log('...' . $percentage . '%', true);
         }
@@ -99,6 +94,7 @@ class ArrayExpressImportJob extends AbstractImportJob
             }
             $this->log("...OK\n", true);
             $this->log("Dataset parsed and ready!\n", true);
+            $dataset->status = Dataset::READY;
             $ok = true;
         } catch (\Exception $e) {
             $this->log("\n");

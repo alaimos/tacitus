@@ -237,7 +237,7 @@ abstract class AbstractDataParser implements DataParserInterface
             $row = fgets($fp);
             if ($row !== false) {
                 $this->currentIndex++;
-                return $this->parser($row);
+                return $this->parser(trim($row));
             }
         }
         return null;

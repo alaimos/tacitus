@@ -11,9 +11,11 @@ use App\Dataset\Descriptor;
 use App\Dataset\UseDescriptorTrait;
 use App\Dataset\UseJobDataTrait;
 use App\Models\Data;
+use App\Models\Dataset;
 use App\Models\Job as JobData;
 use App\Models\Metadata;
 use App\Models\MetadataIndex;
+use App\Models\Probe;
 use App\Models\Sample;
 
 /**
@@ -27,19 +29,29 @@ abstract class AbstractModelFactory implements ModelFactoryInterface
     use UseJobDataTrait, UseDescriptorTrait;
 
     /**
-     * Create a new Data model
+     * Create a new Probe model
      *
-     * @param string             $probe
-     * @param string             $value
-     * @param \App\Models\Sample $sample
-     *
-     * @return \App\Models\Data
+     * @param string $name
+     * @param array  $data
+     * @return \App\Models\Probe
      */
-    public function getData($probe, $value, Sample $sample)
+    public function getProbe($name, $data)
     {
-        $data = new Data(['probe' => $probe, 'value' => $value]);
-        $data->sample()->associate($sample);
-        return $data;
+        $dataset = $this->getDataset();
+        /** @var \App\Models\Probe $probe */
+        $probe = Probe::whereName($name)->where('dataset_id', '=', $dataset->id)->first();
+        if ($probe !== null) {
+            $tmp = $probe->data;
+            foreach ($data as $d) {
+                $tmp[] = $d;
+            }
+            $probe->data = $tmp;
+            $probe->save();
+        } else {
+            $probe = new Probe(['name' => $name, 'data' => $data]);
+            $probe->dataset()->associate($dataset);
+        }
+        return $probe;
     }
 
     /**
@@ -81,7 +93,7 @@ abstract class AbstractModelFactory implements ModelFactoryInterface
      */
     public function getSample($name)
     {
-        $sample = new Sample(['name' => $name]);
+        $sample = new Sample(['name' => $name, 'sdata' => []]);
         $sample->dataset()->associate($this->getDataset());
         return $sample;
     }
