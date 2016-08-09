@@ -7,10 +7,9 @@
 
 namespace App\Dataset\ImportJob;
 
-
 use App\Dataset\Factory\ParserFactoryInterface;
-use App\Dataset\JobDataAwareInterface;
-use App\Dataset\LogCallbackAwareInterface;
+use App\Dataset\Contracts\JobDataAwareInterface;
+use App\Dataset\Contracts\LogCallbackAwareInterface;
 
 /**
  * Interface ImportJobInterface

@@ -7,12 +7,8 @@
 
 namespace App\Dataset\Factory;
 
-use App\Dataset\Descriptor;
-use App\Dataset\UseDescriptorTrait;
-use App\Dataset\UseJobDataTrait;
-use App\Models\Data;
-use App\Models\Dataset;
-use App\Models\Job as JobData;
+use App\Dataset\Traits\InteractsWithDescriptor;
+use App\Dataset\Traits\InteractsWithJobData;
 use App\Models\Metadata;
 use App\Models\MetadataIndex;
 use App\Models\Probe;
@@ -26,13 +22,14 @@ use App\Models\Sample;
 abstract class AbstractModelFactory implements ModelFactoryInterface
 {
 
-    use UseJobDataTrait, UseDescriptorTrait;
+    use InteractsWithJobData, InteractsWithDescriptor;
 
     /**
      * Create a new Probe model
      *
      * @param string $name
      * @param array  $data
+     *
      * @return \App\Models\Probe
      */
     public function getProbe($name, $data)

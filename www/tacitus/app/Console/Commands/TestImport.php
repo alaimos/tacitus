@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Dataset\Descriptor;
 use App\Dataset\Registry\ParserFactoryRegistry;
+use App\Jobs\Factory;
 use App\Jobs\ImportDataset;
 use App\Models\Job as JobData;
 use App\Models\User;
@@ -38,19 +39,20 @@ class TestImport extends Command
     {
         /** @var JobData $jobData */
         $jobData = JobData::findOrNew(1)->fill([
-            'job_type' => 'arrexp',
+            'job_type' => 'import_dataset',
             'status'   => JobData::QUEUED,
             'log'      => '',
             'job_data' => [
-                'originalId' => 'E-MTAB-3732',
-                'user_id'    => 1,
-                'private'    => false,
+                'source_type' => 'arrexp',
+                'originalId'  => 'E-MTAB-3732',
+                'user_id'     => 1,
+                'private'     => false,
             ]
         ]);
         $jobData->log = '';
         $jobData->save();
 
-        $this->dispatch((new ImportDataset($jobData))->onQueue('importer'));
+        $this->dispatch(Factory::getQueueJob($jobData));
 
         /*
         $registry = new ParserFactoryRegistry();

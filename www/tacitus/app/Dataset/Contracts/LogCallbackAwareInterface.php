@@ -5,9 +5,7 @@
  * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset;
-
-use App\Models\Job as JobData;
+namespace App\Dataset\Contracts;
 
 /**
  * Interface LogCallbackAwareInterface

@@ -7,8 +7,8 @@
 
 namespace App\Dataset\Downloader;
 
-use App\Dataset\JobDataAwareInterface;
-use App\Dataset\LogCallbackAwareInterface;
+use App\Dataset\Contracts\JobDataAwareInterface;
+use App\Dataset\Contracts\LogCallbackAwareInterface;
 
 /**
  * Interface DownloaderInterface

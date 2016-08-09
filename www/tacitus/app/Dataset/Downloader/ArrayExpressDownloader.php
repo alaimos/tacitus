@@ -9,8 +9,6 @@ namespace App\Dataset\Downloader;
 
 use App\Dataset\Descriptor;
 use App\Dataset\Downloader\Exception\DownloaderException;
-use App\Dataset\UseJobDataTrait;
-use App\Dataset\UseLogCallbackTrait;
 
 /**
  * Class ArrayExpressDownloader

@@ -8,7 +8,6 @@
 namespace App\Dataset\ImportJob;
 
 use App\Dataset\Descriptor;
-use App\Models\Data;
 use App\Models\Dataset;
 
 /**

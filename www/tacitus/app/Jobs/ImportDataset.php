@@ -1,15 +1,15 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: alaim
- * Date: 09/08/2016
- * Time: 17:08
+ * TACITuS - Transcriptomic dAta Collector, InTegrator, and Selector
+ *
+ * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
 namespace App\Jobs;
 
 
 use App\Dataset\Registry\ParserFactoryRegistry;
+use App\Jobs\Exception\JobException;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -35,6 +35,10 @@ class ImportDataset extends Job implements ShouldQueue
     public function __construct(JobData $jobData)
     {
         $this->jobData = $jobData;
+        if ($this->jobData->job_type != 'import_dataset') {
+            throw new JobException('This job cannot be run by this class.');
+        }
+        $this->onQueue('importer'); // Set the default queue for this job
     }
 
     /**
@@ -50,9 +54,9 @@ class ImportDataset extends Job implements ShouldQueue
             $this->delete();
         } else {
             $registry = new ParserFactoryRegistry();
-            $factories = $registry->getParsers($this->jobData->job_type);
+            $factories = $registry->getParsers($this->jobData->job_data['source_type']);
             if (empty($factories)) {
-                throw new \RuntimeException('Unable to find parsers suited for this job type.');
+                throw new JobException('Unable to find parsers suited for this import job.');
             }
             $this->jobData->status = JobData::PROCESSING;
             $this->jobData->save();

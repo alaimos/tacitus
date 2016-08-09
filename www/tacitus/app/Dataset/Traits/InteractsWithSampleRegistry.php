@@ -5,7 +5,7 @@
  * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset;
+namespace App\Dataset\Traits;
 
 use App\Dataset\Registry\SampleRegistry;
 
@@ -14,7 +14,7 @@ use App\Dataset\Registry\SampleRegistry;
  *
  * @package App\Dataset
  */
-trait UseSampleRegistryTrait
+trait InteractsWithSampleRegistry
 {
 
     /**
@@ -28,6 +28,7 @@ trait UseSampleRegistryTrait
      * Set a sample registry object
      *
      * @param \App\Dataset\Registry\SampleRegistry $sampleRegistry
+     *
      * @return $this
      */
     public function setSampleRegistry(SampleRegistry $sampleRegistry)

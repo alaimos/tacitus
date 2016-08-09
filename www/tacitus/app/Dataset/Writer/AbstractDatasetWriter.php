@@ -7,8 +7,8 @@
 
 namespace App\Dataset\Writer;
 
-use App\Dataset\UseModelFactoryTrait;
-use App\Dataset\UseSampleRegistryTrait;
+use App\Dataset\Traits\InteractsWithModelFactory;
+use App\Dataset\Traits\InteractsWithSampleRegistry;
 use App\Dataset\Writer\Exception\DatasetWriterException;
 use App\Models\Sample;
 
@@ -20,7 +20,7 @@ use App\Models\Sample;
 abstract class AbstractDatasetWriter implements DatasetWriterInterface
 {
 
-    use UseModelFactoryTrait, UseSampleRegistryTrait;
+    use InteractsWithModelFactory, InteractsWithSampleRegistry;
 
     /**
      * @var \App\Models\Dataset|null

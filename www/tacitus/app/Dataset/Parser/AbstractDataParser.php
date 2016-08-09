@@ -8,7 +8,7 @@
 namespace App\Dataset\Parser;
 
 use App\Dataset\Parser\Exception\DataParserException;
-use App\Dataset\UseDescriptorTrait;
+use App\Dataset\Traits\InteractsWithDescriptor;
 
 /**
  * Class AbstractDataParser
@@ -18,7 +18,7 @@ use App\Dataset\UseDescriptorTrait;
 abstract class AbstractDataParser implements DataParserInterface
 {
 
-    use UseDescriptorTrait;
+    use InteractsWithDescriptor;
 
     /**
      * The current type of files being parsed

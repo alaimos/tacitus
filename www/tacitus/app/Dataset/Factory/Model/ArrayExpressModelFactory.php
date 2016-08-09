@@ -9,9 +9,7 @@ namespace App\Dataset\Factory\Model;
 
 use App\Dataset\Factory\AbstractModelFactory;
 use App\Dataset\Factory\Exception\FactoryException;
-use App\Models\Data;
 use App\Models\Dataset;
-use App\Models\Job as JobData;
 use App\Models\Source;
 
 /**

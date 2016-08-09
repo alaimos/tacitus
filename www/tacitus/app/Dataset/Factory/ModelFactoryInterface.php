@@ -7,9 +7,8 @@
 
 namespace App\Dataset\Factory;
 
-use App\Dataset\DescriptorAwareInterface;
-use App\Dataset\JobDataAwareInterface;
-use App\Models\Dataset;
+use App\Dataset\Contracts\DescriptorAwareInterface;
+use App\Dataset\Contracts\JobDataAwareInterface;
 use App\Models\Sample;
 
 /**

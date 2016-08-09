@@ -5,14 +5,14 @@
  * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset;
+namespace App\Dataset\Traits;
 
 /**
  * Class UseLogCallback
  *
  * @package App\Dataset
  */
-trait UseLogCallbackTrait
+trait InteractsWithLogCallback
 {
 
     /**

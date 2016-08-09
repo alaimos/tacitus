@@ -7,9 +7,7 @@
 
 namespace App\Dataset\Parser;
 
-use App\Dataset\DescriptorAwareInterface;
-use App\Dataset\JobDataAwareInterface;
-use App\Dataset\LogCallbackAwareInterface;
+use App\Dataset\Contracts\DescriptorAwareInterface;
 
 /**
  * Interface DataParserInterface
@@ -23,6 +21,7 @@ interface DataParserInterface extends DescriptorAwareInterface
      * Initializes the parsing of all data files associated with a specific type
      *
      * @param string $type
+     *
      * @return \App\Dataset\Parser\DataParserInterface
      * @throws \App\Dataset\Parser\Exception\DataParserException
      */

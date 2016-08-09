@@ -8,7 +8,6 @@
 namespace App\Dataset\Writer;
 
 use App\Dataset\Writer\Exception\DatasetWriterException;
-use App\Models\Data;
 use App\Models\Metadata;
 use App\Models\MetadataIndex;
 

@@ -7,8 +7,8 @@
 
 namespace App\Dataset\Writer;
 
-use App\Dataset\ModelFactoryAwareInterface;
-use App\Dataset\SampleRegistryAwareInterface;
+use App\Dataset\Contracts\ModelFactoryAwareInterface;
+use App\Dataset\Contracts\SampleRegistryAwareInterface;
 
 /**
  * Interface DatasetWriterInterface
@@ -33,6 +33,7 @@ interface DatasetWriterInterface extends ModelFactoryAwareInterface, SampleRegis
      *
      * @param string $type
      * @param mixed  $data
+     *
      * @return object|boolean
      * @throws \App\Dataset\Writer\Exception\DatasetWriterException
      */

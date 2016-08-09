@@ -8,8 +8,8 @@
 namespace App\Dataset\Downloader;
 
 use App\Dataset\Downloader\Exception\DownloaderException;
-use App\Dataset\UseJobDataTrait;
-use App\Dataset\UseLogCallbackTrait;
+use App\Dataset\Traits\InteractsWithJobData;
+use App\Dataset\Traits\InteractsWithLogCallback;
 use App\Utils\Utils;
 
 /**
@@ -20,7 +20,7 @@ use App\Utils\Utils;
 abstract class AbstractDownloader implements DownloaderInterface
 {
 
-    use UseJobDataTrait, UseLogCallbackTrait;
+    use InteractsWithJobData, InteractsWithLogCallback;
 
     /**
      * The directory where downloads will be stored

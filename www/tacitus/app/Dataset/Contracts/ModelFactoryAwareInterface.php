@@ -5,23 +5,18 @@
  * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset;
+namespace App\Dataset\Contracts;
+
 use App\Dataset\Factory\ModelFactoryInterface;
 
+
 /**
- * Class UseModelFactory
+ * Interface ModelFactoryAwareInterface
  *
  * @package App\Dataset
  */
-trait UseModelFactoryTrait
+interface ModelFactoryAwareInterface
 {
-
-    /**
-     * Model factory
-     *
-     * @var \App\Dataset\Factory\ModelFactoryInterface
-     */
-    protected $modelFactory;
 
     /**
      * Set a model factory object
@@ -29,21 +24,13 @@ trait UseModelFactoryTrait
      * @param \App\Dataset\Factory\ModelFactoryInterface $modelFactory
      * @return $this
      */
-    public function setModelFactory(ModelFactoryInterface $modelFactory)
-    {
-        $this->modelFactory = $modelFactory;
-        return $this;
-    }
+    public function setModelFactory(ModelFactoryInterface $modelFactory);
 
     /**
      * Get the model factory object
      *
      * @return \App\Dataset\Factory\ModelFactoryInterface
      */
-    public function getModelFactory()
-    {
-        return $this->modelFactory;
-    }
-
+    public function getModelFactory();
 
 }

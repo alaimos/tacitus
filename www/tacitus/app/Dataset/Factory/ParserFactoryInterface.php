@@ -7,7 +7,6 @@
 
 namespace App\Dataset\Factory;
 
-
 use App\Dataset\Descriptor;
 use App\Models\Job as JobData;
 

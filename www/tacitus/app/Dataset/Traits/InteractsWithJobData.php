@@ -5,7 +5,7 @@
  * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset;
+namespace App\Dataset\Traits;
 
 use App\Models\Job as JobData;
 
@@ -14,7 +14,7 @@ use App\Models\Job as JobData;
  *
  * @package App\Dataset
  */
-trait UseJobDataTrait
+trait InteractsWithJobData
 {
 
     /**

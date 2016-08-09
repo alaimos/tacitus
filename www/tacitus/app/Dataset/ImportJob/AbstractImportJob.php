@@ -7,10 +7,9 @@
 
 namespace App\Dataset\ImportJob;
 
-
 use App\Dataset\Factory\ParserFactoryInterface;
-use App\Dataset\UseJobDataTrait;
-use App\Dataset\UseLogCallbackTrait;
+use App\Dataset\Traits\InteractsWithJobData;
+use App\Dataset\Traits\InteractsWithLogCallback;
 
 /**
  * Class AbstractImportJob
@@ -20,7 +19,7 @@ use App\Dataset\UseLogCallbackTrait;
 abstract class AbstractImportJob implements ImportJobInterface
 {
 
-    use UseJobDataTrait, UseLogCallbackTrait;
+    use InteractsWithJobData, InteractsWithLogCallback;
 
     /**
      * A parser factory object

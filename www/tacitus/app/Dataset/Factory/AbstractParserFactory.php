@@ -7,19 +7,19 @@
 
 namespace App\Dataset\Factory;
 
-use App\Dataset\DescriptorAwareInterface;
-use App\Dataset\JobDataAwareInterface;
-use App\Dataset\LogCallbackAwareInterface;
-use App\Dataset\ModelFactoryAwareInterface;
+use App\Dataset\Contracts\DescriptorAwareInterface;
+use App\Dataset\Contracts\JobDataAwareInterface;
+use App\Dataset\Contracts\LogCallbackAwareInterface;
+use App\Dataset\Contracts\ModelFactoryAwareInterface;
 use App\Dataset\Registry\SampleRegistry;
-use App\Dataset\SampleRegistryAwareInterface;
-use App\Dataset\UseDescriptorTrait;
-use App\Dataset\UseJobDataTrait;
+use App\Dataset\Contracts\SampleRegistryAwareInterface;
+use App\Dataset\Traits\InteractsWithDescriptor;
+use App\Dataset\Traits\InteractsWithJobData;
 
 abstract class AbstractParserFactory implements ParserFactoryInterface
 {
 
-    use UseJobDataTrait, UseDescriptorTrait;
+    use InteractsWithJobData, InteractsWithDescriptor;
 
     //const DEBUG = true;
 
@@ -104,6 +104,7 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
      * Build an object from its class name
      *
      * @param string $class
+     *
      * @return object
      */
     protected function buildObject($class)

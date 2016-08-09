@@ -5,7 +5,7 @@
  * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset;
+namespace App\Dataset\Contracts;
 
 use App\Dataset\Registry\SampleRegistry;
 
