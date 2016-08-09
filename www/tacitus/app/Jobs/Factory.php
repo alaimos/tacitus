@@ -14,9 +14,21 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Job as JobData;
 
+/**
+ * Class Factory
+ *
+ * @package App\Jobs
+ */
 class Factory
 {
 
+    /**
+     * Get an handler for this job
+     *
+     * @param \App\Models\Job $jobData
+     *
+     * @return \App\Jobs\Job
+     */
     public static function getQueueJob(JobData $jobData)
     {
         $jobClass = '\App\Jobs\\' . studly_case($jobData->job_type);
