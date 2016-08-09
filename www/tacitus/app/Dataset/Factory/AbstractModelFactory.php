@@ -93,7 +93,7 @@ abstract class AbstractModelFactory implements ModelFactoryInterface
      */
     public function getSample($name)
     {
-        $sample = new Sample(['name' => $name, 'sdata' => []]);
+        $sample = new Sample(['name' => $name]);
         $sample->dataset()->associate($this->getDataset());
         return $sample;
     }
