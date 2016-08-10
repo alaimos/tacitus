@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Jenssegers\Mongodb\Eloquent\HybridRelations;
 
@@ -63,16 +64,20 @@ class Dataset extends Model
      * Get all datasets
      *
      * @param null|\App\Models\User|integer $owner
-     * @return Dataset|\Illuminate\Database\Query\Builder
+     * @return \Illuminate\Database\Query\Builder
      */
     public static function getReadyDatasets($owner = null)
     {
         $query = self::whereStatus(self::READY);
         if ($owner !== null) {
-            if (is_object($owner) && $owner instanceof User) {
-                $owner = $owner->id;
+            if (!($owner instanceof User)) {
+                $owner = User::whereId($owner)->first();
             }
-            $query = $query->whereUserId($owner);
+            if ($owner->can('view-all-datasets')) {
+                $query->where(function (Builder $query) use ($owner) {
+                    $query->where('user_id', '=', $owner->id)->orWhere('private', '=', false);
+                });
+            }
         }
         return $query;
     }

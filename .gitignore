@@ -20,8 +20,5 @@ vendor/
 node_modules/
 
 bootstrap/cache/
-.env.*.php
-.env.php
-.env
 
 .rocketeer/

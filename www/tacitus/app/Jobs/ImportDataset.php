@@ -10,6 +10,7 @@ namespace App\Jobs;
 
 use App\Dataset\Registry\ParserFactoryRegistry;
 use App\Jobs\Exception\JobException;
+use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -48,9 +49,15 @@ class ImportDataset extends Job implements ShouldQueue
      */
     public function handle()
     {
+        $user = User::whereId($this->jobData->job_data['user_id'])->first();
         if ($this->attempts() > 3) {
             $this->jobData->status = JobData::FAILED;
             $this->jobData->save();
+            $this->sendNotification($user, 'exclamation-triangle',
+                'One of your jobs (id: ' . $this->jobData->id . ') failed processing. ' .
+                'The job has been dropped from the processing queue. Please check the ' .
+                'error log, correct the errors and submit a new request. Contact us ' .
+                'if you believe a bug is present in our system.');
             $this->delete();
         } else {
             $registry = new ParserFactoryRegistry();
@@ -60,6 +67,8 @@ class ImportDataset extends Job implements ShouldQueue
             }
             $this->jobData->status = JobData::PROCESSING;
             $this->jobData->save();
+            $this->sendNotification($user, 'comment',
+                'One of your jobs (id: ' . $this->jobData->id . ') started processing.');
             $ok = false;
             foreach ($factories as $factory) {
                 $job = $factory->setJobData($this->jobData)->getRealImporter();
@@ -69,8 +78,13 @@ class ImportDataset extends Job implements ShouldQueue
                 }
             }
             if ($ok) {
+                $this->sendNotification($user, 'check-circle',
+                    'One of your jobs (id: ' . $this->jobData->id . ') has been processed successfully.');
                 $this->jobData->status = JobData::COMPLETED;
+                //$this->jobData->deleteJobDirectory(); //@TODO enable this
             } else {
+                $this->sendNotification($user, 'exclamation-triangle',
+                    'One of your jobs (id: ' . $this->jobData->id . ') failed processing. Our system will automatically retry the job in order to check for temporary errors.');
                 $this->jobData->status = JobData::FAILED;
             }
         }

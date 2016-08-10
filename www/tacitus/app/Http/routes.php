@@ -24,3 +24,13 @@ Route::group(['as' => 'user::', 'prefix' => 'user', 'middleware' => ['permission
         $router->get('/alerts', ['as' => 'alerts', 'uses' => 'UserController@alerts']);
     }
 );
+
+Route::get('/datasets', ['as' => 'datasets-lists', 'uses' => 'DatasetController@datasetsList']);
+Route::get('/datasets/data', ['as' => 'datasets-lists-data', 'uses' => 'DatasetController@datasetsData']);
+
+/*
+Route::controller('datatables', 'DatatablesController', [
+    'anyData'  => 'datatables.data',
+    'getIndex' => 'datatables',
+]);
+ */

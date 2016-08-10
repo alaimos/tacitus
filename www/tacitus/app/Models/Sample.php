@@ -11,7 +11,6 @@ use Jenssegers\Mongodb\Eloquent\Model as Model;
  * @property string                                                               $name
  * @property integer                                                              $position
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Metadata[] $metadata
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Data[]     $data
  * @property-read \App\Models\Dataset                                             $dataset
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Sample whereName($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Sample whereDatasetId($value)
@@ -56,13 +55,5 @@ class Sample extends Model
     public function metadata()
     {
         return $this->hasMany('App\Models\Metadata', 'sample_id');
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function data()
-    {
-        return $this->hasMany('App\Models\Data', 'sample_id');
     }
 }

@@ -6,6 +6,7 @@
  */
 
 namespace App\Dataset\Contracts;
+use App\Dataset\Descriptor;
 
 /**
  * Interface DescriptorAwareInterface

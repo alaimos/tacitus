@@ -6,6 +6,7 @@
  */
 
 namespace App\Dataset\Traits;
+use App\Dataset\Descriptor;
 
 /**
  * Class UseDescriptor

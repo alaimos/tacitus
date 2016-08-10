@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 
 abstract class Job
@@ -18,4 +19,23 @@ abstract class Job
     */
 
     use Queueable;
+
+    /**
+     * Send notification message to an user
+     *
+     * @param User   $to
+     * @param string $icon
+     * @param string $message
+     */
+    protected function sendNotification(User $to, $icon, $message)
+    {
+        $from = User::whereEmail(env('ADMIN_MAIL', 'admin@tacitus'))->first();
+        /** @var \Fenos\Notifynder\NotifynderManager $notification */
+        $notification = \Notifynder::category('notification');
+        $notification->from($from->id)->to($to->id)->url(url('/'))->extra([
+            'icon'    => $icon,
+            'message' => $message,
+        ])->send();
+    }
+
 }

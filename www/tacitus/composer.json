@@ -16,7 +16,6 @@
     "davejamesmiller/laravel-breadcrumbs": "~3.0",
     "spatie/laravel-backup": "~3.8",
     "sun/laravel-flash": "~1.4",
-    "larablocks/pigeon": "~5.2",
     "greggilbert/recaptcha": "~2.1",
     "fenos/notifynder": "3.*",
     "laravelcollective/html": "~5.2",
