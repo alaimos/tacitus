@@ -2,19 +2,22 @@
 
 namespace App\Models;
 
+use App\Utils\Permissions;
 use App\Utils\Utils;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * App\Models\Job
  *
- * @property integer        $id
- * @property string         $job_type
- * @property string         $status
- * @property string         $job_data
- * @property string         $log
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property integer               $id
+ * @property string                $job_type
+ * @property string                $status
+ * @property string                $job_data
+ * @property string                $log
+ * @property \Carbon\Carbon        $created_at
+ * @property \Carbon\Carbon        $updated_at
+ * @property integer               $user_id
+ * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Job whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Job whereJobType($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Job whereStatus($value)
@@ -22,6 +25,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Job whereLog($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Job whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Job whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Job whereUserId($value)
  * @mixin \Eloquent
  */
 class Job extends Model
@@ -49,6 +53,36 @@ class Job extends Model
     protected $fillable = [
         'job_type', 'status', 'job_data'
     ];
+
+    /**
+     * Get all datasets
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    public static function listJobs()
+    {
+        $query = self::query();
+        if (user_can(Permissions::VIEW_JOBS) && !user_can(Permissions::VIEW_ALL_JOBS)) {
+            $owner = current_user();
+            if ($owner !== null) {
+                $query->where('user_id', '=', $owner->id);
+            }
+            return $query;
+        } elseif (user_can(Permissions::VIEW_JOBS) && user_can(Permissions::VIEW_ALL_JOBS)) {
+            return $query;
+        } else {
+            return abort(401, 'You are not allowed to view jobs.');
+        }
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User', 'user_id', 'id');
+    }
 
     /**
      * Returns the path of the job storage directory

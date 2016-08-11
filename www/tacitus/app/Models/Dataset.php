@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Utils\Permissions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Jenssegers\Mongodb\Eloquent\HybridRelations;
@@ -63,23 +64,29 @@ class Dataset extends Model
     /**
      * Get all datasets
      *
-     * @param null|\App\Models\User|integer $owner
      * @return \Illuminate\Database\Query\Builder
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public static function getReadyDatasets($owner = null)
+    public static function listDatasets()
     {
-        $query = self::whereStatus(self::READY);
-        if ($owner !== null) {
-            if (!($owner instanceof User)) {
-                $owner = User::whereId($owner)->first();
-            }
-            if ($owner->can('view-all-datasets')) {
+        /** @var \Illuminate\Database\Query\Builder $query */
+        $query = self::join('sources', 'datasets.source_id', '=', 'sources.id')
+            ->where('datasets.status', '=', self::READY);
+        if (user_can(Permissions::VIEW_DATASETS) && !user_can(Permissions::VIEW_ALL_DATASETS)) {
+            $owner = current_user();
+            if ($owner === null) {
+                $query->where('datasets.private', '=', false);
+            } else {
                 $query->where(function (Builder $query) use ($owner) {
-                    $query->where('user_id', '=', $owner->id)->orWhere('private', '=', false);
+                    $query->where('datasets.user_id', '=', $owner->id)->orWhere('datasets.private', '=', false);
                 });
             }
+            return $query;
+        } elseif (user_can(Permissions::VIEW_DATASETS) && user_can(Permissions::VIEW_ALL_DATASETS)) {
+            return $query;
+        } else {
+            return abort(401, 'You are not allowed to view datasets.');
         }
-        return $query;
     }
 
     /**
@@ -120,6 +127,30 @@ class Dataset extends Model
     public function probes()
     {
         return $this->hasMany('App\Models\Probe');
+    }
+
+    /**
+     * Checks if the current user can delete this dataset
+     *
+     * @return bool
+     */
+    public function canDelete()
+    {
+        $current = current_user();
+        $isOwned = ($current !== null && $current->id == $this->user->id);
+        return (user_can(Permissions::DELETE_DATASETS) && (user_can(Permissions::USE_ALL_DATASETS) || $isOwned));
+    }
+
+    /**
+     * Checks if the current user can select data from this dataset
+     *
+     * @return bool
+     */
+    public function canSelect()
+    {
+        $current = current_user();
+        $isOwned = ($current !== null && $current->id == $this->user->id);
+        return (user_can(Permissions::SELECT_FROM_DATASETS) && (user_can(Permissions::USE_ALL_DATASETS) || $isOwned));
     }
 
 }

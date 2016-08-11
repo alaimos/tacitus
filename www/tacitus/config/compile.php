@@ -14,7 +14,7 @@ return [
     */
 
     'files' => [
-        //
+        __DIR__ . '/../app/Utils/helpers.php',
     ],
 
     /*

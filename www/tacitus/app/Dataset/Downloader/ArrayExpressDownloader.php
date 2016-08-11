@@ -39,7 +39,7 @@ class ArrayExpressDownloader extends AbstractDownloader
      */
     protected function getDatasetId()
     {
-        return $this->jobData->job_data['originalId'];
+        return $this->jobData->job_data['original_id'];
     }
 
     /**

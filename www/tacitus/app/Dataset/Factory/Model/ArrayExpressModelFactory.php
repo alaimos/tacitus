@@ -51,7 +51,7 @@ class ArrayExpressModelFactory extends AbstractModelFactory
             $dataset = Dataset::whereOriginalId($descriptors['id'])->whereSourceId($this->source->id)->first();
             if ($dataset !== null && $dataset instanceof Dataset) {
                 if (!$dataset->private
-                    || $dataset->user_id == $this->jobData->job_data['user_id']
+                    || $dataset->user_id == $this->jobData->user->id
                     || $dataset->user->can('use-all-datasets')
                 ) {
                     if ($dataset->status == Dataset::READY) {
@@ -67,7 +67,7 @@ class ArrayExpressModelFactory extends AbstractModelFactory
             $dataset = new Dataset([
                 'original_id' => $descriptors['id'],
                 'source_id'   => $this->source->id,
-                'user_id'     => $this->jobData->job_data['user_id'],
+                'user_id'     => $this->jobData->user->id,
                 'title'       => $descriptors['name'],
                 'private'     => $this->jobData->job_data['private'],
                 'status'      => Dataset::PENDING

@@ -8,6 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Transcriptomic data collector, integrator, and selector">
     <meta name="author" content="Salvatore Alaimo, Ph.D.">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <title>TACITuS</title>
 

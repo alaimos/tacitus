@@ -9,15 +9,16 @@ use Laratrust\Traits\LaratrustUserTrait;
 /**
  * App\Models\User
  *
- * @property integer                                                                                    $id
- * @property string                                                                                     $name
- * @property string                                                                                     $email
- * @property string                                                                                     $password
- * @property string                                                                                     $remember_token
- * @property \Carbon\Carbon                                                                             $created_at
- * @property \Carbon\Carbon                                                                             $updated_at
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Dataset[]                        $datasets
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Role[]                           $roles
+ * @property integer $id
+ * @property string $name
+ * @property string $email
+ * @property string $password
+ * @property string $remember_token
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Dataset[] $datasets
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Job[] $jobs
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Role[] $roles
  * @property-read \Fenos\Notifynder\Models\NotifynderCollection|\Fenos\Notifynder\Models\Notification[] $notifications
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereName($value)
@@ -58,5 +59,13 @@ class User extends Authenticatable
     public function datasets()
     {
         return $this->hasMany('App\Models\Dataset', 'user_id', 'id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function jobs()
+    {
+        return $this->hasMany('App\Models\Job', 'user_id', 'id');
     }
 }

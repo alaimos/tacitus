@@ -36,6 +36,7 @@ elixir(function (mix) {
     //CSS Libraries
     mix.styles([
         vendors + 'font-awesome/css/font-awesome.css',
+        vendors + 'font-awesome-animation/dist/font-awesome-animation.css',
         vendors + 'jquery-ui/themes/base/jquery-ui.css',
         vendors + 'tether/dist/css/tether.css',
         vendors + 'bootstrap/dist/css/bootstrap.css',

@@ -19,7 +19,8 @@
 |
 */
 
-require __DIR__.'/../bootstrap/autoload.php';
+require __DIR__ . '/../bootstrap/autoload.php';
+require __DIR__ . '/../app/Utils/helpers.php'; //@todo remove in production
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +34,7 @@ require __DIR__.'/../bootstrap/autoload.php';
 |
 */
 
-$app = require_once __DIR__.'/../bootstrap/app.php';
+$app = require_once __DIR__ . '/../bootstrap/app.php';
 
 /*
 |--------------------------------------------------------------------------

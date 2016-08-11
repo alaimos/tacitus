@@ -3,10 +3,26 @@
 @section('content')
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Datasets</h1>
+            <h1 class="page-header">
+                Datasets
+                @if(user_can(\App\Utils\Permissions::SUBMIT_DATASETS))
+                    <span class="pull-right">
+                        <a href="{{ route('datasets-submission') }}" class="btn btn-success">
+                            <i class="fa fa-plus-circle" aria-hidden="true"></i> Submit dataset
+                        </a>
+                    </span>
+                @endif
+            </h1>
         </div>
         <!-- /.col-lg-12 -->
     </div>
+
+    <div class="row">
+        <div class="col-lg-12 alert-container">
+            @include('sun::flash')
+        </div>
+    </div>
+    <!-- /.row -->
 
     <div class="row">
         <div class="col-lg-12">
@@ -26,6 +42,19 @@
         </div>
     </div>
 
+    <div class="row">
+        <div class="col-lg-12">
+            @if(user_can(\App\Utils\Permissions::SUBMIT_DATASETS))
+                <span class="pull-right">
+                    <a href="{{ route('datasets-submission') }}" class="btn btn-success">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i> Submit dataset
+                    </a>
+                </span>
+            @endif
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+
 @endsection
 
 @push('scripts')
@@ -35,25 +64,28 @@
             responsive: true,
             processing: true,
             serverSide: true,
-            ajax: '{{ route('datasets-lists-data') }}',
+            ajax: {
+                url: '{{ route('datasets-lists-data') }}',
+                method: 'POST'
+            },
             columns: [
-                {data: 'id', name: 'id'},
-                {data: 'original_id', name: 'original_id'},
-                {data: 'source_id', name: 'source_id'},
-                {data: 'title', name: 'title'},
-                {data: 'created_at', name: 'created_at'},
+                {data: 'id', name: 'datasets.id'},
+                {data: 'original_id', name: 'datasets.original_id'},
+                {data: 'display_name', name: 'sources.display_name'},
+                {data: 'title', name: 'datasets.title'},
+                {data: 'created_at', name: 'datasets.created_at'},
                 {data: 'action', name: 'action', orderable: false, searchable: false}
             ],
             columnDefs: [
                 {responsivePriority: 1, targets: 0},
-                {responsivePriority: 2, targets: 1},
-                {responsivePriority: 1, targets: 2},
+                {responsivePriority: 3, targets: 1},
+                {responsivePriority: 2, targets: 2},
                 {responsivePriority: 1, targets: 3},
-                {responsivePriority: 2, targets: 4},
-                {responsivePriority: 1, targets: 5}
+                {responsivePriority: 3, targets: 4},
+                {responsivePriority: 2, targets: 5}
             ],
             language: {
-                processing: '<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i><span class="sr-only">Loading...</span>'
+                processing: '<i class="fa fa-spinner faa-spin fa-3x fa-fw animated"></i><span class="sr-only">Loading...</span>'
 
             }
         });

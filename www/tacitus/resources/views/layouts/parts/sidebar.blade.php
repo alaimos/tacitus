@@ -4,24 +4,34 @@
             <li>
                 <a href="{{ url('/') }}"><i class="fa fa-dashboard fa-fw"></i> Home</a>
             </li>
-            <li>
-                <a href="{{ route('datasets-lists') }}"><i class="fa fa-database fa-fw"></i> Datasets</a>
-            </li>
-            <li>
-                <a href="http://to.define/"><i class="fa fa-table fa-fw"></i> Selections</a>
-            </li>
-            <li>
-                <a href="#"><i class="fa fa-wrench fa-fw"></i> Tools<span class="fa arrow"></span></a>
-                <ul class="nav nav-second-level">
-                    <li>
-                        <a href="http://to.define/"><i class="fa fa-link fa-fw"></i> Integrator</a>
-                    </li>
-                </ul>
-                <!-- /.nav-second-level -->
-            </li>
-            <li>
-                <a href="http://to.define/"><i class="fa fa-cog fa-fw"></i> Jobs</a>
-            </li>
+            @if(user_can(\App\Utils\Permissions::VIEW_DATASETS))
+                <li>
+                    <a href="{{ route('datasets-lists') }}"><i class="fa fa-database fa-fw"></i> Datasets</a>
+                </li>
+            @endif
+            @if(user_can(\App\Utils\Permissions::VIEW_SELECTIONS))
+                <li>
+                    <a href="http://to.define/"><i class="fa fa-table fa-fw"></i> Selections</a>
+                </li>
+            @endif
+            @if(user_can(\App\Utils\Permissions::USE_TOOLS))
+                <li>
+                    <a href="#"><i class="fa fa-wrench fa-fw"></i> Tools<span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        @if(user_can(\App\Utils\Permissions::INTEGRATE_DATASETS))
+                            <li>
+                                <a href="http://to.define/"><i class="fa fa-link fa-fw"></i> Integrator</a>
+                            </li>
+                        @endif
+                    </ul>
+                    <!-- /.nav-second-level -->
+                </li>
+            @endif
+            @if(user_can(\App\Utils\Permissions::VIEW_JOBS))
+                <li>
+                    <a href="{{ route('jobs-list') }}"><i class="fa fa-cog fa-fw"></i> Jobs</a>
+                </li>
+            @endif
             {{--
             <li>
                 <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Charts<span class="fa arrow"></span></a>

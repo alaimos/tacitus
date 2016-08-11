@@ -7,8 +7,14 @@
 
 namespace App\Utils;
 
+use Auth;
+
 class Utils
 {
+
+    protected static $allowedForGuest = [
+        'view-datasets',
+    ];
 
     /**
      * Delete a file or a directory
@@ -76,6 +82,30 @@ class Utils
         $unit = ['b', 'Kb', 'Mb', 'Gb', 'Tb', 'Pb'];
         $i = floor(log($size, 1024));
         return @round($size / pow(1024, $i), 2) . ' ' . $unit[(int)$i];
+    }
+
+    /**
+     * Checks if current user can do something
+     *
+     * @param string $permission
+     * @return bool
+     */
+    public static function userCan($permission)
+    {
+        if (Auth::guest()) {
+            return in_array($permission, self::$allowedForGuest);
+        }
+        return Auth::user()->can($permission);
+    }
+
+    /**
+     * Get the current user
+     *
+     * @return \App\Models\User|null
+     */
+    public static function currentUser()
+    {
+        return Auth::guest() ? null : Auth::user();
     }
 
 }
