@@ -1,4 +1,9 @@
 <?php
+/**
+ * TACITuS - Transcriptomic dAta Collector, InTegrator, and Selector
+ *
+ * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
+ */
 
 namespace App\Http\Controllers;
 
@@ -8,6 +13,7 @@ use App\Models\Source;
 use App\Utils\Permissions;
 use App\Models\Job as JobData;
 use Auth;
+use Carbon\Carbon;
 use Datatables;
 use Flash;
 use Illuminate\Http\Request;
@@ -87,7 +93,7 @@ class DatasetController extends Controller
             $jobData->save();
             $job = JobFactory::getQueueJob($jobData);
             $this->dispatch($job);
-            Flash::success('Job successfully submitted. Please check the Jobs panel in order to check the ' .
+            Flash::success('Job successfully submitted. Please check the Jobs panel in order to see the ' .
                            'status of your request.');
         } catch (\Exception $e) {
             Flash::error('Error occurred while submitting job: ' . $e->getMessage());
@@ -95,4 +101,112 @@ class DatasetController extends Controller
         return redirect()->route('datasets-lists');
     }
 
+    /**
+     * Shows sample selection form
+     *
+     * @param Request $request
+     * @param Dataset $dataset
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function sampleSelection(Request $request, Dataset $dataset)
+    {
+        if (!$dataset || !$dataset->exists) {
+            abort(404, 'Unable to find the dataset.');
+        }
+        if (!$dataset->canSelect()) {
+            abort(401, 'You are not allowed to use this dataset');
+        }
+        return view('datasets.samples.selection', [
+            'dataset' => $dataset,
+        ]);
+
+    }
+
+    /**
+     * Process datatables ajax request for the list of samples
+     *
+     * @param Request $request
+     * @param Dataset $dataset
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function sampleSelectionData(Request $request, Dataset $dataset)
+    {
+        if (!$dataset || !$dataset->exists) {
+            abort(404, 'Unable to find the dataset.');
+        }
+        if (!$dataset->canSelect()) {
+            abort(401, 'You are not allowed to use this dataset');
+        }
+        /** @var \Yajra\Datatables\Engines\CollectionEngine $table */
+        $table = Datatables::of($dataset->getMetadataSamplesCollection());
+        return $table->make(true);
+    }
+
+    /**
+     * Prepare and queue sample selection
+     *
+     * @param Request $request
+     * @param Dataset $dataset
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function queueSampleSelection(Request $request, Dataset $dataset)
+    {
+        if (!$dataset || !$dataset->exists) {
+            abort(404, 'Unable to find the dataset.');
+        }
+        if (!$dataset->canSelect()) {
+            abort(401, 'You are not allowed to use this dataset');
+        }
+        $selectionName = $request->get('selectionName');
+        if (empty($selectionName)) {
+            $selectionName = 'Selection from ' . $dataset->source->display_name . ' dataset ' .
+                             $dataset->original_id . ' on ' . Carbon::now()->toDateTimeString();
+        }
+        $samples = $request->get('samples');
+        if (empty($samples)) {
+            Flash::error('You must select at least one sample.');
+            return redirect()->back();
+        }
+        if (!is_array($samples)) {
+            $samples = (array)$samples;
+        }
+        $jobData = new JobData([
+            'job_type' => 'dataset_selection',
+            'status'   => JobData::QUEUED,
+            'job_data' => [
+                'dataset_id'    => $dataset->id,
+                'selectionName' => $selectionName,
+                'samples'       => $samples
+            ]
+        ]);
+        $jobData->user()->associate(Auth::user());
+        $jobData->save();
+        $job = JobFactory::getQueueJob($jobData);
+        $this->dispatch($job);
+        Flash::success('Selection Job successfully submitted. Please check the Jobs panel in order to see the ' .
+                       'status of your request.');
+        return redirect()->route('datasets-lists');
+    }
+
+    /**
+     * Delete a dataset
+     *
+     * @param Dataset $dataset
+     * @return mixed
+     */
+    public function delete(Dataset $dataset)
+    {
+        if (!user_can(Permissions::DELETE_DATASETS)) {
+            abort(403);
+        }
+        if (!$dataset || !$dataset->exists) {
+            abort(404, 'Unable to find the dataset.');
+        }
+        if (!$dataset->canDelete()) {
+            abort(401, 'You are not allowed to delete this dataset.');
+        }
+        $dataset->delete();
+        Flash::success('Selection deleted successfully.');
+        return back();
+    }
 }

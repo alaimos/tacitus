@@ -1,6 +1,6 @@
 @if($dataset->canSelect())
     <a href="{{ route('datasets-select', ['dataset' => $dataset]) }}" class="btn btn-xs btn-primary">
-        <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Select samples
+        <i class="fa fa-pencil-square-o" aria-hidden="true"></i> Make Selection
     </a>
 @endif
 @if($dataset->canDelete())

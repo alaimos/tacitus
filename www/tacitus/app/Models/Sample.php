@@ -1,4 +1,9 @@
 <?php
+/**
+ * TACITuS - Transcriptomic dAta Collector, InTegrator, and Selector
+ *
+ * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
+ */
 
 namespace App\Models;
 
@@ -40,6 +45,28 @@ class Sample extends Model
     protected $fillable = [
         'name', 'position', 'dataset_id'
     ];
+
+    /**
+     * Return a complete metadata array for this sample
+     *
+     * @return array
+     */
+    public function toMetadataArray()
+    {
+        $data = [
+            'id'   => $this->position + 1,
+            'key'  => $this->getKey(),
+            'name' => $this->name,
+        ];
+        $tmpMetadata = new Metadata();
+        /** @var \Jenssegers\Mongodb\Query\Builder $query */
+        $query = \DB::connection($tmpMetadata->getConnectionName())->collection($tmpMetadata->getTable());
+        $query->select()->where('sample_id', '=', $this->getKey());
+        foreach ($query->pluck('value', 'name') as $name => $value) {
+            $data[snake_case($name)] = $value;
+        }
+        return $data;
+    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo

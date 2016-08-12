@@ -11,7 +11,7 @@
             @endif
             @if(user_can(\App\Utils\Permissions::VIEW_SELECTIONS))
                 <li>
-                    <a href="http://to.define/"><i class="fa fa-table fa-fw"></i> Selections</a>
+                    <a href="{{ route('selections-lists') }}"><i class="fa fa-table fa-fw"></i> Selections</a>
                 </li>
             @endif
             @if(user_can(\App\Utils\Permissions::USE_TOOLS))

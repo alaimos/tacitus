@@ -154,9 +154,10 @@ class ArrayExpressDataParser extends AbstractDataParser
             if (preg_match(self::IDENTIFIERS_REGEXP, $item, $matches)) {
                 if ($this->identifierIndex == null) {
                     $this->identifierIndex = $i;
+                } else {
+                    $this->supportedMetadataIndex[$i] = ucwords($matches[1]);
+                    $results[] = ['name' => $this->supportedMetadataIndex[$i]];
                 }
-                $this->supportedMetadataIndex[$i] = ucwords($matches[1]);
-                $results[] = ['name' => $this->supportedMetadataIndex[$i]];
                 $supportedFields++;
             } elseif (preg_match(self::METADATA_REGEXP, $item, $matches)) {
                 $this->supportedMetadataIndex[$i] = ucwords((isset($matches[2])) ? $matches[2] : $matches[1]);

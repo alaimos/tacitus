@@ -1,15 +1,6 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Application Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register all of the routes for an application.
-| It's a breeze. Simply tell Laravel the URIs it should respond to
-| and give it the controller to call when that URI is requested.
-|
-*/
+use App\Utils\Permissions;
 
 Route::get('/', function () {
     return view('welcome');
@@ -29,31 +20,40 @@ Route::group(['as'         => 'user::',
 
 Route::get('/datasets', ['as' => 'datasets-lists', 'uses' => 'DatasetController@datasetsList']);
 Route::any('/datasets/data', ['as' => 'datasets-lists-data', 'uses' => 'DatasetController@datasetsData']);
-Route::get('/datasets/{dataset}/selection', ['as'         => 'datasets-select',
-                                             'uses'       => 'DatasetController@sampleSelection',
-                                             'middleware' => ['permission:' . \App\Utils\Permissions::SELECT_FROM_DATASETS]]);
+Route::get('/datasets/{dataset}/selection', ['as'   => 'datasets-select',
+                                             'uses' => 'DatasetController@sampleSelection']);
+Route::any('/datasets/{dataset}/selection/data', ['as'   => 'datasets-lists-samples',
+                                                  'uses' => 'DatasetController@sampleSelectionData']);
+Route::post('/datasets/{dataset}/selection', ['as'   => 'queue-dataset-selection',
+                                              'uses' => 'DatasetController@queueSampleSelection']);
 Route::get('/datasets/{dataset}/delete', ['as'         => 'datasets-delete',
                                           'uses'       => 'DatasetController@delete',
-                                          'middleware' => ['permission:' . \App\Utils\Permissions::DELETE_DATASETS]]);
+                                          'middleware' => ['permission:' . Permissions::DELETE_DATASETS]]);
 
 Route::get('/datasets/submission', ['as'         => 'datasets-submission',
                                     'uses'       => 'DatasetController@submission',
-                                    'middleware' => ['permission:' . \App\Utils\Permissions::SUBMIT_DATASETS]]);
+                                    'middleware' => ['permission:' . Permissions::SUBMIT_DATASETS]]);
 
 Route::post('/datasets/submission', ['as'         => 'datasets-submission-process',
                                      'uses'       => 'DatasetController@processSubmission',
-                                     'middleware' => ['permission:' . \App\Utils\Permissions::SUBMIT_DATASETS]]);
+                                     'middleware' => ['permission:' . Permissions::SUBMIT_DATASETS]]);
 
 Route::get('/jobs', ['as'         => 'jobs-list',
                      'uses'       => 'JobsController@jobsList',
-                     'middleware' => ['permission:' . \App\Utils\Permissions::VIEW_JOBS]]);
+                     'middleware' => ['permission:' . Permissions::VIEW_JOBS]]);
 Route::any('/jobs/data', ['as'         => 'jobs-lists-data',
                           'uses'       => 'JobsController@jobsData',
-                          'middleware' => ['permission:' . \App\Utils\Permissions::VIEW_JOBS]]);
+                          'middleware' => ['permission:' . Permissions::VIEW_JOBS]]);
 Route::any('/jobs/{job}/view', ['as'         => 'jobs-view',
                                 'uses'       => 'JobsController@viewJob',
-                                'middleware' => ['permission:' . \App\Utils\Permissions::VIEW_JOBS]]);
+                                'middleware' => ['permission:' . Permissions::VIEW_JOBS]]);
 
+Route::get('/selections', ['as' => 'selections-lists', 'uses' => 'SelectionController@selectionsList']);
+Route::any('/selections/data', ['as' => 'selections-lists-data', 'uses' => 'SelectionController@selectionsData']);
+Route::get('/selections/{selection}/download/{type}',
+    ['as' => 'selections-download', 'uses' => 'SelectionController@download']);
+Route::get('/selections/{selection}/delete',
+    ['as' => 'selections-delete', 'uses' => 'SelectionController@delete']);
 /*
 Route::controller('datatables', 'DatatablesController', [
     'anyData'  => 'datatables.data',

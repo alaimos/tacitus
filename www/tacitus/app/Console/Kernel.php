@@ -15,7 +15,7 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         Commands\Notification::class,
         Commands\TestImport::class,
-        Commands\TestLineCounter::class,
+        Commands\TestSelection::class,
     ];
 
     /**

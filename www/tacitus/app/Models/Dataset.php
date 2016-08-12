@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Utils\Permissions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Jenssegers\Mongodb\Eloquent\HybridRelations;
 
 /**
@@ -152,5 +153,85 @@ class Dataset extends Model
         $isOwned = ($current !== null && $current->id == $this->user->id);
         return (user_can(Permissions::SELECT_FROM_DATASETS) && (user_can(Permissions::USE_ALL_DATASETS) || $isOwned));
     }
+
+    /**
+     * Returns a collection of samples to be used as table source
+     *
+     * @param array $selection
+     * @return Collection
+     */
+    public function getMetadataSamplesCollection(array $selection = [])
+    {
+        $samples = new Collection();
+        $query = Sample::whereDatasetId($this->id);
+        if (!empty($selection)) {
+            $query->where(function ($query) use ($selection) {
+                foreach ($selection as $id) {
+                    $query->orWhere('_id', '=', $id);
+                }
+            });
+        }
+        foreach ($query->get() as $sample) {
+            $samples->push($sample->toMetadataArray());
+        }
+        return $samples;
+    }
+
+    /**
+     * Delete a sample metadata
+     *
+     * @param string $sampleId
+     * @return void
+     */
+    protected function deleteSampleMetadata($sampleId)
+    {
+        $tmpMetadata = new Metadata();
+        /** @var \MongoDb\Collection $collection */
+        $collection = \DB::connection($tmpMetadata->getConnectionName())->getCollection($tmpMetadata->getTable());
+        $collection->deleteMany(['sample_id' => $sampleId]);
+    }
+
+    /**
+     * Delete all probes
+     *
+     * @return $this
+     */
+    protected function deleteProbes()
+    {
+        $probe = new Probe();
+        /** @var \MongoDb\Collection $collection */
+        $collection = \DB::connection($probe->getConnectionName())->getCollection($probe->getTable());
+        $collection->deleteMany(['dataset_id' => $this->id]);
+        return $this;
+    }
+
+    /**
+     * Delete all samples
+     *
+     * @return $this
+     */
+    protected function deleteSamples()
+    {
+        $query = Sample::whereDatasetId($this->id);
+        foreach ($query->get() as $sample) {
+            $this->deleteSampleMetadata($sample->getKey());
+            $sample->delete();
+        }
+        return $this;
+    }
+
+    /**
+     * Delete the model from the database.
+     *
+     * @return bool|null
+     *
+     * @throws \Exception
+     */
+    public function delete()
+    {
+        $this->deleteSamples()->deleteProbes();
+        return parent::delete();
+    }
+
 
 }

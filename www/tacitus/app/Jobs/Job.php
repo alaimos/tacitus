@@ -38,4 +38,11 @@ abstract class Job
         ])->send();
     }
 
+    /**
+     * Delete the job
+     *
+     * @return void
+     */
+    public abstract function destroy();
+
 }

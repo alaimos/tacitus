@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class AddUserIdFieldToJobs extends Migration
+class AddUserIdFieldToSampleSelections extends Migration
 {
     /**
      * Run the migrations.
@@ -12,9 +12,9 @@ class AddUserIdFieldToJobs extends Migration
      */
     public function up()
     {
-        Schema::table('jobs', function (Blueprint $table) {
+        Schema::table('sample_selections', function (Blueprint $table) {
             $table->integer('user_id')->unsigned()->index();
-            $table->foreign('user_id', 'user_id_to_user_foreign_key')->references('id')->on('users')
+            $table->foreign('user_id', 'sample_selection_user_id_foreign_key')->references('id')->on('users')
                 ->onDelete('cascade')->onUpdate('cascade');
         });
     }
@@ -26,8 +26,8 @@ class AddUserIdFieldToJobs extends Migration
      */
     public function down()
     {
-        Schema::table('jobs', function (Blueprint $table) {
-            $table->dropForeign('user_id_to_user_foreign_key');
+        Schema::table('sample_selections', function (Blueprint $table) {
+            $table->dropForeign('sample_selection_user_id_foreign_key');
             $table->dropColumn('user_id');
         });
     }

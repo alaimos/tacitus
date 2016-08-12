@@ -27,7 +27,7 @@
     <div class="row">
         <div class="col-lg-12">
             {{--  table table-condensed table-responsive --}}
-            <table class="display responsive no-wrap" id="datasets-table">
+            <table class="table table-condensed table-responsive table-hover table-striped no-wrap" id="datasets-table">
                 <thead>
                 <tr>
                     <th>#</th>
@@ -56,14 +56,27 @@
     </div>
 
 @endsection
-
+@push('head-scripts')
+<script src="{{ url('js/pdfmake.min.js') }}"></script>
+<script src="{{ url('js/vfs_fonts.js') }}"></script>
+<script src="{{ url('js/jszip.min.js') }}"></script>
+@endpush
 @push('scripts')
 <script>
     $(function () {
         $('#datasets-table').dataTable({
+            dom: "<'row'<'col-sm-3'l><'col-sm-6 text-center'B><'col-sm-3'f>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-5'i><'col-sm-7'p>>",
             responsive: true,
             processing: true,
             serverSide: true,
+            buttons: [
+                'copyHtml5',
+                'excelHtml5',
+                'csvHtml5',
+                'print'
+            ],
             ajax: {
                 url: '{{ route('datasets-lists-data') }}',
                 method: 'POST'

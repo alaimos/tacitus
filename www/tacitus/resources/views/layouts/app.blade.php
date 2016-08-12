@@ -20,6 +20,7 @@
     <!--[if lt IE 9]>
     <script src="{{ url('js/ie6.js') }}"></script>
     <![endif]-->
+    @stack('head-scripts')
 
 </head>
 

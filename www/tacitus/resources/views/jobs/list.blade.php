@@ -20,7 +20,7 @@
     <div class="row">
         <div class="col-lg-12">
             {{--  table table-condensed table-responsive --}}
-            <table class="display responsive no-wrap" id="jobs-table">
+            <table class="table table-condensed table-responsive table-hover table-striped no-wrap" id="jobs-table">
                 <thead>
                 <tr>
                     <th>#</th>

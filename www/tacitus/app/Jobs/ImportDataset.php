@@ -7,10 +7,8 @@
 
 namespace App\Jobs;
 
-
 use App\Dataset\Registry\ParserFactoryRegistry;
 use App\Jobs\Exception\JobException;
-use App\Models\User;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
@@ -49,7 +47,7 @@ class ImportDataset extends Job implements ShouldQueue
      */
     public function handle()
     {
-        $user = User::whereId($this->jobData->job_data['user_id'])->first();
+        $user = $this->jobData->user;
         if ($this->attempts() > 3) {
             $this->jobData->status = JobData::FAILED;
             $this->jobData->save();
@@ -86,9 +84,21 @@ class ImportDataset extends Job implements ShouldQueue
                 $this->sendNotification($user, 'exclamation-triangle',
                     'One of your jobs (id: ' . $this->jobData->id . ') failed processing. Our system will automatically retry the job in order to check for temporary errors.');
                 $this->jobData->status = JobData::FAILED;
+                $this->failed();
             }
         }
         $this->jobData->save();
     }
+
+    /**
+     * Delete the job
+     *
+     * @return void
+     */
+    public function destroy()
+    {
+        $this->jobData->deleteJobDirectory();
+    }
+
 
 }

@@ -30,6 +30,12 @@ elixir(function (mix) {
     mix.copy(bower_base + 'c3/c3.min.js', 'public/js');
     //D3 Library
     mix.copy(bower_base + 'd3/d3.min.js', 'public/js');
+    //JSZip Library
+    mix.copy(bower_base + 'jszip/dist/jszip.min.js', 'public/js');
+    //PDFMAKE Library
+    mix.copy(bower_base + 'pdfmake-dist/build/pdfmake.min.js', 'public/js');
+    mix.copy(bower_base + 'pdfmake-dist/build/pdfmake.min.js.map', 'public/js')
+    mix.copy(bower_base + 'pdfmake-dist/build/vfs_fonts.js', 'public/js')
     //FontAwesome Fonts
     mix.copy(bower_base + 'font-awesome/fonts', 'public/fonts');
 
@@ -40,7 +46,7 @@ elixir(function (mix) {
         vendors + 'jquery-ui/themes/base/jquery-ui.css',
         vendors + 'tether/dist/css/tether.css',
         vendors + 'bootstrap/dist/css/bootstrap.css',
-        vendors + 'datatables/media/css/jquery.dataTables.css',
+        //vendors + 'datatables/media/css/jquery.dataTables.css',
         vendors + 'datatables/media/css/dataTables.bootstrap.css',
         vendors + 'metisMenu/dist/metisMenu.css',
         'theme.css',
@@ -63,6 +69,13 @@ elixir(function (mix) {
         vendors + 'datatables/media/js/dataTables.bootstrap.js',
         vendors + 'datatables-responsive/js/dataTables.responsive.js',
         vendors + 'datatables-responsive/js/responsive.bootstrap.js',
+        vendors + 'datatables-select/js/dataTables.select.js',
+        vendors + 'datatables-fixedcolumns/js/dataTables.fixedColumns.js',
+        vendors + 'datatables-buttons/js/dataTables.buttons.js',
+        vendors + 'datatables-buttons/js/buttons.html5.js',
+        vendors + 'datatables-buttons/js/buttons.print.js',
+        vendors + 'datatables-buttons/js/buttons.colVis.js',
+        vendors + 'datatables-buttons/js/buttons.bootstrap.js',
         vendors + 'moment/moment.js',
         vendors + 'metisMenu/dist/metisMenu.js'
     ], 'public/js/base.js');
@@ -70,8 +83,14 @@ elixir(function (mix) {
     mix.scriptsIn('resources/assets/js', 'public/js/app.js');
 
     mix.sass([
-        vendors + 'datatables-responsive/css/responsive.dataTables.scss',
+        //vendors + 'datatables-responsive/css/responsive.dataTables.scss',
         vendors + 'datatables-responsive/css/responsive.bootstrap.scss',
+        //vendors + 'datatables-select/css/select.dataTables.scss',
+        vendors + 'datatables-select/css/select.bootstrap.scss',
+        //vendors + 'datatables-fixedcolumns/css/fixedColumns.dataTables.scss',
+        vendors + 'datatables-fixedcolumns/css/fixedColumns.bootstrap.scss',
+        //vendors + 'datatables-buttons/css/buttons.dataTables.scss',
+        vendors + 'datatables-buttons/css/buttons.bootstrap.scss',
         'app.scss'
     ], 'public/css/app.css');
 
