@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Jobs\Factory;
 use App\Utils\Permissions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\Collection;
+use App\Models\Job as JobData;
 use Jenssegers\Mongodb\Eloquent\HybridRelations;
 
 /**
@@ -40,7 +43,7 @@ use Jenssegers\Mongodb\Eloquent\HybridRelations;
  */
 class Dataset extends Model
 {
-    use HybridRelations;
+    use HybridRelations, DispatchesJobs;
 
     const PENDING = 'pending';
     const READY = 'ready';
@@ -73,7 +76,7 @@ class Dataset extends Model
         /** @var \Illuminate\Database\Query\Builder $query */
         $query = self::join('sources', 'datasets.source_id', '=', 'sources.id')
             ->where('datasets.status', '=', self::READY);
-        if (user_can(Permissions::VIEW_DATASETS) && !user_can(Permissions::VIEW_ALL_DATASETS)) {
+        if (user_can(Permissions::VIEW_DATASETS) && !user_can(Permissions::ADMINISTER)) {
             $owner = current_user();
             if ($owner === null) {
                 $query->where('datasets.private', '=', false);
@@ -83,7 +86,7 @@ class Dataset extends Model
                 });
             }
             return $query;
-        } elseif (user_can(Permissions::VIEW_DATASETS) && user_can(Permissions::VIEW_ALL_DATASETS)) {
+        } elseif (user_can(Permissions::VIEW_DATASETS) && user_can(Permissions::ADMINISTER)) {
             return $query;
         } else {
             return abort(401, 'You are not allowed to view datasets.');
@@ -139,7 +142,7 @@ class Dataset extends Model
     {
         $current = current_user();
         $isOwned = ($current !== null && $current->id == $this->user->id);
-        return (user_can(Permissions::DELETE_DATASETS) && (user_can(Permissions::USE_ALL_DATASETS) || $isOwned));
+        return (user_can(Permissions::DELETE_DATASETS) && (user_can(Permissions::ADMINISTER) || $isOwned));
     }
 
     /**
@@ -151,7 +154,7 @@ class Dataset extends Model
     {
         $current = current_user();
         $isOwned = ($current !== null && $current->id == $this->user->id);
-        return (user_can(Permissions::SELECT_FROM_DATASETS) && (user_can(Permissions::USE_ALL_DATASETS) || $isOwned));
+        return (user_can(Permissions::SELECT_FROM_DATASETS) && (user_can(Permissions::ADMINISTER) || $isOwned));
     }
 
     /**
@@ -196,7 +199,7 @@ class Dataset extends Model
      *
      * @return $this
      */
-    protected function deleteProbes()
+    public function deleteProbes()
     {
         $probe = new Probe();
         /** @var \MongoDb\Collection $collection */
@@ -210,7 +213,7 @@ class Dataset extends Model
      *
      * @return $this
      */
-    protected function deleteSamples()
+    public function deleteSamples()
     {
         $query = Sample::whereDatasetId($this->id);
         foreach ($query->get() as $sample) {
@@ -229,7 +232,29 @@ class Dataset extends Model
      */
     public function delete()
     {
-        $this->deleteSamples()->deleteProbes();
+        if (!$this->canDelete()) {
+            throw new \RuntimeException('You are not allowed to delete this dataset.');
+        }
+        $jobData = new JobData([
+            'job_type' => 'delete_dataset',
+            'status'   => JobData::QUEUED,
+            'job_data' => [
+                'dataset_id' => $this->id
+            ],
+            'log'      => ''
+        ]);
+        $jobData->save();
+        $this->dispatch(Factory::getQueueJob($jobData));
+        return true;
+    }
+
+    /**
+     * Delete the model from the database.
+     *
+     * @return bool|null
+     */
+    public function realDelete()
+    {
         return parent::delete();
     }
 

@@ -59,7 +59,6 @@ class DatasetSelection extends Job implements ShouldQueue
     {
         $this->jobData->log = $this->jobData->log . $message;
         $this->jobData->save();
-        echo $message;
         return $this;
     }
 
@@ -235,8 +234,7 @@ class DatasetSelection extends Job implements ShouldQueue
                 } catch (\Exception $e) {
                     $this->log("\n");
                     $errorClass = join('', array_slice(explode('\\', get_class($e)), -1));
-                    $this->log('Unable to complete job. Error "' . $errorClass . '" with message "' . $e->getMessage() . '".');
-                    echo $e->__toString();
+                    $this->log('Unable to complete job. Error "' . $errorClass . '" with message "' . $e->getMessage() . "\".\n");
                     if ($sampleSelection !== null && $sampleSelection instanceof SampleSelection) {
                         $sampleSelection->status = SampleSelection::FAILED;
                     }
@@ -244,6 +242,9 @@ class DatasetSelection extends Job implements ShouldQueue
                 }
                 if ($sampleSelection !== null && $sampleSelection instanceof SampleSelection) {
                     $sampleSelection->save();
+                    $tmp = $this->jobData->job_data;
+                    $tmp['selection_id'] = $sampleSelection->id;
+                    $this->jobData->job_data = $tmp;
                 }
             } else {
                 $ok = false;
@@ -253,15 +254,15 @@ class DatasetSelection extends Job implements ShouldQueue
                 $this->sendNotification($user, 'check-circle',
                     'One of your jobs (id: ' . $this->jobData->id . ') has been processed successfully.');
                 $this->jobData->status = JobData::COMPLETED;
+                $this->jobData->save();
             } else {
                 $this->sendNotification($user, 'exclamation-triangle',
                     'One of your jobs (id: ' . $this->jobData->id . ') failed processing. Our system will automatically retry the job in order to check for temporary errors.');
                 $this->jobData->status = JobData::FAILED;
-                $this->failed();
-                $this->release();
+                $this->jobData->save();
+                throw new JobException('Job Failed'); //Releases the job back into the queue
             }
         }
-        $this->jobData->save();
     }
 
     /**

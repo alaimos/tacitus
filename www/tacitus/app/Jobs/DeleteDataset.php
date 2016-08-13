@@ -7,14 +7,16 @@
 
 namespace App\Jobs;
 
-use App\Dataset\Registry\ParserFactoryRegistry;
 use App\Jobs\Exception\JobException;
+use App\Models\Dataset;
+use App\Models\SampleSelection;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use App\Models\Job as JobData;
 
-class ImportDataset extends Job implements ShouldQueue
+
+class DeleteDataset extends Job implements ShouldQueue
 {
 
     use InteractsWithQueue, SerializesModels;
@@ -34,10 +36,23 @@ class ImportDataset extends Job implements ShouldQueue
     public function __construct(JobData $jobData)
     {
         $this->jobData = $jobData;
-        if ($this->jobData->job_type != 'import_dataset') {
+        if ($this->jobData->job_type != 'delete_dataset') {
             throw new JobException('This job cannot be run by this class.');
         }
-        $this->onQueue('importer'); // Set the default queue for this job
+        $this->onQueue('maintenance'); // Set the default queue for this job
+    }
+
+    /**
+     * Print a log message
+     *
+     * @param string $message
+     * @return $this
+     */
+    protected function log($message)
+    {
+        $this->jobData->log = $this->jobData->log . $message;
+        $this->jobData->save();
+        return $this;
     }
 
     /**
@@ -58,28 +73,41 @@ class ImportDataset extends Job implements ShouldQueue
                 'if you believe a bug is present in our system.');
             $this->delete();
         } else {
-            $registry = new ParserFactoryRegistry();
-            $factories = $registry->getParsers($this->jobData->job_data['source_type']);
-            if (empty($factories)) {
-                throw new JobException('Unable to find parsers suited for this import job.');
-            }
             $this->jobData->status = JobData::PROCESSING;
             $this->jobData->save();
             $this->sendNotification($user, 'comment',
                 'One of your jobs (id: ' . $this->jobData->id . ') started processing.');
-            $ok = false;
-            foreach ($factories as $factory) {
-                $job = $factory->setJobData($this->jobData)->getRealImporter();
-                if ($job->run()) {
+            $dataset = Dataset::whereId($this->jobData->job_data['dataset_id'])->first();
+            if ($dataset === null) {
+                $ok = false;
+                $this->log("Unable to complete the job. The specified dataset was not found.\n");
+            } else {
+                try {
+                    $this->log('Deleting dataset "' . $dataset->title . "\".\n");
+                    $dataset->status = Dataset::PENDING;
+                    $dataset->save();
+                    $this->log('Deleting all samples');
+                    $dataset->deleteSamples();
+                    $this->log("...OK\n");
+                    $this->log('Deleting all probes');
+                    $dataset->deleteProbes();
+                    $this->log("...OK\n");
+                    $this->log('Deleting dataset record');
+                    $dataset->realDelete();
+                    $this->log("...OK\n");
+                    $this->log("Dataset deleted successfully!\n");
                     $ok = true;
-                    break;
+                } catch (\Exception $e) {
+                    $this->log("\n");
+                    $errorClass = join('', array_slice(explode('\\', get_class($e)), -1));
+                    $this->log('Unable to complete job. Error "' . $errorClass . '" with message "' . $e->getMessage() . "\".\n");
+                    $ok = false;
                 }
             }
             if ($ok) {
                 $this->sendNotification($user, 'check-circle',
                     'One of your jobs (id: ' . $this->jobData->id . ') has been processed successfully.');
                 $this->jobData->status = JobData::COMPLETED;
-                //$this->jobData->deleteJobDirectory(); //@TODO enable this
                 $this->jobData->save();
             } else {
                 $this->sendNotification($user, 'exclamation-triangle',
@@ -98,6 +126,12 @@ class ImportDataset extends Job implements ShouldQueue
      */
     public function destroy()
     {
+        if (isset($this->jobData->job_data['selection_id'])) {
+            $selection = SampleSelection::whereId($this->jobData->job_data['selection_id'])->first();
+            if ($selection !== null) {
+                $selection->delete();
+            }
+        }
         $this->jobData->deleteJobDirectory();
     }
 

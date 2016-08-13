@@ -47,6 +47,9 @@ Route::any('/jobs/data', ['as'         => 'jobs-lists-data',
 Route::any('/jobs/{job}/view', ['as'         => 'jobs-view',
                                 'uses'       => 'JobsController@viewJob',
                                 'middleware' => ['permission:' . Permissions::VIEW_JOBS]]);
+Route::get('/jobs/{job}/delete', ['as'         => 'jobs-delete',
+                                  'uses'       => 'JobsController@delete',
+                                  'middleware' => ['permission:' . Permissions::VIEW_JOBS]]);
 
 Route::get('/selections', ['as' => 'selections-lists', 'uses' => 'SelectionController@selectionsList']);
 Route::any('/selections/data', ['as' => 'selections-lists-data', 'uses' => 'SelectionController@selectionsData']);

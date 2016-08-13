@@ -7,6 +7,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Dataset\Registry\ParserFactoryRegistry;
 use App\Jobs\Factory as JobFactory;
 use App\Models\Dataset;
 use App\Models\Source;
@@ -61,6 +62,7 @@ class DatasetController extends Controller
      */
     public function submission()
     {
+        new ParserFactoryRegistry(); //Init Parser Factory Registry to setup all sources
         return view('datasets.submissionForm', [
             'sources' => Source::all()->pluck('display_name', 'name'),
         ]);
@@ -87,14 +89,15 @@ class DatasetController extends Controller
                     'original_id' => $request->get('accession'),
                     'source_type' => $request->get('source_type'),
                     'private'     => boolval($request->get('private', false)),
-                ]
+                ],
+                'log'      => ''
             ]);
             $jobData->user()->associate(Auth::user());
             $jobData->save();
             $job = JobFactory::getQueueJob($jobData);
             $this->dispatch($job);
-            Flash::success('Job successfully submitted. Please check the Jobs panel in order to see the ' .
-                           'status of your request.');
+            Flash::success('Your import request has been submitted. Please check the Jobs panel in order to verify ' .
+                           'its status.');
         } catch (\Exception $e) {
             Flash::error('Error occurred while submitting job: ' . $e->getMessage());
         }
@@ -177,14 +180,15 @@ class DatasetController extends Controller
                 'dataset_id'    => $dataset->id,
                 'selectionName' => $selectionName,
                 'samples'       => $samples
-            ]
+            ],
+            'log'      => ''
         ]);
         $jobData->user()->associate(Auth::user());
         $jobData->save();
         $job = JobFactory::getQueueJob($jobData);
         $this->dispatch($job);
-        Flash::success('Selection Job successfully submitted. Please check the Jobs panel in order to see the ' .
-                       'status of your request.');
+        Flash::success('Your selection request has been submitted. Please check the Jobs panel in order to verify ' .
+                       'its status.');
         return redirect()->route('datasets-lists');
     }
 
@@ -206,7 +210,8 @@ class DatasetController extends Controller
             abort(401, 'You are not allowed to delete this dataset.');
         }
         $dataset->delete();
-        Flash::success('Selection deleted successfully.');
+        Flash::success('Your deletion request has been submitted. Please check the Jobs panel in order to verify its ' .
+                       'status.');
         return back();
     }
 }

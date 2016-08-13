@@ -7,9 +7,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\Factory;
 use App\Models\Job as JobData;
 use Auth;
 use Datatables;
+use Flash;
 use Illuminate\Http\Request;
 
 class JobsController extends Controller
@@ -55,10 +57,7 @@ class JobsController extends Controller
                     break;
             }
             return $text . ucfirst($jobData->status);
-        })->addColumn('view', function (JobData $jobData) {
-            if ($jobData->status == JobData::QUEUED) {
-                return '';
-            }
+        })->addColumn('action', function (JobData $jobData) {
             return view('jobs.list_action_column', [
                 'jobData' => $jobData
             ])->render();
@@ -76,5 +75,26 @@ class JobsController extends Controller
     public function viewJob(Request $request, JobData $job)
     {
         return response()->json($job->toArray());
+    }
+
+
+    /**
+     * Delete a job
+     *
+     * @param JobData $job
+     * @return mixed
+     */
+    public function delete(JobData $job)
+    {
+        if (!$job || !$job->exists) {
+            abort(404, 'Unable to find the job.');
+        }
+        if (!$job->canDelete()) {
+            abort(401, 'You are not allowed to delete this job.');
+        }
+        Factory::getQueueJob($job)->destroy();
+        $job->delete();
+        Flash::success('Job deleted successfully.');
+        return back();
     }
 }

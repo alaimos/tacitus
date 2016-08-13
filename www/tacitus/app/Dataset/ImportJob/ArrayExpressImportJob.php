@@ -98,7 +98,7 @@ class ArrayExpressImportJob extends AbstractImportJob
         } catch (\Exception $e) {
             $this->log("\n");
             $errorClass = join('', array_slice(explode('\\', get_class($e)), -1));
-            $this->log('Unable to complete job. Error "' . $errorClass . '" with message "' . $e->getMessage() . '".',
+            $this->log('Unable to complete job. Error "' . $errorClass . '" with message "' . $e->getMessage() . "\".\n",
                 true);
             if ($dataset !== null && $dataset instanceof Dataset) {
                 $dataset->status = Dataset::FAILED;

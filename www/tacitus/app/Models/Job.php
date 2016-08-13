@@ -56,7 +56,7 @@ class Job extends Model
      * @var array
      */
     protected $fillable = [
-        'job_type', 'status', 'job_data'
+        'job_type', 'status', 'job_data', 'log'
     ];
 
     /**
@@ -68,13 +68,13 @@ class Job extends Model
     public static function listJobs()
     {
         $query = self::query();
-        if (user_can(Permissions::VIEW_JOBS) && !user_can(Permissions::VIEW_ALL_JOBS)) {
+        if (user_can(Permissions::VIEW_JOBS) && !user_can(Permissions::ADMINISTER)) {
             $owner = current_user();
             if ($owner !== null) {
                 $query->where('user_id', '=', $owner->id);
             }
             return $query;
-        } elseif (user_can(Permissions::VIEW_JOBS) && user_can(Permissions::VIEW_ALL_JOBS)) {
+        } elseif (user_can(Permissions::VIEW_JOBS) && user_can(Permissions::ADMINISTER)) {
             return $query;
         } else {
             return abort(401, 'You are not allowed to view jobs.');
@@ -111,6 +111,18 @@ class Job extends Model
     public function deleteJobDirectory()
     {
         return Utils::delete($this->getJobDirectory());
+    }
+
+    /**
+     * Checks if the current user can delete this dataset
+     *
+     * @return bool
+     */
+    public function canDelete()
+    {
+        $current = current_user();
+        $isOwned = ($current !== null && $current->id == $this->user->id);
+        return (user_can(Permissions::VIEW_JOBS) && (user_can(Permissions::ADMINISTER) || $isOwned));
     }
 
 }

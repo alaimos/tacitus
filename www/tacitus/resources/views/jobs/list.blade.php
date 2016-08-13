@@ -28,7 +28,7 @@
                     <th>Status</th>
                     <th>Created At</th>
                     <th>Updated At</th>
-                    <th>View</th>
+                    <th>Action</th>
                 </tr>
                 </thead>
             </table>
@@ -49,7 +49,16 @@
                     </pre>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <span class="pull-left">
+                        <button type="button" class="btn btn-primary live-log-button" data-toggle="button"
+                                aria-pressed="false" autocomplete="off">
+                            <i class="fa fa-play fa-fw"></i> Live logs
+                        </button>
+                        <span class="updating"></span>
+                    </span>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">
+                        <i class="fa fa-times-circle fa-fw"></i> Close
+                    </button>
                 </div>
             </div><!-- /.modal-content -->
         </div><!-- /.modal-dialog -->
@@ -60,16 +69,50 @@
 @push('scripts')
 <script>
     $(function () {
+        var dialog = $('#log-viewer-dialog'),
+                updatingIcon = dialog.find('.updating'),
+                liveButton = dialog.find('.live-log-button'), currentId, timer;
+        dialog.on('hidden.bs.modal', function () {
+            if (liveButton.hasClass('active')) {
+                liveButton.button('toggle');
+            }
+            updatingIcon.html('');
+            currentId = null;
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+        });
+        liveButton.on('click', function () {
+            if (!liveButton.hasClass('active')) {
+                updatingIcon.html('<i class="fa fa-cog fa-spin  fa-fw"></i><span class="sr-only">Updating...</span>');
+                timer = setInterval(function () {
+                    if (!currentId) return;
+                    $.ajax({
+                        dataType: 'json',
+                        method: 'GET',
+                        url: '{{ url('/jobs') }}/' + currentId + '/view',
+                        success: function (data) {
+                            dialog.find('.modal-body').find('pre').html(data.log);
+                        }
+                    });
+                }, 10000);
+            } else {
+                updatingIcon.html('');
+                clearInterval(timer);
+                timer = null;
+            }
+        });
         var tbl = $('#jobs-table'),
                 viewLog = function (id) {
+                    currentId = id;
                     $.ajax({
                         dataType: 'json',
                         method: 'GET',
                         url: '{{ url('/jobs') }}/' + id + '/view',
                         success: function (data) {
-                            var lv = $('#log-viewer-dialog');
-                            lv.find('.modal-body').find('pre').html(data.log);
-                            lv.modal('show');
+                            dialog.find('.modal-body').find('pre').html(data.log);
+                            dialog.modal('show');
                             $('i.loading-job').remove();
                         }
                     });
@@ -88,7 +131,7 @@
                 {data: 'status', name: 'status'},
                 {data: 'created_at', name: 'created_at'},
                 {data: 'updated_at', name: 'updated_at'},
-                {data: 'view', name: 'view', orderable: false, searchable: false}
+                {data: 'action', name: 'action', orderable: false, searchable: false}
             ],
             columnDefs: [
                 {responsivePriority: 1, targets: 0},
