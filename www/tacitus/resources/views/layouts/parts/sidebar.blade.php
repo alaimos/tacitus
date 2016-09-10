@@ -36,6 +36,9 @@
                 <li>
                     <a href="{{ route('tasks-list') }}"><i class="fa fa-tasks fa-fw"></i> Tasks</a>
                 </li>
+                <li>
+                    <a href="{{ route('user::list') }}"><i class="fa fa-users fa-fw"></i> Users</a>
+                </li>
             @endif
             {{--
             <li>

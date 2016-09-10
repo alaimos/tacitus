@@ -187,4 +187,19 @@ class UserController extends Controller
         return $table->make(true);
     }
 
+    public function delete(User $user) {
+        if (!user_can(Permissions::ADMINISTER)) {
+            abort(403);
+        }
+        if (!$user->exists) {
+            abort(404, 'User does not exist');
+        }
+        if ($user->id == Auth::user()->id) {
+            abort(500, 'You are not allowed to delete yourself');
+        }
+        $user->delete();
+        Flash::success('User deleted successfully!');
+        return redirect()->back();
+    }
+
 }
