@@ -10,7 +10,7 @@
     <meta name="author" content="Salvatore Alaimo, Ph.D.">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>TACITuS</title>
+    <title>TACITuS - Transcriptomic Data Collector, Integrator, and Selector</title>
 
     <!-- Styles -->
     <link href="{{ url('css/base.css') }}" rel="stylesheet">
@@ -37,7 +37,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a class="navbar-brand" href="{{ url('/') }}">TACITuS v0.1</a>
+            <a class="navbar-brand" href="{{ url('/') }}">TACITuS</a>
         </div>
         <!-- /.navbar-header -->
 
