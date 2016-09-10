@@ -3,6 +3,7 @@ puphpet/config-custom.yaml
 .idea/
 .phpstorm.meta.php
 _ide_helper.php
+.env
 
 /www/html/index.html
 
@@ -22,3 +23,6 @@ node_modules/
 bootstrap/cache/
 
 .rocketeer/
+app/Http/Controllers/TaskController.php
+app/Task.php
+database/migrations/2016_09_10_080631_create_tasks_table.php
