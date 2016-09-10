@@ -3,7 +3,16 @@
 @section('content')
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">{{$user->name ?:'User'}}'s profile</h1>
+            <h1 class="page-header">
+                {{$user->name ?:'User'}}'s profile
+                @if ($isAdmin)
+                    <span class="pull-right">
+                        <a href="{{ route('user::list') }}" class="btn btn-info">
+                            <i class="fa fa-arrow-left" aria-hidden="true"></i> Go to Users list
+                        </a>
+                    </span>
+                @endif
+            </h1>
         </div>
         <!-- /.col-lg-12 -->
     </div>
@@ -24,8 +33,8 @@
                             <i class="fa fa-comments fa-5x"></i>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div class="huge">{{$statistics['datasets']['all']}}</div>
-                            <div>Datasets</div>
+                            <div class="huge">{{$count = $statistics['datasets']['all']}}</div>
+                            <div>{{ str_plural('Dataset', $count) }}</div>
                         </div>
                     </div>
                 </div>
@@ -54,8 +63,8 @@
                             <i class="fa fa-table fa-5x"></i>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div class="huge">{{$statistics['selections']['all']}}</div>
-                            <div>Selections</div>
+                            <div class="huge">{{$count = $statistics['selections']['all']}}</div>
+                            <div>{{ str_plural('Selection', $count) }}</div>
                         </div>
                     </div>
                 </div>
@@ -84,8 +93,8 @@
                             <i class="fa fa-cog fa-5x"></i>
                         </div>
                         <div class="col-xs-9 text-right">
-                            <div class="huge">{{$statistics['jobs']['all']}}</div>
-                            <div>Jobs</div>
+                            <div class="huge">{{$count = $statistics['jobs']['all']}}</div>
+                            <div>{{ str_plural('Job', $count) }}</div>
                         </div>
                     </div>
                 </div>
@@ -138,7 +147,7 @@
             <div class="panel panel-info">
                 <div class="panel-heading">
                     <i class="fa fa-user fa-fw"></i>
-                    Your details
+                    Account details
                 </div>
                 <div class="panel-body">
                     <dl class="dl-horizontal">
@@ -152,22 +161,35 @@
                         <dd>{{$user->created_at->diffForHumans()}}</dd>
                     </dl>
                 </div>
-                @if ($isCurrent)
-                    <div class="panel-footer">
-                        <div class="row">
-                            <div class="col-md-6">
+                <div class="panel-footer">
+                    <div class="row">
+                        <div class="col-md-6">
+                            @if ($isCurrent)
                                 <a href="{{ route('user::change-password') }}" role="button" class="btn btn-success">
                                     <i class="fa fa-key fa-fw"></i>Change password
                                 </a>
-                            </div>
-                            <div class="col-md-6 text-right">
+                            @elseif(!$isCurrent && $isAdmin)
+                                <a href="{{ route('user::change-password', $user) }}"
+                                   role="button" class="btn btn-success">
+                                    <i class="fa fa-key fa-fw"></i>Change password
+                                </a>
+                            @endif
+                        </div>
+                        <div class="col-md-6 text-right">
+                            @if ($isCurrent)
                                 <a href="{{ route('user::edit-profile') }}" role="button" class="btn btn-success">
                                     <i class="fa fa-user fa-fw"></i> Edit Profile
                                 </a>
-                            </div>
+                            @elseif(!$isCurrent && $isAdmin)
+                                <a href="{{ route('user::edit-profile', $user) }}" role="button"
+                                   class="btn btn-success">
+                                    <i class="fa fa-user fa-fw"></i> Edit Profile
+                                </a>
+                            @endif
                         </div>
                     </div>
-                @endif
+
+                </div>
             </div>
         </div>
     </div>

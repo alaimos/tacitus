@@ -3,7 +3,15 @@
 @section('content')
     <div class="row">
         <div class="col-lg-12">
-            <h1 class="page-header">Change Password</h1>
+            <h1 class="page-header">
+                Change Password
+                <span class="pull-right">
+                    <a href="{{ route('user::profile', ((!$isCurrent && $isAdmin) ? $user : [])) }}"
+                       class="btn btn-info">
+                        <i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back
+                    </a>
+                </span>
+            </h1>
         </div>
         <!-- /.col-lg-12 -->
     </div>
@@ -13,21 +21,23 @@
             <div class="panel panel-default">
                 <div class="panel-body">
                     <form class="form-horizontal" role="form" method="POST"
-                          action="{{ route('user::change-password-post') }}">
+                          action="{{ route('user::change-password-post', ((!$isCurrent && $isAdmin) ? $user : [])) }}">
                         {{ csrf_field() }}
-                        <div class="form-group{{ $errors->has('old-password') ? ' has-error' : '' }}">
-                            <label for="old-password" class="col-md-4 control-label">Old Password</label>
+                        @if ($isCurrent)
+                            <div class="form-group{{ $errors->has('old-password') ? ' has-error' : '' }}">
+                                <label for="old-password" class="col-md-4 control-label">Old Password</label>
 
-                            <div class="col-md-6">
-                                <input id="old-password" type="password" class="form-control" name="old-password">
+                                <div class="col-md-6">
+                                    <input id="old-password" type="password" class="form-control" name="old-password">
 
-                                @if ($errors->has('old-password'))
-                                    <span class="help-block">
+                                    @if ($errors->has('old-password'))
+                                        <span class="help-block">
                                         <strong>{{ $errors->first('old-password') }}</strong>
                                     </span>
-                                @endif
+                                    @endif
+                                </div>
                             </div>
-                        </div>
+                        @endif
                         <div class="form-group{{ $errors->has('password') ? ' has-error' : '' }}">
                             <label for="password" class="col-md-4 control-label">New Password</label>
 

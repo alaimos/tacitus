@@ -15,13 +15,17 @@ Route::group(['as'         => 'user::',
               'middleware' => ['permission:' . \App\Utils\Permissions::USER_PANELS]],
     function (\Illuminate\Routing\Router $router) {
         $router->get('/alerts', ['as' => 'alerts', 'uses' => 'UserController@alerts']);
-        $router->get('/profile', ['as' => 'profile', 'uses' => 'UserController@profile']);
-        $router->get('/profile/edit', ['as' => 'edit-profile', 'uses' => 'UserController@editProfile']);
-        $router->post('/profile/edit', ['as' => 'edit-profile-post', 'uses' => 'UserController@doEditProfile']);
-        $router->get('/profile/password/change', ['as' => 'change-password', 'uses' =>
-            'UserController@changePassword']);
-        $router->post('/profile/password/change', ['as' => 'change-password-post', 'uses' =>
-            'UserController@doChangePassword']);
+        $router->get('/list', ['as' => 'list', 'uses' => 'UserController@listUsers']);
+        $router->any('/list/data', ['as' => 'list-data', 'uses' => 'UserController@listUsersData']);
+        $router->get('/delete/{user}', ['as' => 'delete', 'uses' => 'UserController@delete']);
+        $router->get('/profile/{user?}', ['as' => 'profile', 'uses' => 'UserController@profile']);
+        $router->get('/profile/edit/details/{user?}', ['as' => 'edit-profile', 'uses' => 'UserController@editProfile']);
+        $router->post('/profile/edit/details/{user?}',
+            ['as' => 'edit-profile-post', 'uses' => 'UserController@doEditProfile']);
+        $router->get('/profile/password/change/{user?}',
+            ['as' => 'change-password', 'uses' => 'UserController@changePassword']);
+        $router->post('/profile/password/change/{user?}',
+            ['as' => 'change-password-post', 'uses' => 'UserController@doChangePassword']);
     }
 );
 
