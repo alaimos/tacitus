@@ -2,7 +2,10 @@
 
 namespace App\Providers;
 
+use Auth;
+use Hash;
 use Illuminate\Support\ServiceProvider;
+use Validator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +16,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        Validator::extend('old_password', function ($attribute, $value, $parameters, $validator) {
+            return Hash::check($value, Auth::user()->password);
+        }, 'The specified value does not match the current password.');
     }
 
     /**

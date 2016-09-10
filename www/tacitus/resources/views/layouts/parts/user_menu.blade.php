@@ -7,7 +7,7 @@
             <i class="fa fa-user fa-fw"></i> <i class="fa fa-caret-down"></i>
         </a>
         <ul class="dropdown-menu" role="menu">
-            <li><a href="#"><i class="fa fa-user fa-fw"></i> User Profile</a></li>
+            <li><a href="{{ route('user::profile') }}"><i class="fa fa-user fa-fw"></i> User Profile</a></li>
             <li class="divider"></li>
             <li><a href="{{ url('/logout') }}"><i class="fa fa-sign-out fa-fw"></i>Logout</a></li>
         </ul>

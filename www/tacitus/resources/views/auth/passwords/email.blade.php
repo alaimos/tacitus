@@ -2,11 +2,16 @@
 
 <!-- Main Content -->
 @section('content')
-<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+            <h1 class="page-header">Reset Password</h1>
+        </div>
+        <!-- /.col-lg-12 -->
+    </div>
+
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
             <div class="panel panel-default">
-                <div class="panel-heading">Reset Password</div>
                 <div class="panel-body">
                     @if (session('status'))
                         <div class="alert alert-success">
@@ -21,7 +26,8 @@
                             <label for="email" class="col-md-4 control-label">E-Mail Address</label>
 
                             <div class="col-md-6">
-                                <input id="email" type="email" class="form-control" name="email" value="{{ old('email') }}">
+                                <input id="email" type="email" class="form-control" name="email"
+                                       value="{{ old('email') }}">
 
                                 @if ($errors->has('email'))
                                     <span class="help-block">
@@ -43,5 +49,4 @@
             </div>
         </div>
     </div>
-</div>
 @endsection

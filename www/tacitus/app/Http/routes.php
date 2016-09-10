@@ -15,6 +15,13 @@ Route::group(['as'         => 'user::',
               'middleware' => ['permission:' . \App\Utils\Permissions::USER_PANELS]],
     function (\Illuminate\Routing\Router $router) {
         $router->get('/alerts', ['as' => 'alerts', 'uses' => 'UserController@alerts']);
+        $router->get('/profile', ['as' => 'profile', 'uses' => 'UserController@profile']);
+        $router->get('/profile/edit', ['as' => 'edit-profile', 'uses' => 'UserController@editProfile']);
+        $router->post('/profile/edit', ['as' => 'edit-profile-post', 'uses' => 'UserController@doEditProfile']);
+        $router->get('/profile/password/change', ['as' => 'change-password', 'uses' =>
+            'UserController@changePassword']);
+        $router->post('/profile/password/change', ['as' => 'change-password-post', 'uses' =>
+            'UserController@doChangePassword']);
     }
 );
 
@@ -70,6 +77,9 @@ Route::get('/selections/{selection}/download/{type}',
     ['as' => 'selections-download', 'uses' => 'SelectionController@download']);
 Route::get('/selections/{selection}/delete',
     ['as' => 'selections-delete', 'uses' => 'SelectionController@delete']);
+Route::get('/not-available', ['as' => 'not-available', function () {
+    return view('errors.feature_not_available');
+}]);
 /*
 Route::controller('datatables', 'DatatablesController', [
     'anyData'  => 'datatables.data',

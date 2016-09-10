@@ -29,6 +29,21 @@
                             </div>
                         </div>
 
+                        <div class="form-group{{ $errors->has('affiliation') ? ' has-error' : '' }}">
+                            <label for="name" class="col-md-4 control-label">Affiliation</label>
+
+                            <div class="col-md-6">
+                                <input id="name" type="text" class="form-control" name="affiliation"
+                                       value="{{ old('affiliation') }}">
+
+                                @if ($errors->has('affiliation'))
+                                    <span class="help-block">
+                                        <strong>{{ $errors->first('affiliation') }}</strong>
+                                    </span>
+                                @endif
+                            </div>
+                        </div>
+
                         <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
                             <label for="email" class="col-md-4 control-label">E-Mail Address</label>
 

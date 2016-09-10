@@ -20,7 +20,7 @@
                     <ul class="nav nav-second-level">
                         @if(user_can(\App\Utils\Permissions::INTEGRATE_DATASETS))
                             <li>
-                                <a href="http://to.define/"><i class="fa fa-link fa-fw"></i> Integrator</a>
+                                <a href="{{ route('not-available') }}"><i class="fa fa-link fa-fw"></i> Integrator</a>
                             </li>
                         @endif
                     </ul>
