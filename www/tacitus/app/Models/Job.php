@@ -60,7 +60,7 @@ class Job extends Model
     ];
 
     /**
-     * Get all datasets
+     * Get all jobs
      *
      * @return \Illuminate\Database\Eloquent\Builder
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException

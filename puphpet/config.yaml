@@ -108,7 +108,16 @@ firewall:
     rules: {  }
 cron:
     install: '1'
-    jobs: {  }
+    jobs:
+        cj_6has30tk4jrx:
+            name: artisan-schedule
+            user: 'root'
+            command: 'php /var/www/tacitus/artisan schedule:run >> /dev/null 2>&1'
+            minute: '*'
+            hour: '*'
+            weekday: '*'
+            month: '*'
+            monthday: ''
 nginx:
     install: '0'
     settings:

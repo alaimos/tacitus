@@ -51,6 +51,19 @@ Route::get('/jobs/{job}/delete', ['as'         => 'jobs-delete',
                                   'uses'       => 'JobsController@delete',
                                   'middleware' => ['permission:' . Permissions::VIEW_JOBS]]);
 
+Route::get('/tasks', ['as'         => 'tasks-list',
+                      'uses'       => 'TasksController@tasksList',
+                      'middleware' => ['permission:' . Permissions::ADMINISTER]]);
+Route::any('/tasks/data', ['as'         => 'tasks-lists-data',
+                           'uses'       => 'TasksController@tasksData',
+                           'middleware' => ['permission:' . Permissions::ADMINISTER]]);
+Route::any('/tasks/{task}/view', ['as'         => 'tasks-view',
+                                  'uses'       => 'TasksController@viewTask',
+                                  'middleware' => ['permission:' . Permissions::ADMINISTER]]);
+Route::get('/tasks/{task}/delete', ['as'         => 'tasks-delete',
+                                    'uses'       => 'TasksController@delete',
+                                    'middleware' => ['permission:' . Permissions::ADMINISTER]]);
+
 Route::get('/selections', ['as' => 'selections-lists', 'uses' => 'SelectionController@selectionsList']);
 Route::any('/selections/data', ['as' => 'selections-lists-data', 'uses' => 'SelectionController@selectionsData']);
 Route::get('/selections/{selection}/download/{type}',

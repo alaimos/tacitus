@@ -43,7 +43,7 @@
 
         <ul class="nav navbar-top-links navbar-right">
             @if(user_can(\App\Utils\Permissions::ADMINISTER))
-            <li class="dropdown">
+            {{--<li class="dropdown">
                 <a class="dropdown-toggle" data-toggle="dropdown" href="#">
                     <i class="fa fa-tasks fa-fw"></i> <i class="fa fa-caret-down"></i>
                 </a>
@@ -124,7 +124,7 @@
                     </li>
                 </ul>
                 <!-- /.dropdown-tasks -->
-            </li>
+            </li>--}}
             @endif
             <!-- /.dropdown -->
             @include('layouts.parts.notifications')

@@ -32,6 +32,11 @@
                     <a href="{{ route('jobs-list') }}"><i class="fa fa-cog fa-fw"></i> Jobs</a>
                 </li>
             @endif
+            @if(user_can(\App\Utils\Permissions::ADMINISTER))
+                <li>
+                    <a href="{{ route('tasks-list') }}"><i class="fa fa-tasks fa-fw"></i> Tasks</a>
+                </li>
+            @endif
             {{--
             <li>
                 <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Charts<span class="fa arrow"></span></a>
