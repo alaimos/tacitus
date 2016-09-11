@@ -139,6 +139,7 @@ class DatasetSelection extends Job implements ShouldQueue
             $this->logProgress(++$i, $c);
         }
         @fclose($fp);
+        chmod($fileName, 0777);
         $sampleSelection->setMetadataFilename($fileName)->save();
         $this->log("...OK\n");
         return $keyToName;
@@ -192,8 +193,8 @@ class DatasetSelection extends Job implements ShouldQueue
             $this->logProgress(($i + 1), $probes);
         }
         $this->log("...OK\n");
-        $sampleSelection->setDataFilename($fileName);
-        $sampleSelection->save();
+        chmod($fileName, 0777);
+        $sampleSelection->setDataFilename($fileName)->save();
     }
 
     /**
@@ -204,15 +205,7 @@ class DatasetSelection extends Job implements ShouldQueue
     public function handle()
     {
         $user = $this->jobData->user;
-        if ($this->attempts() > 3) {
-            $this->jobData->status = JobData::FAILED;
-            $this->jobData->save();
-            $this->sendNotification($user, 'exclamation-triangle',
-                'One of your jobs (id: ' . $this->jobData->id . ') failed processing. ' .
-                'The job has been dropped from the processing queue. Please check the ' .
-                'error log, correct the errors and submit a new request. Contact us ' .
-                'if you believe a bug is present in our system.');
-            $this->sendEmail($user, 'TACITuS Notification - A Job Failed', 'emails.job_failed', ['retry' => false]);
+        if ($this->attempts() > 1) {
             $this->delete();
         } else {
             $this->jobData->status = JobData::PROCESSING;
@@ -259,12 +252,14 @@ class DatasetSelection extends Job implements ShouldQueue
                 $this->jobData->save();
             } else {
                 $this->sendNotification($user, 'exclamation-triangle',
-                    'One of your jobs (id: ' . $this->jobData->id . ') failed processing. Our system will automatically retry the job in order to check for temporary errors.');
-                $this->sendEmail($user, 'TACITuS Notification - A Job Failed', 'emails.job_failed', ['retry' => true]);
+                    'One of your jobs (id: ' . $this->jobData->id . ') failed processing. Please check the ' .
+                    'error log, correct the errors and submit a new request. Contact us ' .
+                    'if you believe a bug is present in our system.');
+                $this->sendEmail($user, 'TACITuS Notification - A Job Failed', 'emails.job_failed');
                 $this->jobData->status = JobData::FAILED;
                 $this->jobData->save();
-                throw new JobException('Job Failed'); //Releases the job back into the queue
             }
+            $this->delete();
         }
     }
 

@@ -48,15 +48,7 @@ class ImportDataset extends Job implements ShouldQueue
     public function handle()
     {
         $user = $this->jobData->user;
-        if ($this->attempts() > 3) {
-            $this->jobData->status = JobData::FAILED;
-            $this->jobData->save();
-            $this->sendNotification($user, 'exclamation-triangle',
-                'One of your jobs (id: ' . $this->jobData->id . ') failed processing. ' .
-                'The job has been dropped from the processing queue. Please check the ' .
-                'error log, correct the errors and submit a new request. Contact us ' .
-                'if you believe a bug is present in our system.');
-            $this->sendEmail($user, 'TACITuS Notification - A Job Failed', 'emails.job_failed', ['retry' => false]);
+        if ($this->attempts() > 1) {
             $this->delete();
         } else {
             $registry = new ParserFactoryRegistry();
@@ -85,12 +77,14 @@ class ImportDataset extends Job implements ShouldQueue
                 $this->jobData->save();
             } else {
                 $this->sendNotification($user, 'exclamation-triangle',
-                    'One of your jobs (id: ' . $this->jobData->id . ') failed processing. Our system will automatically retry the job in order to check for temporary errors.');
-                $this->sendEmail($user, 'TACITuS Notification - A Job Failed', 'emails.job_failed', ['retry' => true]);
+                    'One of your jobs (id: ' . $this->jobData->id . ') failed processing. Please check the ' .
+                    'error log, correct the errors and submit a new request. Contact us ' .
+                    'if you believe a bug is present in our system.');
+                $this->sendEmail($user, 'TACITuS Notification - A Job Failed', 'emails.job_failed');
                 $this->jobData->status = JobData::FAILED;
                 $this->jobData->save();
-                throw new JobException('Job Failed'); //Releases the job back into the queue
             }
+            $this->delete();
         }
     }
 

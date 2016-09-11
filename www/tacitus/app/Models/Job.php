@@ -99,6 +99,7 @@ class Job extends Model
         $path = storage_path('app/jobs/' . $this->id);
         if (!file_exists($path)) {
             mkdir($path, 0777, true);
+            chmod($path, 0777);
         }
         return $path;
     }
