@@ -101,11 +101,12 @@ class UserController extends Controller
     {
         list($user, $currentUser) = $this->getUser($user);
         $isAdmin = user_can(Permissions::ADMINISTER);
+        $changePasswordNotSelf = $isAdmin && $user->id != $currentUser->id;
         $rules = [
             'old-password' => 'required|old_password',
-            'password'     => 'required|confirmed|different:old-password|min:6',
+            'password'     => 'required|confirmed|min:6' . (($changePasswordNotSelf) ? '' : '|different:old-password'),
         ];
-        if ($isAdmin && $user->id != $currentUser->id) {
+        if ($changePasswordNotSelf) {
             unset($rules['old-password']);
         }
         $this->validate($request, $rules);
