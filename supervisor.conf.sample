@@ -1,0 +1,39 @@
+[program:tacitus-importer-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /home/tacitus/www/artisan queue:work --queue=importer --sleep=10 --tries=4 --daemon
+autostart=true
+autorestart=true
+user=tacitus
+numprocs=3
+redirect_stderr=true
+stdout_logfile=/home/tacitus/logs/importer-worker.log
+
+[program:tacitus-maintenance-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /home/tacitus/www/artisan queue:work --queue=maintenance --sleep=10 --tries=4 --daemon
+autostart=true
+autorestart=true
+user=tacitus
+numprocs=3
+redirect_stderr=true
+stdout_logfile=/home/tacitus/logs/maintenance-worker.log
+
+[program:tacitus-analysis-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /home/tacitus/www/artisan queue:work --queue=analysis --sleep=10 --tries=4 --daemon
+autostart=true
+autorestart=true
+user=tacitus
+numprocs=3
+redirect_stderr=true
+stdout_logfile=/home/tacitus/logs/analysis-worker.log
+
+[program:tacitus-selections-worker]
+process_name=%(program_name)s_%(process_num)02d
+command=php /home/tacitus/www/artisan queue:work --queue=selections --sleep=10 --tries=4 --daemon
+autostart=true
+autorestart=true
+user=tacitus
+numprocs=3
+redirect_stderr=true
+stdout_logfile=/home/tacitus/logs/selections-worker.log
