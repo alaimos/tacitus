@@ -8,7 +8,7 @@
                 <span class="pull-right">
                     <a href="{{ route('user::profile', ((!$isCurrent && $isAdmin) ? $user : [])) }}"
                        class="btn btn-info">
-                        <i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back
+                        <i class="fa fa-arrow-left fa-fw" aria-hidden="true"></i> Go Back
                     </a>
                 </span>
             </h1>
@@ -24,10 +24,9 @@
                           action="{{ route('user::edit-profile-post', ((!$isCurrent && $isAdmin) ? $user : [])) }}">
                         {{ csrf_field() }}
                         <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
-                            <label for="name" class="col-md-4 control-label">Name</label>
+                            {!! Form::label('name', 'Name', ['class' => 'col-md-4 control-label']) !!}
                             <div class="col-md-6">
-                                <input id="name" type="text" class="form-control" name="name"
-                                       value="{{ old('name', $user->name) }}">
+                                {!! Form::text('name', $user->name, ['class' => 'form-control']) !!}
                                 @if ($errors->has('name'))
                                     <span class="help-block">
                                         <strong>{{ $errors->first('name') }}</strong>
@@ -36,10 +35,9 @@
                             </div>
                         </div>
                         <div class="form-group{{ $errors->has('affiliation') ? ' has-error' : '' }}">
-                            <label for="affiliation" class="col-md-4 control-label">Affiliation</label>
+                            {!! Form::label('affiliation', 'Affiliation', ['class' => 'col-md-4 control-label']) !!}
                             <div class="col-md-6">
-                                <input id="affiliation" type="text" class="form-control" name="affiliation"
-                                       value="{{ old('affiliation', $user->affiliation) }}">
+                                {!! Form::text('affiliation', $user->affiliation, ['class' => 'form-control']) !!}
                                 @if ($errors->has('affiliation'))
                                     <span class="help-block">
                                         <strong>{{ $errors->first('affiliation') }}</strong>
@@ -48,10 +46,9 @@
                             </div>
                         </div>
                         <div class="form-group{{ $errors->has('email') ? ' has-error' : '' }}">
-                            <label for="email" class="col-md-4 control-label">E-Mail</label>
+                            {!! Form::label('email', 'E-Mail', ['class' => 'col-md-4 control-label']) !!}
                             <div class="col-md-6">
-                                <input id="email" type="email" class="form-control" name="email"
-                                       value="{{ old('email', $user->email) }}">
+                                {!! Form::email('email', $user->email, ['class' => 'form-control']) !!}
                                 @if ($errors->has('email'))
                                     <span class="help-block">
                                         <strong>{{ $errors->first('email') }}</strong>
@@ -59,6 +56,19 @@
                                 @endif
                             </div>
                         </div>
+                        @if ($isAdmin && !$isCurrent)
+                            <div class="form-group{{ $errors->has('role') ? ' has-error' : '' }}">
+                                {!! Form::label('role[]', 'Role', ['class' => 'col-md-4 control-label']) !!}
+                                <div class="col-md-6">
+                                    {!! Form::select('role[]', $roles, $userRoles, ['class' => 'form-control', 'multiple' => true]) !!}
+                                    @if ($errors->has('role'))
+                                        <span class="help-block">
+                                        <strong>{{ $errors->first('role') }}</strong>
+                                    </span>
+                                    @endif
+                                </div>
+                            </div>
+                        @endif
                         <div class="form-group">
                             <div class="col-md-6 col-md-offset-4">
                                 <button type="submit" class="btn btn-primary">

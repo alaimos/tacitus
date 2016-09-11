@@ -13,6 +13,8 @@ Route::group(['as'         => 'user::',
         $router->get('/alerts', ['as' => 'alerts', 'uses' => 'UserController@alerts']);
         $router->get('/list', ['as' => 'list', 'uses' => 'UserController@listUsers']);
         $router->any('/list/data', ['as' => 'list-data', 'uses' => 'UserController@listUsersData']);
+        $router->get('/create', ['as' => 'create', 'uses' => 'UserController@createUser']);
+        $router->post('/create', ['as' => 'create-post', 'uses' => 'UserController@doCreateUser']);
         $router->get('/delete/{user}', ['as' => 'delete', 'uses' => 'UserController@delete']);
         $router->get('/profile/{user?}', ['as' => 'profile', 'uses' => 'UserController@profile']);
         $router->get('/profile/edit/details/{user?}', ['as' => 'edit-profile', 'uses' => 'UserController@editProfile']);

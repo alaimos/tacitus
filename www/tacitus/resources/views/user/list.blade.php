@@ -5,6 +5,11 @@
         <div class="col-lg-12">
             <h1 class="page-header">
                 Users list
+                <span class="pull-right">
+                    <a href="{{ route('user::create') }}" class="btn btn-success">
+                        <i class="fa fa-plus-circle fa-fw" aria-hidden="true"></i> New User
+                    </a>
+                </span>
             </h1>
         </div>
         <!-- /.col-lg-12 -->

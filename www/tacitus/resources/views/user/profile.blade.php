@@ -8,7 +8,7 @@
                 @if ($isAdmin)
                     <span class="pull-right">
                         <a href="{{ route('user::list') }}" class="btn btn-info">
-                            <i class="fa fa-arrow-left" aria-hidden="true"></i> Go to Users list
+                            <i class="fa fa-arrow-left fa-fw" aria-hidden="true"></i> Go to Users list
                         </a>
                     </span>
                 @endif

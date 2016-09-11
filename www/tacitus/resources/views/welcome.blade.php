@@ -52,11 +52,15 @@
         <div class="col-lg-12">
             <div class="panel panel-warning">
                 <div class="panel-heading">
-                    <i class="fa fa-newspaper-o fa-fw"></i> Release Notes
+                    <i class="fa fa-newspaper-o fa-fw"></i> Release History
                 </div>
                 <ul class="list-group">
                     <li class="list-group-item">
-                        <b>Version 0.1</b>: Base application structure is now ready. Dataset importer works only with
+                        <b>Version 0.1.1</b>: Bug fixes. Notifications now are sent also by email. The administrator
+                        can now change user roles. The administrator can create new users. Improved email messages.
+                    </li>
+                    <li class="list-group-item">
+                        <b>Version 0.1.0</b>: Base application structure is now ready. Dataset importer works only with
                         ArrayExpress MTAB datasets. Data Integrator and Id Mapper implementation is still a work in
                         progress.
                     </li>

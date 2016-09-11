@@ -71,6 +71,7 @@ class DeleteDataset extends Job implements ShouldQueue
                 'The job has been dropped from the processing queue. Please check the ' .
                 'error log, correct the errors and submit a new request. Contact us ' .
                 'if you believe a bug is present in our system.');
+            $this->sendEmail($user, 'TACITuS Notification - A Job Failed', 'emails.job_failed', ['retry' => false]);
             $this->delete();
         } else {
             $this->jobData->status = JobData::PROCESSING;
@@ -107,11 +108,13 @@ class DeleteDataset extends Job implements ShouldQueue
             if ($ok) {
                 $this->sendNotification($user, 'check-circle',
                     'One of your jobs (id: ' . $this->jobData->id . ') has been processed successfully.');
+                $this->sendEmail($user, 'TACITuS Notification - A Job has been completed', 'emails.job_completed');
                 $this->jobData->status = JobData::COMPLETED;
                 $this->jobData->save();
             } else {
                 $this->sendNotification($user, 'exclamation-triangle',
                     'One of your jobs (id: ' . $this->jobData->id . ') failed processing. Our system will automatically retry the job in order to check for temporary errors.');
+                $this->sendEmail($user, 'TACITuS Notification - A Job Failed', 'emails.job_failed', ['retry' => true]);
                 $this->jobData->status = JobData::FAILED;
                 $this->jobData->save();
                 throw new JobException('Job Failed'); //Releases the job back into the queue

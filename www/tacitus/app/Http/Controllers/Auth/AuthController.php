@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Auth;
 
+use App\Models\Role;
 use App\Models\User;
 use Validator;
 use App\Http\Controllers\Controller;
@@ -63,11 +64,14 @@ class AuthController extends Controller
      */
     protected function create(array $data)
     {
-        return User::create([
+        $user = User::create([
             'name'        => $data['name'],
             'email'       => $data['email'],
             'password'    => bcrypt($data['password']),
             'affiliation' => $data['affiliation'],
         ]);
+        $user->attachRole(Role::whereName('user')->first());
+        $user->save();
+        return $user;
     }
 }

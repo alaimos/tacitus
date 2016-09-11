@@ -7,6 +7,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use App\Utils\Permissions;
 use Auth;
@@ -126,7 +127,9 @@ class UserController extends Controller
         return view('user.edit_profile', [
             'user'      => $user,
             'isCurrent' => $currentUser->id == $user->id,
-            'isAdmin'   => user_can(Permissions::ADMINISTER)
+            'isAdmin'   => user_can(Permissions::ADMINISTER),
+            'roles'     => Role::all()->pluck('display_name', 'name'),
+            'userRoles' => $user->roles->pluck('name')->toArray(),
         ]);
     }
 
@@ -140,14 +143,25 @@ class UserController extends Controller
     public function doEditProfile(Request $request, User $user = null)
     {
         list($user, $currentUser) = $this->getUser($user);
-        $this->validate($request, [
+        $saveRole = (user_can(Permissions::ADMINISTER) && $user->id != $currentUser->id);
+        $rules = [
             'name'        => 'required|max:255',
             'affiliation' => 'required|max:255',
-            'email'       => 'required|email|max:255|unique:users,email,' . $user->id
-        ]);
+            'email'       => 'required|email|max:255|unique:users,email,' . $user->id,
+        ];
+        if ($saveRole) {
+            $rules['role'] = 'required|array|exists:roles,name';
+        }
+        $this->validate($request, $rules);
         $user->name = $request->get('name');
         $user->affiliation = $request->get('affiliation');
         $user->email = $request->get('email');
+        if ($saveRole) {
+            $user->detachRoles();
+            $user->attachRoles(array_unique(array_filter(array_map(function ($role) {
+                return Role::whereName($role)->first();
+            }, (array)$request->get('role')))));
+        }
         $user->save();
         Flash::success('Profile saved successfully!');
         return redirect()->route('user::profile', ($user->id == $currentUser->id) ? [] : $user);
@@ -187,7 +201,8 @@ class UserController extends Controller
         return $table->make(true);
     }
 
-    public function delete(User $user) {
+    public function delete(User $user)
+    {
         if (!user_can(Permissions::ADMINISTER)) {
             abort(403);
         }
@@ -201,5 +216,54 @@ class UserController extends Controller
         Flash::success('User deleted successfully!');
         return redirect()->back();
     }
+
+    /**
+     * Show user creation form
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|void
+     */
+    public function createUser()
+    {
+        if (!user_can(Permissions::ADMINISTER)) {
+            abort(403);
+        }
+        return view('user.create', [
+            'roles' => Role::all()->pluck('display_name', 'name'),
+        ]);
+    }
+
+    /**
+     * Save new user
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function doCreateUser(Request $request)
+    {
+        if (!user_can(Permissions::ADMINISTER)) {
+            abort(403);
+        }
+        $this->validate($request, [
+            'name'        => 'required|max:255',
+            'affiliation' => 'required|max:255',
+            'password'    => 'required|confirmed|min:6',
+            'email'       => 'required|email|max:255|unique:users,email',
+            'role'        => 'required|array|exists:roles,name',
+        ]);
+        $user = new User([
+            'name'        => $request->get('name'),
+            'email'       => $request->get('email'),
+            'password'    => bcrypt($request->get('password')),
+            'affiliation' => $request->get('affiliation'),
+        ]);
+        $user->save();
+        $user->attachRoles(array_unique(array_filter(array_map(function ($role) {
+            return Role::whereName($role)->first();
+        }, (array)$request->get('role')))));
+        $user->save();
+        Flash::success('User created successfully!');
+        return redirect()->route('user::list');
+    }
+
 
 }

@@ -4,6 +4,8 @@ namespace App\Jobs;
 
 use App\Models\User;
 use Illuminate\Bus\Queueable;
+use Illuminate\Mail\Message;
+use Mail;
 
 abstract class Job
 {
@@ -36,6 +38,24 @@ abstract class Job
             'icon'    => $icon,
             'message' => $message,
         ])->send();
+    }
+
+    /**
+     * Send an email to an user
+     *
+     * @param User   $to
+     * @param string $subject
+     * @param string $view
+     * @param array  $data
+     */
+    protected function sendEmail(User $to, $subject, $view, array $data = [])
+    {
+        $data['user'] = $to;
+        Mail::send($view, $data, function (Message $message) use ($subject, $to) {
+            $message->to($to->email, $to->name)
+                ->replyTo(env('MAIL_REPLY_TO'))
+                ->subject($subject);
+        });
     }
 
     /**

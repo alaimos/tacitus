@@ -1,0 +1,11 @@
+Version 0.1.1:
+    Bug fixes.
+    Notifications now are sent also by email.
+    The administrator can now change user roles.
+    The administrator can create new users.
+    Improved email messages.
+------------------------------------------------------------------------------------------------------------------------
+Version 0.1.0:
+    Base application structure is now ready.
+    Dataset importer works only with ArrayExpress MTAB datasets.
+    Data Integrator and Id Mapper implementation is still a work in progress.

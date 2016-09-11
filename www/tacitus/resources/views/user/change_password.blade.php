@@ -8,7 +8,7 @@
                 <span class="pull-right">
                     <a href="{{ route('user::profile', ((!$isCurrent && $isAdmin) ? $user : [])) }}"
                        class="btn btn-info">
-                        <i class="fa fa-arrow-left" aria-hidden="true"></i> Go Back
+                        <i class="fa fa-arrow-left fa-fw" aria-hidden="true"></i> Go Back
                     </a>
                 </span>
             </h1>
