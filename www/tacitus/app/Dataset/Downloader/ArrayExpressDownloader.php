@@ -22,7 +22,11 @@ class ArrayExpressDownloader extends AbstractDownloader
     const DATASET_FILES_URL = 'http://www.ebi.ac.uk/arrayexpress/json/v2/files/%s';
     const METADATA_KIND = 'sdrf';
     const DATA_KIND = 'processed';
-    const SUPPORTED_EXTENSIONS = ['txt', 'zip'];
+
+    /**
+     * @var array
+     */
+    protected $supportedExtensions = ['txt', 'zip'];
 
     /**
      * @var array
@@ -91,7 +95,7 @@ class ArrayExpressDownloader extends AbstractDownloader
             ];
             foreach ($experiment['file'] as $file) {
                 $extension = strtolower($file['extension']);
-                if (!in_array($extension, self::SUPPORTED_EXTENSIONS)) {
+                if (!in_array($extension, $this->supportedExtensions)) {
                     continue;
                 }
                 $kind = (array)$file['kind'];
