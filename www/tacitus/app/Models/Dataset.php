@@ -154,7 +154,8 @@ class Dataset extends Model
     {
         $current = current_user();
         $isOwned = ($current !== null && $current->id == $this->user->id);
-        return (user_can(Permissions::SELECT_FROM_DATASETS) && (user_can(Permissions::ADMINISTER) || $isOwned));
+        return user_can(Permissions::SELECT_FROM_DATASETS)
+               && ((!$this->private) ? true : ($isOwned || user_can(Permissions::ADMINISTER)));
     }
 
     /**
