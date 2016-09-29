@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePlatformsTable extends Migration
+class CreatePlatformMappingsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -12,10 +12,11 @@ class CreatePlatformsTable extends Migration
      */
     public function up()
     {
-        Schema::create('platforms', function (Blueprint $table) {
+        Schema::create('platform_mappings', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('title');
-            $table->string('organism')->index();
+            $table->integer('platform_id')->unsigned()->index();
+            $table->foreign('platform_id')->references('id')->on('platforms')->onDelete('cascade')->onUpdate('cascade');
+            $table->string('name');
             $table->timestamps();
         });
     }
@@ -27,6 +28,6 @@ class CreatePlatformsTable extends Migration
      */
     public function down()
     {
-        Schema::drop('platforms');
+        Schema::drop('platform_mappings');
     }
 }
