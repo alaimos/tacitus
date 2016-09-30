@@ -11,6 +11,7 @@ namespace App\Platform\Import;
 use App\Models\Platform;
 use App\Models\PlatformMapData;
 use App\Models\PlatformMapping;
+use App\Platform\Import\Renderer\MapFileRenderer;
 
 class MapFileImporter extends AbstractImporter implements ImporterInterface
 {
@@ -183,4 +184,13 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
     }
 
 
+    /**
+     * Return a renderer object for this importer
+     *
+     * @return \App\Platform\Import\Renderer\RendererInterface
+     */
+    public static function getRenderer()
+    {
+        return new MapFileRenderer();
+    }
 }

@@ -12,6 +12,13 @@ interface ImporterInterface
 {
 
     /**
+     * Return a renderer object for this importer
+     *
+     * @return \App\Platform\Import\Renderer\RendererInterface
+     */
+    public static function getRenderer();
+
+    /**
      * Get the imported platform model object
      *
      * @return \App\Models\Platform
