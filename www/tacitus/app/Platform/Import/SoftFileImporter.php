@@ -103,7 +103,6 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
         }
     }
 
-
     /**
      * Import a platform
      *
@@ -170,10 +169,8 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
         MultiFile::fileClose($fp);
         $this->log("...OK\n", true);
         $this->log("The platform is now ready to use!\n");
-        @fclose($fp);
         return $this;
     }
-
 
     /**
      * Return a renderer object for this importer

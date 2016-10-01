@@ -47,28 +47,41 @@ class Utils
      */
     public static function getDownloadSize($url)
     {
-        $result = -1;
-        $curl = curl_init($url);
-        curl_setopt($curl, CURLOPT_NOBODY, true);
-        curl_setopt($curl, CURLOPT_HEADER, true);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-        $data = curl_exec($curl);
-        curl_close($curl);
-        if ($data) {
-            $content_length = "unknown";
-            $status = "unknown";
-            if (preg_match('/^HTTP\/1\.[01] (\d\d\d)/', $data, $matches)) {
-                $status = (int)$matches[1];
+        if (preg_match('/ftp:\/\/([^\/]+)(.*)/i', $url, $matches)) {
+            $server = $matches[1];
+            $file = $matches[2];
+            $ftpConnection = ftp_connect($server);
+            if (!ftp_login($ftpConnection, 'anonymous', 'tacitus@user')) {
+                return -1;
             }
-            if (preg_match('/Content-Length: (\d+)/', $data, $matches)) {
-                $content_length = (int)$matches[1];
+            ftp_pasv($ftpConnection, true);
+            $size = ftp_size($ftpConnection, $file);
+            ftp_close($ftpConnection);
+            return $size;
+        } else {
+            $result = -1;
+            $curl = curl_init($url);
+            curl_setopt($curl, CURLOPT_NOBODY, true);
+            curl_setopt($curl, CURLOPT_HEADER, true);
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+            $data = curl_exec($curl);
+            curl_close($curl);
+            if ($data) {
+                $content_length = "unknown";
+                $status = "unknown";
+                if (preg_match('/^HTTP\/1\.[01] (\d\d\d)/', $data, $matches)) {
+                    $status = (int)$matches[1];
+                }
+                if (preg_match('/Content-Length: (\d+)/', $data, $matches)) {
+                    $content_length = (int)$matches[1];
+                }
+                if ($status == 200 || ($status > 300 && $status <= 308)) {
+                    $result = $content_length;
+                }
             }
-            if ($status == 200 || ($status > 300 && $status <= 308)) {
-                $result = $content_length;
-            }
+            return (int)$result;
         }
-        return (int)$result;
     }
 
     /**
