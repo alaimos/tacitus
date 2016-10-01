@@ -12,6 +12,7 @@ use App\Models\Platform;
 use App\Models\PlatformMapData;
 use App\Models\PlatformMapping;
 use App\Platform\Import\Renderer\MapFileRenderer;
+use App\Utils\MultiFile;
 
 class MapFileImporter extends AbstractImporter implements ImporterInterface
 {
@@ -131,9 +132,9 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
      */
     protected function importMapData(array $line)
     {
-        $mapFrom = $line[0];
+        $mapFrom = trim(stripcslashes($line[0]), '"\'');
         for ($i = 1; $i < count($line); $i++) {
-            $mapTo = $line[$i];
+            $mapTo = trim(stripcslashes($line[$i]), '"\'');
             if (empty($mapTo)) {
                 continue;
             }
@@ -164,13 +165,13 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
         $currLineProcessed = 0;
         $totalLines = $this->countLines($this->mapFile);
         $currLine = 0;
-        $fp = @fopen($this->mapFile, 'r');
-        if (!$fp) {
+        $fp = MultiFile::fileOpen($this->mapFile, 'r');
+        if (!MultiFile::fileIsOpen($fp)) {
             throw new \RuntimeException("Unable to open file to import");
         }
         $this->resetLogProgress();
         $this->log('Importing mappings', true);
-        while (($line = @fgets($fp)) !== false) {
+        while (($line = MultiFile::fileReadLine($fp)) !== false) {
             $currLine++;
             $this->logProgress($currLine, $totalLines);
             $line = trim($line);
@@ -190,7 +191,7 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
         }
         $this->log("...OK\n", true);
         $this->log("The platform is now ready to use!\n");
-        @fclose($fp);
+        MultiFile::fileClose($fp);
         return $this;
     }
 

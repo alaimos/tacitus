@@ -67,7 +67,6 @@ abstract class AbstractImporter implements ImporterInterface
         $this->prevPercentage = $percentage;
     }
 
-
     /**
      * Count the number of lines in a text file
      *

@@ -25,6 +25,7 @@ final class PlatformImportFactory
      */
     protected $classes = [
         \App\Platform\Import\MapFileImporter::class,
+        \App\Platform\Import\SoftFileImporter::class,
     ];
 
     /**

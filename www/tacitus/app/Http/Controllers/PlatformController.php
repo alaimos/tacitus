@@ -183,7 +183,6 @@ class PlatformController extends Controller
         return redirect()->route('platforms-lists');
     }
 
-
     /**
      * Delete a platform
      *
@@ -205,4 +204,46 @@ class PlatformController extends Controller
         Flash::success('Selection deleted successfully.');
         return back();
     }
+
+    /**
+     * Shows platform content
+     *
+     * @param Request  $request
+     * @param Platform $platform
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function viewPlatform(Request $request, Platform $platform)
+    {
+        if (!$platform || !$platform->exists) {
+            abort(404, 'Unable to find the platform.');
+        }
+        if (!$platform->canUse()) {
+            abort(401, 'You are not allowed to use this platform');
+        }
+        return view('platforms.view', [
+            'platform' => $platform,
+        ]);
+
+    }
+
+    /**
+     * Process datatables ajax request for the list of platform mappings
+     *
+     * @param Request  $request
+     * @param Platform $platform
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function platformData(Request $request, Platform $platform)
+    {
+        if (!$platform || !$platform->exists) {
+            abort(404, 'Unable to find the dataset.');
+        }
+        if (!$platform->canUse()) {
+            abort(401, 'You are not allowed to use this dataset');
+        }
+        /** @var \Yajra\Datatables\Engines\CollectionEngine $table */
+        $table = Datatables::of($platform->getMappingsCollection());
+        return $table->make(true);
+    }
+
 }

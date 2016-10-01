@@ -9,6 +9,7 @@ namespace App\Models;
 
 use App\Utils\Permissions;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
 use Jenssegers\Mongodb\Eloquent\HybridRelations;
 
 /**
@@ -111,7 +112,19 @@ class Platform extends Model
     }
 
     /**
-     * Checks if the current user can delete this selection
+     * Checks if the current user can use this platform
+     *
+     * @return bool
+     */
+    public function canUse()
+    {
+        $current = current_user();
+        $isOwned = ($current !== null && $current->id == $this->user->id);
+        return (user_can(Permissions::USE_TOOLS) && (user_can(Permissions::ADMINISTER) || $isOwned));
+    }
+
+    /**
+     * Checks if the current user can delete this platform
      *
      * @return bool
      */
@@ -136,7 +149,6 @@ class Platform extends Model
         }
         return parent::delete();
     }
-
 
     /**
      * Get mapping array
@@ -171,4 +183,46 @@ class Platform extends Model
         }
         return $result;
     }
+
+    /**
+     * Generate a map from mapping id to mapping name
+     *
+     * @return array|\Illuminate\Support\Collection
+     */
+    public function mappingList()
+    {
+        return PlatformMapping::wherePlatformId($this->id)->pluck('name', 'id');
+    }
+
+    /**
+     * Returns a collection of map data to be used as table source
+     *
+     * @param array $selection
+     * @return Collection
+     */
+    public function getMappingsCollection(array $selection = [])
+    {
+        $allData = new Collection();
+        $mappings = $this->mappingList();
+        $query = PlatformMapData::wherePlatformId($this->id);
+        if (!empty($selection)) {
+            $query->where(function ($query) use ($selection) {
+                foreach ($selection as $id) {
+                    $query->orWhere('_id', '=', $id);
+                }
+            });
+        }
+        foreach ($query->get() as $mapData) {
+            /** @var PlatformMapData $mapData */
+            $id = $mapData->mapFrom;
+            $data = $allData->get($id, [
+                'id'    => $id,
+                'probe' => $id,
+            ]);
+            $data[$mapData->mapping_id] = $mapData->mapTo;
+            $allData[$id] = $data;
+        }
+        return $allData;
+    }
+
 }

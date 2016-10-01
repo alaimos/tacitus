@@ -88,6 +88,8 @@ Route::post('/platforms/submission',
 Route::post('/platforms/submission/form',
     ['as' => 'platforms-submission-form', 'uses' => 'PlatformController@submissionForm']);
 Route::get('/platforms/{platform}/delete', ['as' => 'platforms-delete', 'uses' => 'PlatformController@delete']);
+Route::get('/platforms/{platform}/view', ['as' => 'platforms-view', 'uses' => 'PlatformController@viewPlatform']);
+Route::any('/platforms/{platform}/data', ['as' => 'platforms-view-data', 'uses' => 'PlatformController@platformData']);
 
 Route::get('/not-available', ['as' => 'not-available', function () {
     return view('errors.feature_not_available');
