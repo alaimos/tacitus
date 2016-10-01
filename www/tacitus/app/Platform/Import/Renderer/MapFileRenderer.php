@@ -15,6 +15,16 @@ class MapFileRenderer implements RendererInterface
 {
 
     /**
+     * Returns an array which contains the name and a description of the current importer
+     *
+     * @return array
+     */
+    public function getImporterDescription()
+    {
+        return ['MapFile', 'Map File'];
+    }
+
+    /**
      * Returns a view for the rendering of the custom form controls
      *
      * @return \Illuminate\View\View

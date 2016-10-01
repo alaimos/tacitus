@@ -7,8 +7,9 @@
 
 namespace App\Platform\Import;
 
+use App\Dataset\Contracts\LogCallbackAwareInterface;
 
-interface ImporterInterface
+interface ImporterInterface extends LogCallbackAwareInterface
 {
 
     /**

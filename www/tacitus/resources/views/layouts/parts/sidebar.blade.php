@@ -18,6 +18,10 @@
                 <li>
                     <a href="#"><i class="fa fa-wrench fa-fw"></i> Tools<span class="fa arrow"></span></a>
                     <ul class="nav nav-second-level">
+                        <li>
+                            <a href="{{ route('platforms-lists') }}"><i class="fa fa-map-signs fa-fw"></i>
+                                Platforms</a>
+                        </li>
                         @if(user_can(\App\Utils\Permissions::INTEGRATE_DATASETS))
                             <li>
                                 <a href="{{ route('not-available') }}"><i class="fa fa-link fa-fw"></i> Integrator</a>

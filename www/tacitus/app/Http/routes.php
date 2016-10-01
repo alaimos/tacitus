@@ -79,6 +79,21 @@ Route::get('/selections/{selection}/download/{type}',
     ['as' => 'selections-download', 'uses' => 'SelectionController@download']);
 Route::get('/selections/{selection}/delete',
     ['as' => 'selections-delete', 'uses' => 'SelectionController@delete']);
+
+Route::get('/platforms', ['as' => 'platforms-lists', 'uses' => 'PlatformController@platformsList']);
+Route::any('/platforms/data', ['as' => 'platforms-lists-data', 'uses' => 'PlatformController@platformsListData']);
+Route::get('/platforms/submission', ['as' => 'platforms-submission', 'uses' => 'PlatformController@submission']);
+Route::post('/platforms/submission',
+    ['as' => 'platforms-submission-process', 'uses' => 'PlatformController@processSubmission']);
+Route::post('/platforms/submission/form',
+    ['as' => 'platforms-submission-form', 'uses' => 'PlatformController@submissionForm']);
+Route::get('/platforms/{platform}/delete', ['as' => 'platforms-delete', 'uses' => 'PlatformController@delete']);
+
+Route::get('/not-available', ['as' => 'not-available', function () {
+    return view('errors.feature_not_available');
+}]);
+
+
 Route::get('/not-available', ['as' => 'not-available', function () {
     return view('errors.feature_not_available');
 }]);

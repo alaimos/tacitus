@@ -28,9 +28,8 @@ class ArrayExpressImportJob extends AbstractImportJob
      *
      * @param integer $current
      * @param integer $total
-     * @return void
      */
-    protected function logProgress($current, $total, $b = false)
+    protected function logProgress($current, $total)
     {
         $percentage = floor(min(100, ((float)$current / (float)$total) * 100));
         if (($percentage % 10) == 0 && $percentage != 100 && $percentage != $this->prevPercentage) {
@@ -89,7 +88,7 @@ class ArrayExpressImportJob extends AbstractImportJob
                 if (!empty($row)) {
                     $dataWriter->write(Descriptor::TYPE_DATA, $row);
                 }
-                $this->logProgress($dataParser->current(), $dataParser->count(), true);
+                $this->logProgress($dataParser->current(), $dataParser->count());
             }
             $this->log("...OK\n", true);
             $this->log("Dataset parsed and ready!\n", true);

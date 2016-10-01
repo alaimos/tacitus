@@ -50,11 +50,12 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
      * @param string|array $mapFile
      * @param string|null  $title
      * @param string|null  $organism
+     * @param boolean|null $private
      */
-    public function __construct($mapFile, $title = null, $organism = null)
+    public function __construct($mapFile, $title = null, $organism = null, $private = null)
     {
         if (!is_array($mapFile)) {
-            $mapFile = compact('mapFile', 'title', 'organism');
+            $mapFile = compact('mapFile', 'title', 'organism', 'private');
         }
         $this->handleConfig($mapFile);
     }
@@ -97,7 +98,7 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
      */
     public function setOrganism($organism)
     {
-        if (empty($title)) {
+        if (empty($organism)) {
             throw new \RuntimeException("The organism is required");
         }
         $this->organism = $organism;
@@ -153,32 +154,42 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
      */
     public function import()
     {
-        $this->platform = new Platform([
+        $this->log('Importing new platform "' . $this->title . "\".\n", true);
+        $this->platform = Platform::create([
             'title'    => $this->title,
             'organism' => $this->organism,
+            'private'  => $this->private,
+            'user_id'  => $this->user->id,
         ]);
-        $this->platform->save();
+        $currLineProcessed = 0;
+        $totalLines = $this->countLines($this->mapFile);
         $currLine = 0;
         $fp = @fopen($this->mapFile, 'r');
         if (!$fp) {
             throw new \RuntimeException("Unable to open file to import");
         }
+        $this->resetLogProgress();
+        $this->log('Importing mappings', true);
         while (($line = @fgets($fp)) !== false) {
+            $currLine++;
+            $this->logProgress($currLine, $totalLines);
             $line = trim($line);
             if (empty($line) || $line{0} == '#') { //ignores empty lines or commented lines
                 continue;
             }
             $line = explode("\t", $line);
-            if (!$currLine && count($line) <= 1) {
+            if (!$currLineProcessed && count($line) <= 1) {
                 throw new \RuntimeException("The Map File should contain more than one field");
             }
-            if ($currLine == 0) {
+            if ($currLineProcessed == 0) {
                 $this->importMappings($line);
             } else {
                 $this->importMapData($line);
             }
-            $currLine++;
+            $currLineProcessed++;
         }
+        $this->log("...OK\n", true);
+        $this->log("The platform is now ready to use!\n");
         @fclose($fp);
         return $this;
     }
