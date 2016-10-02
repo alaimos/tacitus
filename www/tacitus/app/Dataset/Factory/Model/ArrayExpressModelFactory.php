@@ -70,7 +70,8 @@ class ArrayExpressModelFactory extends AbstractModelFactory
                 'user_id'     => $this->jobData->user->id,
                 'title'       => $descriptors['name'],
                 'private'     => $this->jobData->job_data['private'],
-                'status'      => Dataset::PENDING
+                'status'      => Dataset::PENDING,
+                'platform_id' => null,
             ]);
             $this->dataset = $dataset;
         }

@@ -8,6 +8,7 @@
 namespace App\Jobs;
 
 use App\Jobs\Exception\JobException;
+use App\Models\Platform;
 use App\Platform\Import\Factory\PlatformImportFactory;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
@@ -81,15 +82,17 @@ class ImportPlatform extends Job implements ShouldQueue
             $importerConfig = $this->jobData->job_data['importer_config'];
             $this->jobData->status = JobData::PROCESSING;
             $this->jobData->save();
+            $importer = null;
             try {
                 $importerConfig['logCallback'] = $this->getLogCallback();
                 $importerConfig['user'] = $user;
                 $this->sendNotification($user, 'comment',
                     'One of your jobs (id: ' . $this->jobData->id . ') started processing.');
                 $importer = $factory->getImporter($importerType, $importerConfig);
-                $importer->import();
-                if ($importer->getPlatform() !== null) {
-                    $importer->getPlatform()->save();
+                $platform = $importer->import()->getPlatform();
+                if ($platform !== null) {
+                    $platform->status = Platform::READY;
+                    $platform->save();
                 }
                 $this->sendNotification($user, 'check-circle',
                     'One of your jobs (id: ' . $this->jobData->id . ') has been processed successfully.');
@@ -98,6 +101,12 @@ class ImportPlatform extends Job implements ShouldQueue
                 $this->jobData->deleteJobDirectory();
                 $this->jobData->save();
             } catch (\Exception $e) {
+                if ($importer !== null) {
+                    $platform = $importer->getPlatform();
+                    if ($platform !== null) {
+                        $platform->delete();
+                    }
+                }
                 $errorClass = join('', array_slice(explode('\\', get_class($e)), -1));
                 $this->jobData->log = $this->jobData->log . "\n\n" . 'Unable to complete job. Error "' . $errorClass .
                                       '" with message "' . $e->getMessage() . "\".\n";

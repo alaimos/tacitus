@@ -52,7 +52,7 @@
                             <div class="checkbox">
                                 <label>
                                     {!! Form::checkbox('private', 1, null, []) !!}
-                                    Is private?
+                                    Is this dataset available only on your account?
                                 </label>
                             </div>
                             @if ($errors->has('private'))

@@ -24,9 +24,11 @@ use Jenssegers\Mongodb\Eloquent\HybridRelations;
  * @property string                                                                    $error
  * @property \Carbon\Carbon                                                            $created_at
  * @property \Carbon\Carbon                                                            $updated_at
+ * @property integer                                                                   $platform_id
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\MetadataIndex[] $metadataIndex
  * @property-read \App\Models\User                                                     $user
  * @property-read \App\Models\Source                                                   $source
+ * @property-read \App\Models\Platform                                                 $platform
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Sample[]        $samples
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Probe[]         $probes
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Dataset whereId($value)
@@ -39,6 +41,7 @@ use Jenssegers\Mongodb\Eloquent\HybridRelations;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Dataset whereError($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Dataset whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Dataset whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Dataset wherePlatformId($value)
  * @mixin \Eloquent
  */
 class Dataset extends Model
@@ -62,7 +65,7 @@ class Dataset extends Model
      * @var array
      */
     protected $fillable = [
-        'original_id', 'source_id', 'user_id', 'title', 'private', 'status'
+        'original_id', 'source_id', 'user_id', 'title', 'private', 'status', 'platform_id'
     ];
 
     /**
@@ -116,6 +119,15 @@ class Dataset extends Model
     {
         return $this->belongsTo('App\Models\Source', 'source_id', 'id');
     }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function platform()
+    {
+        return $this->belongsTo('App\Models\Platform', 'platform_id', 'id');
+    }
+
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany

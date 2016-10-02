@@ -10,6 +10,7 @@ namespace App\Dataset\Downloader;
 use App\Dataset\Downloader\Exception\DownloaderException;
 use App\Dataset\Traits\InteractsWithJobData;
 use App\Dataset\Traits\InteractsWithLogCallback;
+use App\Utils\Exception\DownloadException;
 use App\Utils\Utils;
 
 /**
@@ -51,44 +52,21 @@ abstract class AbstractDownloader implements DownloaderInterface
      */
     protected function downloadFile($source, $targetFileName)
     {
-        $targetFileName = $this->downloadDirectory . '/' . $targetFileName;
-        $size = Utils::getDownloadSize($source);
-        $displaySize = Utils::displaySize($size);
-        $this->log('Downloading "' . $targetFileName . '" from "' . $source . '" (' . $displaySize . ')', true);
-        if (file_exists($targetFileName)) { //File caching
-            $this->log("...Already downloaded!\n", true);
-            return true;
+        try {
+            $target = $this->downloadDirectory . '/' . $targetFileName;
+            return Utils::downloadFile($source, $target, function ($target, $source, $size) {
+                $displaySize = Utils::displaySize($size);
+                $this->log('Downloading "' . $target . '" from "' . $source . '" (' . $displaySize . ')', true);
+            }, function ($target, $source, $size) {
+                $this->log("...OK\n", true);
+            }, function ($target, $source, $size, $currentByte, $percentage) {
+                $this->log('...' . $percentage . '%', true);
+            }, function ($target, $source, $size) {
+                $this->log("...Already downloaded!\n", true);
+            });
+        } catch (DownloadException $ex) {
+            throw new DownloaderException($ex->getMessage(), 0, $ex);
         }
-        $rh = fopen($source, 'rb');
-        $wh = fopen($targetFileName, 'w+b');
-        if (!$rh) {
-            throw new DownloaderException("Unable to open source file");
-        }
-        if (!$wh) {
-            throw new DownloaderException("Unable to open destination file");
-        }
-        $size = (float)$size;
-        $currentByte = 0;
-        $prevPercentage = 0;
-        while (!feof($rh)) {
-            if (($tmp = fread($rh, 8192)) !== false) {
-                if (fwrite($wh, $tmp, 8192) === false) {
-                    throw new DownloaderException("Unable to write to destination");
-                }
-                $currentByte += strlen($tmp);
-                $percentage = floor(min(100, ((float)$currentByte / $size) * 100));
-                if (($percentage % 10) == 0 && $percentage != 100 && $percentage != $prevPercentage) {
-                    $this->log('...' . $percentage . '%', true);
-                }
-                $prevPercentage = $percentage;
-            } else {
-                throw new DownloaderException("Unable to read from source");
-            }
-        }
-        fclose($rh);
-        fclose($wh);
-        $this->log("...OK\n", true);
-        return true;
     }
 
     /**

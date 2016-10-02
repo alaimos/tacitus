@@ -10,6 +10,7 @@ namespace App\Platform\Import;
 
 use App\Dataset\Traits\InteractsWithLogCallback;
 use App\Platform\Import\Exception\ImportException;
+use App\Utils\Exception\DownloadException;
 use App\Utils\Utils;
 
 abstract class AbstractImporter implements ImporterInterface
@@ -52,57 +53,20 @@ abstract class AbstractImporter implements ImporterInterface
      */
     protected function downloadFile($source, $target)
     {
-        $size = Utils::getDownloadSize($source);
-        $displaySize = Utils::displaySize($size);
-        $this->log('Downloading "' . $target . '" from "' . $source . '" (' . $displaySize . ')', true);
-        if (file_exists($target)) { //File caching
-            $this->log("...Already downloaded!\n", true);
-            return true;
+        try {
+            return Utils::downloadFile($source, $target, function ($target, $source, $size) {
+                $displaySize = Utils::displaySize($size);
+                $this->log('Downloading "' . $target . '" from "' . $source . '" (' . $displaySize . ')', true);
+            }, function ($target, $source, $size) {
+                $this->log("...OK\n", true);
+            }, function ($target, $source, $size, $currentByte, $percentage) {
+                $this->log('...' . $percentage . '%', true);
+            }, function ($target, $source, $size) {
+                $this->log("...Already downloaded!\n", true);
+            });
+        } catch (DownloadException $ex) {
+            throw new ImportException($ex->getMessage(), 0, $ex);
         }
-        if (preg_match('/ftp:\/\/([^\/]+)(.*)/i', $source, $matches)) {
-            $server = $matches[1];
-            $file = $matches[2];
-            $ftpConnection = ftp_connect($server);
-            if (!ftp_login($ftpConnection, 'anonymous', 'tacitus@user')) {
-                throw new ImportException("Unable to login to ftp server.");
-            }
-            ftp_pasv($ftpConnection, true);
-            if (!ftp_get($ftpConnection, $target, $file, FTP_BINARY)) {
-                throw new ImportException("Unable to download file.");
-            }
-            ftp_close($ftpConnection);
-        } else {
-            $rh = fopen($source, 'rb');
-            $wh = fopen($target, 'w+b');
-            if (!$rh) {
-                throw new ImportException("Unable to open source file");
-            }
-            if (!$wh) {
-                throw new ImportException("Unable to open destination file");
-            }
-            $size = (float)$size;
-            $currentByte = 0;
-            $prevPercentage = 0;
-            while (!feof($rh)) {
-                if (($tmp = fread($rh, 8192)) !== false) {
-                    if (fwrite($wh, $tmp, 8192) === false) {
-                        throw new ImportException("Unable to write to destination");
-                    }
-                    $currentByte += strlen($tmp);
-                    $percentage = floor(min(100, ((float)$currentByte / $size) * 100));
-                    if (($percentage % 10) == 0 && $percentage != 100 && $percentage != $prevPercentage) {
-                        $this->log('...' . $percentage . '%', true);
-                    }
-                    $prevPercentage = $percentage;
-                } else {
-                    throw new ImportException("Unable to read from source");
-                }
-            }
-            fclose($rh);
-            fclose($wh);
-        }
-        $this->log("...OK\n", true);
-        return true;
     }
 
     /**

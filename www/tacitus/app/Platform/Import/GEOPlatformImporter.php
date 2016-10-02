@@ -84,7 +84,7 @@ class GEOPlatformImporter extends AbstractImporter implements ImporterInterface
             'user'        => $this->user,
             'logCallback' => $this->logCallback,
         ]);
-        $importer->import();
+        $this->platform = $importer->import()->getPlatform();
         return $this;
     }
 

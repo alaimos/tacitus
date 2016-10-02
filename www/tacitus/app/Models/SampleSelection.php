@@ -13,18 +13,20 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * App\Models\SampleSelection
  *
- * @property integer                  $id
- * @property string                   $name
- * @property string                   $slug
- * @property array                    $selected_samples
- * @property array                    $generated_files
- * @property string                   $status
- * @property integer                  $dataset_id
- * @property \Carbon\Carbon           $created_at
- * @property \Carbon\Carbon           $updated_at
- * @property integer                  $user_id
- * @property-read \App\Models\User    $user
- * @property-read \App\Models\Dataset $dataset
+ * @property integer                   $id
+ * @property string                    $name
+ * @property string                    $slug
+ * @property string                    $selected_samples
+ * @property string                    $generated_files
+ * @property string                    $status
+ * @property integer                   $dataset_id
+ * @property \Carbon\Carbon            $created_at
+ * @property \Carbon\Carbon            $updated_at
+ * @property integer                   $user_id
+ * @property integer                   $platform_id
+ * @property-read \App\Models\User     $user
+ * @property-read \App\Models\Dataset  $dataset
+ * @property-read \App\Models\Platform $platform
  * @method static \Illuminate\Database\Query\Builder|\App\Models\SampleSelection whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\SampleSelection whereName($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\SampleSelection whereSlug($value)
@@ -35,6 +37,7 @@ use Illuminate\Database\Eloquent\Model;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\SampleSelection whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\SampleSelection whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\SampleSelection whereUserId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\SampleSelection wherePlatformId($value)
  * @mixin \Eloquent
  */
 class SampleSelection extends Model
@@ -60,7 +63,7 @@ class SampleSelection extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'slug', 'selected_samples', 'generated_files', 'status', 'dataset_id', 'user_id'
+        'name', 'slug', 'selected_samples', 'generated_files', 'status', 'dataset_id', 'user_id', 'platform_id'
     ];
 
     /**
@@ -98,6 +101,14 @@ class SampleSelection extends Model
     public function dataset()
     {
         return $this->belongsTo('App\Models\Dataset', 'dataset_id', 'id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function platform()
+    {
+        return $this->belongsTo('App\Models\Platform', 'platform_id', 'id');
     }
 
     /**

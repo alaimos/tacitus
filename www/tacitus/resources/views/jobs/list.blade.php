@@ -133,6 +133,7 @@
                 {data: 'updated_at', name: 'updated_at'},
                 {data: 'action', name: 'action', orderable: false, searchable: false}
             ],
+            order: [[3, 'desc']],
             columnDefs: [
                 {responsivePriority: 1, targets: 0},
                 {responsivePriority: 1, targets: 1},

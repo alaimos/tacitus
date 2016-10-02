@@ -16,28 +16,34 @@ use Jenssegers\Mongodb\Eloquent\HybridRelations;
 /**
  * App\Models\Platform
  *
- * @mixin \Eloquent
  * @property integer                                                                     $id
  * @property string                                                                      $title
  * @property string                                                                      $organism
+ * @property string                                                                      $status
  * @property \Carbon\Carbon                                                              $created_at
  * @property \Carbon\Carbon                                                              $updated_at
+ * @property boolean                                                                     $private
+ * @property integer                                                                     $user_id
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\PlatformMapping[] $mappings
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\PlatformMapData[] $mapData
+ * @property-read \App\Models\User                                                       $user
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Platform whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Platform whereTitle($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Platform whereOrganism($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\Platform whereStatus($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Platform whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Platform whereUpdatedAt($value)
- * @property boolean                                                                     $private
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Platform wherePrivate($value)
- * @property integer                                                                     $user_id
- * @property-read \App\Models\User                                                       $user
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Platform whereUserId($value)
+ * @mixin \Eloquent
  */
 class Platform extends Model
 {
     use HybridRelations;
+
+    const PENDING = 'pending';
+    const READY = 'ready';
+    const FAILED = 'failed';
 
     /**
      * The connection name for the model.
@@ -52,7 +58,7 @@ class Platform extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'organism', 'private', 'user_id'
+        'title', 'organism', 'private', 'user_id', 'status'
     ];
 
     /**
@@ -64,11 +70,12 @@ class Platform extends Model
     public static function listPlatforms()
     {
         /** @var \Illuminate\Database\Query\Builder $query */
+        $query = self::whereStatus(self::READY);
         if (user_can(Permissions::USE_TOOLS) && !user_can(Permissions::ADMINISTER)) {
             $owner = current_user();
-            return self::whereUserId($owner->id);
+            return $query->whereUserId($owner->id);
         } elseif (user_can(Permissions::USE_TOOLS) && user_can(Permissions::ADMINISTER)) {
-            return self::all();
+            return $query;
         } else {
             return abort(401, 'You are not allowed to view platforms.');
         }
@@ -169,7 +176,9 @@ class Platform extends Model
         /** @var \Jenssegers\Mongodb\Query\Builder $query */
         $query = \DB::connection($tmp->getConnectionName())->collection($tmp->getTable());
         $field = $mapping->slug;
-        return $query->select(['probe', $field])->where('platform_id', '=', $this->getKey())->pluck('probe', $field);
+        return $query->select([$field, 'probe'])
+            ->where('platform_id', '=', $this->getKey())
+            ->pluck($field, 'probe');
     }
 
     /**

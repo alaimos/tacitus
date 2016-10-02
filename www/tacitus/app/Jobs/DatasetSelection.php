@@ -92,7 +92,8 @@ class DatasetSelection extends Job implements ShouldQueue
             'slug'             => Str::slug($this->jobData->job_data['selectionName'], '_'),
             'selected_samples' => $this->jobData->job_data['samples'],
             'generated_files'  => [],
-            'status'           => SampleSelection::PENDING
+            'status'           => SampleSelection::PENDING,
+            'platform_id'      => $dataset->platform_id,
         ]);
         $sampleSelection->dataset()->associate($dataset);
         $sampleSelection->user()->associate($this->jobData->user);

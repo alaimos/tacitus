@@ -107,7 +107,6 @@ class PlatformController extends Controller
         }
     }
 
-
     /**
      * Renders the submission for for a specific importer
      *

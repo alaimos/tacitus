@@ -7,6 +7,7 @@
 
 namespace App\Utils;
 
+use App\Utils\Exception\DownloadException;
 use Auth;
 
 class Utils
@@ -96,6 +97,82 @@ class Utils
         $i = floor(log($size, 1024));
         return @round($size / pow(1024, $i), 2) . ' ' . $unit[(int)$i];
     }
+
+    /**
+     * Download a file from a source
+     *
+     * @param string        $source
+     * @param string        $target
+     * @param callable|null $beforeCallback
+     * @param callable|null $afterCallback
+     * @param callable|null $progressCallback
+     * @param callable|null $fileExistsCallback
+     * @throws DownloadException
+     * @return bool
+     */
+    public static function downloadFile($source, $target, $beforeCallback = null, $afterCallback = null,
+        $progressCallback = null, $fileExistsCallback = null)
+    {
+        $size = Utils::getDownloadSize($source);
+        if (is_callable($beforeCallback)) {
+            call_user_func($beforeCallback, $target, $source, $size);
+        }
+        if (file_exists($target)) { //File caching
+            if (is_callable($fileExistsCallback)) {
+                call_user_func($fileExistsCallback, $target, $source, $size);
+            }
+            return true;
+        }
+        if (preg_match('/ftp:\/\/([^\/]+)(.*)/i', $source, $matches)) {
+            $server = $matches[1];
+            $file = $matches[2];
+            $ftpConnection = ftp_connect($server);
+            if (!ftp_login($ftpConnection, 'anonymous', 'tacitus@user')) {
+                throw new DownloadException("Unable to login to ftp server.");
+            }
+            ftp_pasv($ftpConnection, true);
+            if (!ftp_get($ftpConnection, $target, $file, FTP_BINARY)) {
+                throw new DownloadException("Unable to download file.");
+            }
+            ftp_close($ftpConnection);
+        } else {
+            $rh = fopen($source, 'rb');
+            $wh = fopen($target, 'w+b');
+            if (!$rh) {
+                throw new DownloadException("Unable to open source file");
+            }
+            if (!$wh) {
+                throw new DownloadException("Unable to open destination file");
+            }
+            $size = (float)$size;
+            $currentByte = 0;
+            $prevPercentage = 0;
+            while (!feof($rh)) {
+                if (($tmp = fread($rh, 8192)) !== false) {
+                    if (fwrite($wh, $tmp, 8192) === false) {
+                        throw new DownloadException("Unable to write to destination");
+                    }
+                    $currentByte += strlen($tmp);
+                    $percentage = floor(min(100, ((float)$currentByte / $size) * 100));
+                    if (($percentage % 10) == 0 && $percentage != 100 && $percentage != $prevPercentage) {
+                        if (is_callable($progressCallback)) {
+                            call_user_func($progressCallback, $target, $source, $size, $currentByte, $percentage);
+                        }
+                    }
+                    $prevPercentage = $percentage;
+                } else {
+                    throw new DownloadException("Unable to read from source");
+                }
+            }
+            fclose($rh);
+            fclose($wh);
+        }
+        if (is_callable($afterCallback)) {
+            call_user_func($afterCallback, $target, $source, $size);
+        }
+        return true;
+    }
+
 
     /**
      * Checks if current user can do something

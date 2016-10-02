@@ -63,7 +63,7 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
     public function setSoftFile($softFile)
     {
         if (!file_exists($softFile) || !is_readable($softFile)) {
-            throw new \RuntimeException("Unable to find file to import");
+            throw new ImportException("Unable to find file to import");
         }
         $this->softFile = $softFile;
         return $this;
@@ -138,11 +138,15 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
             if (strtolower($line) == self::TABLE_BEGIN && ($title === null || $organism === null)) {
                 throw new ImportException('SOFT file is not correctly formatted: table begins before metadata are set.');
             } elseif (strtolower($line) == self::TABLE_BEGIN && $title !== null && $organism !== null) {
+                if (Platform::whereTitle($title)->whereOrganism($organism)->first() !== null) {
+                    throw new ImportException('Another platform with the same name for the same organism already exists.');
+                }
                 $this->platform = Platform::create([
                     'title'    => $title,
                     'organism' => $organism,
                     'private'  => $this->private,
                     'user_id'  => $this->user->id,
+                    'status'   => Platform::PENDING,
                 ]);
                 $readingMeta = false;
                 $readingTable = true;

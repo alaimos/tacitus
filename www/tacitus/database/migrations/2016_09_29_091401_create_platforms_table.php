@@ -16,6 +16,7 @@ class CreatePlatformsTable extends Migration
             $table->increments('id');
             $table->string('title');
             $table->string('organism')->index();
+            $table->enum('status', ['pending', 'ready', 'failed']);
             $table->timestamps();
         });
     }

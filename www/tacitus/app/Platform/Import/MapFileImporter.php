@@ -11,6 +11,7 @@ namespace App\Platform\Import;
 use App\Models\Platform;
 use App\Models\PlatformMapData;
 use App\Models\PlatformMapping;
+use App\Platform\Import\Exception\ImportException;
 use App\Platform\Import\Renderer\MapFileRenderer;
 use App\Utils\MultiFile;
 
@@ -77,7 +78,7 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
     public function setMapFile($mapFile)
     {
         if (!file_exists($mapFile) || !is_readable($mapFile)) {
-            throw new \RuntimeException("Unable to find file to import");
+            throw new ImportException("Unable to find file to import");
         }
         $this->mapFile = $mapFile;
         return $this;
@@ -92,7 +93,7 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
     public function setTitle($title)
     {
         if (empty($title)) {
-            throw new \RuntimeException("The title is required");
+            throw new ImportException("The title is required");
         }
         $this->title = $title;
         return $this;
@@ -107,7 +108,7 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
     public function setOrganism($organism)
     {
         if (empty($organism)) {
-            throw new \RuntimeException("The organism is required");
+            throw new ImportException("The organism is required");
         }
         $this->organism = $organism;
         return $this;
@@ -159,11 +160,15 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
     public function import()
     {
         $this->log('Importing new platform "' . $this->title . "\".\n", true);
+        if (Platform::whereTitle($this->title)->whereOrganism($this->organism)->first() !== null) {
+            throw new ImportException('Another platform with the same name for the same organism already exists.');
+        }
         $this->platform = Platform::create([
             'title'    => $this->title,
             'organism' => $this->organism,
             'private'  => $this->private,
             'user_id'  => $this->user->id,
+            'status'   => Platform::PENDING,
         ]);
         $tmp = new PlatformMapData();
         $this->collection = \DB::connection($tmp->getConnectionName())->getCollection($tmp->getTable());
@@ -172,7 +177,7 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
         $currLine = 0;
         $fp = MultiFile::fileOpen($this->mapFile, 'r');
         if (!MultiFile::fileIsOpen($fp)) {
-            throw new \RuntimeException("Unable to open file to import");
+            throw new ImportException("Unable to open file to import");
         }
         $this->resetLogProgress();
         $this->log('Importing mappings', true);
@@ -185,7 +190,7 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
             }
             $line = explode("\t", $line);
             if (!$currLineProcessed && count($line) <= 1) {
-                throw new \RuntimeException("The Map File should contain more than one field");
+                throw new ImportException("The Map File should contain more than one field");
             }
             if ($currLineProcessed == 0) {
                 $this->importMappings($line);
@@ -199,7 +204,6 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
         MultiFile::fileClose($fp);
         return $this;
     }
-
 
     /**
      * Return a renderer object for this importer
