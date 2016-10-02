@@ -7,6 +7,7 @@
 
 namespace App\Models;
 
+use App\Utils\FixedMongoQueryBuilder;
 use App\Utils\Permissions;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -164,7 +165,11 @@ class Platform extends Model
                 throw new \RuntimeException('Unable to find mapping');
             }
         }
-        return $mapping->mapArray();
+        $tmp = new PlatformMapData();
+        /** @var \Jenssegers\Mongodb\Query\Builder $query */
+        $query = \DB::connection($tmp->getConnectionName())->collection($tmp->getTable());
+        $field = $mapping->slug;
+        return $query->select(['probe', $field])->where('platform_id', '=', $this->getKey())->pluck('probe', $field);
     }
 
     /**
@@ -191,38 +196,36 @@ class Platform extends Model
      */
     public function mappingList()
     {
-        return PlatformMapping::wherePlatformId($this->id)->pluck('name', 'id');
+        return PlatformMapping::wherePlatformId($this->id)->pluck('name', 'slug');
+    }
+
+    /**
+     * Count all map data without querying for a resultset
+     *
+     * @return int
+     */
+    public function countMapData()
+    {
+        $tmp = new PlatformMapData();
+        $connection = $tmp->getConnectionName();
+        $collection = $tmp->getTable();
+        return \DB::connection($connection)->getCollection($collection)->count(['platform_id' => $this->getKey()]);
     }
 
     /**
      * Returns a collection of map data to be used as table source
      *
-     * @param array $selection
-     * @return Collection
+     * @return \Jenssegers\Mongodb\Query\Builder
      */
-    public function getMappingsCollection(array $selection = [])
+    public function getMappingsCollection()
     {
-        $allData = new Collection();
-        $mappings = $this->mappingList();
-        $query = PlatformMapData::wherePlatformId($this->id);
-        if (!empty($selection)) {
-            $query->where(function ($query) use ($selection) {
-                foreach ($selection as $id) {
-                    $query->orWhere('_id', '=', $id);
-                }
-            });
-        }
-        foreach ($query->get() as $mapData) {
-            /** @var PlatformMapData $mapData */
-            $id = $mapData->mapFrom;
-            $data = $allData->get($id, [
-                'id'    => $id,
-                'probe' => $id,
-            ]);
-            $data[$mapData->mapping_id] = $mapData->mapTo;
-            $allData[$id] = $data;
-        }
-        return $allData;
+        $tmp = new PlatformMapData();
+        /** @var \Jenssegers\Mongodb\Connection $connection */
+        $connection = \DB::connection($tmp->getConnectionName());
+        $query = new FixedMongoQueryBuilder($connection->collection($tmp->getTable()));
+        $query->where('platform_id', '=', $this->getKey());
+        $connection->setQueryGrammar($query->getGrammar());
+        return $query;
     }
 
 }

@@ -38,6 +38,13 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
     protected $mappings = [];
 
     /**
+     * A MongoDb Collection where MapData will be stored
+     *
+     * @var \MongoDB\Collection
+     */
+    protected $collection;
+
+    /**
      * MapFileImporter constructor.
      *
      * @param string|array $config
@@ -72,11 +79,13 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
     {
         $this->mappings = [];
         for ($i = 1; $i < count($line); $i++) {
-            $mapping = PlatformMapping::create([
+            $slug = str_slug($line[$i], '_');
+            PlatformMapping::create([
                 'platform_id' => $this->platform->getKey(),
+                'slug'        => $slug,
                 'name'        => $line[$i],
             ]);
-            $this->mappings[$i] = $mapping->getKey();
+            $this->mappings[$i] = $slug;
         }
     }
 
@@ -88,19 +97,14 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
      */
     protected function importMapData(array $line)
     {
-        $mapFrom = trim(stripcslashes($line[0]), '"\'');
+        $data = [
+            'platform_id' => $this->platform->getKey(),
+            'probe'       => trim(stripcslashes($line[0]), '"\''),
+        ];
         for ($i = 1; $i < count($line); $i++) {
-            $mapTo = trim(stripcslashes($line[$i]), '"\'');
-            if (empty($mapTo)) {
-                continue;
-            }
-            PlatformMapData::create([
-                'platform_id' => $this->platform->getKey(),
-                'mapping_id'  => $this->mappings[$i],
-                'mapFrom'     => $mapFrom,
-                'mapTo'       => $mapTo,
-            ]);
+            $data[$this->mappings[$i]] = trim(stripcslashes($line[$i]), '"\'');
         }
+        $this->collection->insertOne($data);
     }
 
     /**
@@ -115,6 +119,8 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
         if (!MultiFile::fileIsOpen($fp)) {
             throw new ImportException("Unable to open file to import");
         }
+        $tmp = new PlatformMapData();
+        $this->collection = \DB::connection($tmp->getConnectionName())->getCollection($tmp->getTable());
         $currLineProcessed = 0;
         $totalLines = $this->countLines($this->softFile);
         $currLine = 0;

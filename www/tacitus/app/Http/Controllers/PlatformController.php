@@ -241,8 +241,9 @@ class PlatformController extends Controller
         if (!$platform->canUse()) {
             abort(401, 'You are not allowed to use this dataset');
         }
-        /** @var \Yajra\Datatables\Engines\CollectionEngine $table */
+        /** @var \Yajra\Datatables\Engines\QueryBuilderEngine $table */
         $table = Datatables::of($platform->getMappingsCollection());
+        $table->setTotalRecords($platform->getMappingsCollection()->count());
         return $table->make(true);
     }
 

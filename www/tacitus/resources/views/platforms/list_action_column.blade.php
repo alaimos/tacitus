@@ -1,4 +1,4 @@
-@if(false) {{-- $platform->canUse()) --}}
+@if($platform->canUse())
     <a href="{{ route('platforms-view', ['platform' => $platform]) }}" class="btn btn-xs btn-primary">
         <i class="fa fa-eye" aria-hidden="true"></i> View
     </a>

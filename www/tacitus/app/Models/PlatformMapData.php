@@ -15,16 +15,11 @@ use Jenssegers\Mongodb\Eloquent\Model as Model;
  * App\Models\Metadata
  *
  * @mixin \Eloquent
- * @property string                           $platform_id
- * @property string                           $mapping_id
- * @property string                           $mapFrom
- * @property string                           $mapTo
- * @property-read \App\Models\PlatformMapping $mapping
- * @property-read \App\Models\Platform        $platform
- * @method static \Illuminate\Database\Query\Builder|\App\Models\PlatformMapData whereMapFrom($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\PlatformMapData whereMapTo($value)
+ * @property string                    $platform_id
+ * @property string                    $probe
+ * @property-read \App\Models\Platform $platform
  * @method static \Illuminate\Database\Query\Builder|\App\Models\PlatformMapData wherePlatformId($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\PlatformMapData whereMappingId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\PlatformMapData whereProbe($value)
  */
 class PlatformMapData extends Model implements BulkInsertableInterface
 {
@@ -57,16 +52,8 @@ class PlatformMapData extends Model implements BulkInsertableInterface
      * @var array
      */
     protected $fillable = [
-        'platform_id', 'mapping_id', 'mapFrom', 'mapTo'
+        'platform_id', 'probe'
     ];
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
-     */
-    public function mapping()
-    {
-        return $this->belongsTo('App\Models\PlatformMapping', 'mapping_id');
-    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -75,5 +62,6 @@ class PlatformMapData extends Model implements BulkInsertableInterface
     {
         return $this->belongsTo('App\Models\Platform', 'platform_id');
     }
+
 
 }

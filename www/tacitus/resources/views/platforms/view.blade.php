@@ -26,14 +26,6 @@
                     @endforeach
                 </tr>
                 </thead>
-                <tfoot>
-                <tr>
-                    <th>Probe</th>
-                    @foreach($platform->mappingList() as $mapping)
-                        <th>{{$mapping}}</th>
-                    @endforeach
-                </tr>
-                </tfoot>
             </table>
         </div>
     </div>
@@ -65,21 +57,15 @@
 <script>
     $(function () {
         var t = $('#data-table');
-        t.find('tfoot th').each(function () {
-            var f = $(this), title = f.text(), disable = f.data('disable-search');
-            if (!disable) {
-                f.html('<input type="text" class="form-control input-sm" placeholder="Search ' + title + '" />');
-            }
-        });
         var dataTable = t.dataTable({
-            dom: "<'row'<'col-sm-3'l><'col-sm-6 text-center'B><'col-sm-3'f>>" +
+            dom: "<'row'<'col-sm-3'l><'col-sm-6 text-center'B>>" +
             "<'row'<'col-sm-12'tr>>" +
             "<'row'<'col-sm-5'i><'col-sm-7'p>>",
             scrollX: true,
             deferRender: true,
             responsive: false,
             processing: true,
-            serverSide: false,
+            serverSide: true,
             buttons: [
                 'copyHtml5',
                 'excelHtml5',
@@ -103,14 +89,6 @@
             language: {
                 processing: '<i class="fa fa-spinner faa-spin fa-3x fa-fw animated"></i><span class="sr-only">Loading...</span>'
 
-            },
-            initComplete: function () {
-                this.api().columns().every(function () {
-                    var column = this;
-                    $(column.footer()).find('input').on('change', function () {
-                        column.search($(this).val(), false, false, true).draw();
-                    });
-                });
             }
         });
     });
