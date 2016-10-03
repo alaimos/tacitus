@@ -91,6 +91,20 @@ Route::get('/platforms/{platform}/delete', ['as' => 'platforms-delete', 'uses' =
 Route::get('/platforms/{platform}/view', ['as' => 'platforms-view', 'uses' => 'PlatformController@viewPlatform']);
 Route::any('/platforms/{platform}/data', ['as' => 'platforms-view-data', 'uses' => 'PlatformController@platformData']);
 
+Route::get('/selections/{selection}/map',
+    ['as' => 'selections-delete', 'uses' => 'MappedSelectionController@submitMappingForm']);
+Route::post('/selections/{selection}/map',
+    ['as' => 'selections-delete', 'uses' => 'MappedSelectionController@submitMapping']);
+Route::get('/selections/mapped',
+    ['as' => 'mapped-selections-lists', 'uses' => 'MappedSelectionController@selectionsList']);
+Route::any('/selections/mapped/data',
+    ['as' => 'mapped-selections-lists-data', 'uses' => 'MappedSelectionController@selectionsData']);
+Route::get('/selections/mapped/{selection}/download/{type}',
+    ['as' => 'mapped-selections-download', 'uses' => 'MappedSelectionController@download']);
+Route::get('/selections/mapped/{selection}/delete',
+    ['as' => 'mapped-selections-delete', 'uses' => 'MappedSelectionController@delete']);
+
+
 Route::get('/not-available', ['as' => 'not-available', function () {
     return view('errors.feature_not_available');
 }]);
