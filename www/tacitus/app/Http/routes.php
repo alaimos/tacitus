@@ -92,9 +92,9 @@ Route::get('/platforms/{platform}/view', ['as' => 'platforms-view', 'uses' => 'P
 Route::any('/platforms/{platform}/data', ['as' => 'platforms-view-data', 'uses' => 'PlatformController@platformData']);
 
 Route::get('/selections/{selection}/map',
-    ['as' => 'selections-delete', 'uses' => 'MappedSelectionController@submitMappingForm']);
+    ['as' => 'mapped-selections-submit', 'uses' => 'MappedSelectionController@submitMappingForm']);
 Route::post('/selections/{selection}/map',
-    ['as' => 'selections-delete', 'uses' => 'MappedSelectionController@submitMapping']);
+    ['as' => 'mapped-selections-do-submit', 'uses' => 'MappedSelectionController@submitMapping']);
 Route::get('/selections/mapped',
     ['as' => 'mapped-selections-lists', 'uses' => 'MappedSelectionController@selectionsList']);
 Route::any('/selections/mapped/data',

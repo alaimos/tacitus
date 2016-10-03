@@ -1,3 +1,7 @@
+<a href="{{ route('mapped-selections-submit', ['selection' => $selection]) }}"
+   class="btn btn-xs btn-primary">
+    <i class="fa fa-globe" aria-hidden="true"></i> Map Identifiers
+</a>
 @if($selection->canDownload())
     <a href="{{ route('selections-download', ['selection' => $selection, 'type' => 'metadata']) }}"
        class="btn btn-xs btn-primary">
