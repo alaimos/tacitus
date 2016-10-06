@@ -111,7 +111,7 @@ class DatasetSelection extends Job implements ShouldQueue
      */
     protected function buildMetadataFile(SampleSelection $sampleSelection, Dataset $dataset)
     {
-        $fileName = $this->jobData->getJobDirectory() . '/' . $sampleSelection->getFileName('metadata', 'tsv');
+        $fileName = $sampleSelection->getFileName('metadata', 'tsv');
         $this->log('Writing metadata file');
         $fp = fopen($fileName, 'w');
         if (!$fp) {
@@ -123,7 +123,7 @@ class DatasetSelection extends Job implements ShouldQueue
             $idx[] = snake_case($meta->name);
             $tmp[] = $meta->name;
         }
-        @fwrite($fp, implode("\t", $tmp) . PHP_EOL);
+        @fputcsv($fp, $tmp, "\t", '"', '\\');
         $this->log('...Headers');
         $keyToName = [];
         $metadata = $dataset->getMetadataSamplesCollection($sampleSelection->selected_samples);
@@ -136,7 +136,7 @@ class DatasetSelection extends Job implements ShouldQueue
             foreach ($idx as $id) {
                 $tmp[] = $meta[$id];
             }
-            @fwrite($fp, implode("\t", $tmp) . PHP_EOL);
+            @fputcsv($fp, $tmp, "\t", '"', '\\');
             $this->logProgress(++$i, $c);
         }
         @fclose($fp);
@@ -169,7 +169,7 @@ class DatasetSelection extends Job implements ShouldQueue
      */
     protected function buildDataFile(SampleSelection $sampleSelection, Dataset $dataset, array $keyToName)
     {
-        $fileName = $this->jobData->getJobDirectory() . '/' . $sampleSelection->getFileName('data', 'tsv');
+        $fileName = $sampleSelection->getFileName('data', 'tsv');
         $probes = $this->countProbes();
         $this->log('Writing data file (' . $probes . ' probes)');
         $fp = fopen($fileName, 'w');
@@ -180,7 +180,7 @@ class DatasetSelection extends Job implements ShouldQueue
         foreach ($keyToName as $key => $dt) {
             $tmp[] = $dt[0];
         }
-        @fwrite($fp, implode("\t", $tmp) . PHP_EOL);
+        @fputcsv($fp, $tmp, "\t", '"', '\\');
         $this->log('...Headers');
         $this->prevPercentage = 0;
         for ($i = 0; $i < $probes; $i++) {
@@ -190,10 +190,11 @@ class DatasetSelection extends Job implements ShouldQueue
             foreach ($keyToName as $key => $dt) {
                 $tmp[] = $probe->data[$dt[1]];
             }
-            @fwrite($fp, implode("\t", $tmp) . PHP_EOL);
+            @fputcsv($fp, $tmp, "\t", '"', '\\');
             $this->logProgress(($i + 1), $probes);
         }
         $this->log("...OK\n");
+        @fclose($fp);
         chmod($fileName, 0777);
         $sampleSelection->setDataFilename($fileName)->save();
     }
@@ -271,12 +272,6 @@ class DatasetSelection extends Job implements ShouldQueue
      */
     public function destroy()
     {
-        if (isset($this->jobData->job_data['selection_id'])) {
-            $selection = SampleSelection::whereId($this->jobData->job_data['selection_id'])->first();
-            if ($selection !== null) {
-                $selection->delete();
-            }
-        }
         $this->jobData->deleteJobDirectory();
     }
 

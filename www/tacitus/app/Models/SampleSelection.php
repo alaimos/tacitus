@@ -112,6 +112,21 @@ class SampleSelection extends Model
     }
 
     /**
+     * Returns the path of the storage directory
+     *
+     * @return string
+     */
+    public function getStorageDirectory()
+    {
+        $path = storage_path('app/selections/');
+        if (!file_exists($path)) {
+            mkdir($path, 0777, true);
+            chmod($path, 0777);
+        }
+        return $path;
+    }
+
+    /**
      * Return a file name for this object
      *
      * @param string $type
@@ -120,7 +135,7 @@ class SampleSelection extends Model
      */
     public function getFileName($type, $extension)
     {
-        return $this->slug . '-' . $type . '.' . $extension;
+        return $this->getStorageDirectory() . '/' . $this->id . '-' . $this->slug . '-' . $type . '.' . $extension;
     }
 
     /**
@@ -170,7 +185,6 @@ class SampleSelection extends Model
     {
         return isset($this->generated_files['data']) ? $this->generated_files['data'] : null;
     }
-
 
     /**
      * Checks if the current user can delete this selection

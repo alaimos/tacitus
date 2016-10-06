@@ -67,6 +67,13 @@
                 {data: 'created_at', name: 'mapped_sample_selections.created_at'},
                 {data: 'action', name: 'action', orderable: false, searchable: false}
             ],
+            columnDefs: [
+                {responsivePriority: 1, targets: 0},
+                {responsivePriority: 1, targets: 1},
+                {responsivePriority: 1, targets: 2},
+                {responsivePriority: 3, targets: 3},
+                {responsivePriority: 2, targets: 4}
+            ],
             language: {
                 processing: '<i class="fa fa-spinner faa-spin fa-3x fa-fw animated"></i><span class="sr-only">Loading...</span>'
 

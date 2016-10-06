@@ -53,7 +53,7 @@ class MappedSampleSelection extends Model
      * @var array
      */
     protected $fillable = [
-        'selection_id', 'platform_id', 'mapping_id', 'status', 'user_id'
+        'selection_id', 'platform_id', 'mapping_id', 'status', 'user_id', 'generated_files'
     ];
 
     /**
@@ -65,9 +65,19 @@ class MappedSampleSelection extends Model
     public static function listSelections()
     {
         /** @var \Illuminate\Database\Query\Builder $query */
-        $query = self::whereStatus(self::READY);
+        $query = self::join('sample_selections', 'sample_selections.id', '=', 'mapped_sample_selections.selection_id')
+            ->join('platform_mappings', 'platform_mappings.id', '=', 'mapped_sample_selections.mapping_id')
+            ->join('platforms', 'platforms.id', '=', 'mapped_sample_selections.platform_id')
+            ->where('mapped_sample_selections.status', '=', self::READY)
+            ->select([
+                'mapped_sample_selections.*',
+                'platform_mappings.name AS mapping',
+                'platforms.title AS platform',
+                'platforms.organism AS organism',
+                'sample_selections.name',
+            ]);
         if (user_can(Permissions::USE_TOOLS) && !user_can(Permissions::ADMINISTER)) {
-            $query->whereUserId(current_user()->id);
+            $query->where('mapped_sample_selections.user_id', '=', current_user()->id);
             return $query;
         } elseif (user_can(Permissions::USE_TOOLS) && user_can(Permissions::ADMINISTER)) {
             return $query;
@@ -109,6 +119,21 @@ class MappedSampleSelection extends Model
     }
 
     /**
+     * Returns the path of the storage directory
+     *
+     * @return string
+     */
+    public function getStorageDirectory()
+    {
+        $path = storage_path('app/selections/mapped/');
+        if (!file_exists($path)) {
+            mkdir($path, 0777, true);
+            chmod($path, 0777);
+        }
+        return $path;
+    }
+
+    /**
      * Return a file name for this object
      *
      * @param string $type
@@ -117,7 +142,8 @@ class MappedSampleSelection extends Model
      */
     public function getFileName($type, $extension)
     {
-        return $this->id . '-mapped-' . $this->selection->slug . '-' . $type . '.' . $extension;
+        return $this->getStorageDirectory() . '/' . $this->id . '-mapped-' . $this->selection->slug . '-' . $type .
+               '.' . $extension;
     }
 
     /**

@@ -20,7 +20,14 @@
                     <ul class="nav nav-second-level">
                         <li>
                             <a href="{{ route('platforms-lists') }}"><i class="fa fa-map-signs fa-fw"></i>
-                                Platforms</a>
+                                Platforms
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('mapped-selections-lists') }}">
+                                <i class="fa fa-map fa-fw"></i>
+                                Mapped Selections
+                            </a>
                         </li>
                         @if(user_can(\App\Utils\Permissions::INTEGRATE_DATASETS))
                             <li>

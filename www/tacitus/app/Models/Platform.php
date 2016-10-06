@@ -62,6 +62,13 @@ class Platform extends Model
     ];
 
     /**
+     * Cache of map array
+     *
+     * @var array
+     */
+    protected $cache = [];
+
+    /**
      * Get all selections
      *
      * @return \Illuminate\Database\Eloquent\Collection|\Illuminate\Database\Query\Builder|static[]
@@ -172,13 +179,17 @@ class Platform extends Model
                 throw new \RuntimeException('Unable to find mapping');
             }
         }
+        if (isset($this->cache[$mapping->getKey()])) {
+            return $this->cache[$mapping->getKey()];
+        }
         $tmp = new PlatformMapData();
         /** @var \Jenssegers\Mongodb\Query\Builder $query */
         $query = \DB::connection($tmp->getConnectionName())->collection($tmp->getTable());
         $field = $mapping->slug;
-        return $query->select([$field, 'probe'])
+        $this->cache[$mapping->getKey()] = $query->select([$field, 'probe'])
             ->where('platform_id', '=', $this->getKey())
             ->pluck($field, 'probe');
+        return $this->cache[$mapping->getKey()];
     }
 
     /**
@@ -201,11 +212,12 @@ class Platform extends Model
     /**
      * Generate a map from mapping id to mapping name
      *
-     * @return array|\Illuminate\Support\Collection
+     * @param bool $byId
+     * @return array|Collection
      */
-    public function mappingList()
+    public function mappingList($byId = false)
     {
-        return PlatformMapping::wherePlatformId($this->id)->pluck('name', 'slug');
+        return PlatformMapping::wherePlatformId($this->id)->pluck('name', (($byId) ? 'id' : 'slug'));
     }
 
     /**

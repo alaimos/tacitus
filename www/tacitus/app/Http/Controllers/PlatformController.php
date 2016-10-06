@@ -266,7 +266,10 @@ class PlatformController extends Controller
         if (!$platform->canUse()) {
             abort(401, 'You are not allowed to use this dataset');
         }
-        return response()->json($platform->mappingList());
+        return response()->json([
+            'ok'   => true,
+            'data' => $platform->mappingList(true)
+        ]);
     }
 
     /**
