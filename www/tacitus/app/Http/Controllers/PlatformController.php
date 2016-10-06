@@ -20,11 +20,40 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 use Flash;
+use Illuminate\Routing\Router;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
 
 class PlatformController extends Controller
 {
+
+    /**
+     * Registers routes handled by this controller
+     *
+     * @param \Illuminate\Routing\Router $router
+     */
+    public static function registerRoutes(Router $router)
+    {
+        $router->get('/platforms', ['as' => 'platforms-lists', 'uses' => 'PlatformController@platformsList']);
+        $router->any('/platforms/data',
+            ['as' => 'platforms-lists-data', 'uses' => 'PlatformController@platformsListData']);
+        $router->get('/platforms/submission',
+            ['as' => 'platforms-submission', 'uses' => 'PlatformController@submission']);
+        $router->post('/platforms/submission',
+            ['as' => 'platforms-submission-process', 'uses' => 'PlatformController@processSubmission']);
+        $router->post('/platforms/submission/form',
+            ['as' => 'platforms-submission-form', 'uses' => 'PlatformController@submissionForm']);
+        $router->get('/platforms/{platform}/delete',
+            ['as' => 'platforms-delete', 'uses' => 'PlatformController@delete']);
+        $router->get('/platforms/{platform}/view',
+            ['as' => 'platforms-view', 'uses' => 'PlatformController@viewPlatform']);
+        $router->any('/platforms/{platform}/data',
+            ['as' => 'platforms-view-data', 'uses' => 'PlatformController@platformData']);
+        $router->any('/platforms/list',
+            ['as' => 'platforms-list-json', 'uses' => 'PlatformController@listPlatformsJson']);
+        $router->any('/platforms/{platform}/mappings',
+            ['as' => 'platforms-list-mappings', 'uses' => 'PlatformController@listMappings']);
+    }
 
     /**
      * Prepare the list of selections
@@ -63,6 +92,7 @@ class PlatformController extends Controller
      * Platform submission form
      *
      * @param Request $request
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function submission(Request $request)
@@ -78,6 +108,7 @@ class PlatformController extends Controller
      * Generate an error bag from a request
      *
      * @param Request $request
+     *
      * @return ViewErrorBag
      */
     protected function makeErrorBag(Request $request)
@@ -117,6 +148,7 @@ class PlatformController extends Controller
      * Renders the submission for for a specific importer
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse.
      */
     public function submissionForm(Request $request)
@@ -142,6 +174,7 @@ class PlatformController extends Controller
      * Process platform submission
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function processSubmission(Request $request)
@@ -181,7 +214,7 @@ class PlatformController extends Controller
             $job = JobFactory::getQueueJob($jobData);
             $this->dispatch($job);
             Flash::success('Your import request has been submitted. Please check the Jobs panel in order to verify ' .
-                           'its status.');
+                'its status.');
         } catch (\Exception $e) {
             Flash::error('Error occurred while submitting job: ' . $e->getMessage());
         }
@@ -192,6 +225,7 @@ class PlatformController extends Controller
      * Delete a platform
      *
      * @param Platform $platform
+     *
      * @return mixed
      */
     public function delete(Platform $platform)
@@ -215,6 +249,7 @@ class PlatformController extends Controller
      *
      * @param Request  $request
      * @param Platform $platform
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function viewPlatform(Request $request, Platform $platform)
@@ -236,6 +271,7 @@ class PlatformController extends Controller
      *
      * @param Request  $request
      * @param Platform $platform
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function platformData(Request $request, Platform $platform)
@@ -256,6 +292,7 @@ class PlatformController extends Controller
      * Lists all mappings for a platform
      *
      * @param Platform $platform
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function listMappings(Platform $platform)
@@ -276,6 +313,7 @@ class PlatformController extends Controller
      * Lists all platforms in json format
      *
      * @param Request $request
+     *
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function listPlatformsJson(Request $request)

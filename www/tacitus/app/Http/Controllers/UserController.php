@@ -16,9 +16,41 @@ use Flash;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Illuminate\Routing\Router;
 
 class UserController extends Controller
 {
+
+    /**
+     * Registers routes handled by this controller
+     *
+     * @param \Illuminate\Routing\Router $router
+     */
+    public static function registerRoutes(Router $router)
+    {
+        $router->group(['as'         => 'user::',
+                        'prefix'     => 'user',
+                        'middleware' => ['permission:' . Permissions::USER_PANELS]],
+            function (Router $router) {
+                $router->get('/alerts', ['as' => 'alerts', 'uses' => 'UserController@alerts']);
+                $router->get('/list', ['as' => 'list', 'uses' => 'UserController@listUsers']);
+                $router->any('/list/data', ['as' => 'list-data', 'uses' => 'UserController@listUsersData']);
+                $router->get('/create', ['as' => 'create', 'uses' => 'UserController@createUser']);
+                $router->post('/create', ['as' => 'create-post', 'uses' => 'UserController@doCreateUser']);
+                $router->get('/delete/{user}', ['as' => 'delete', 'uses' => 'UserController@delete']);
+                $router->get('/profile/{user?}', ['as' => 'profile', 'uses' => 'UserController@profile']);
+                $router->get('/profile/edit/details/{user?}',
+                    ['as' => 'edit-profile', 'uses' => 'UserController@editProfile']);
+                $router->post('/profile/edit/details/{user?}',
+                    ['as' => 'edit-profile-post', 'uses' => 'UserController@doEditProfile']);
+                $router->get('/profile/password/change/{user?}',
+                    ['as' => 'change-password', 'uses' => 'UserController@changePassword']);
+                $router->post('/profile/password/change/{user?}',
+                    ['as' => 'change-password-post', 'uses' => 'UserController@doChangePassword']);
+            }
+        );
+    }
+
     /**
      * Shows user alerts
      *
@@ -35,6 +67,7 @@ class UserController extends Controller
      * Get the correct user model
      *
      * @param User|null $user
+     *
      * @return array|void
      */
     protected function getUser(User $user = null)
@@ -61,6 +94,7 @@ class UserController extends Controller
      * Show user profile
      *
      * @param User|null $user
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|void
      */
     public function profile(User $user = null)
@@ -78,6 +112,7 @@ class UserController extends Controller
      * Show change password form
      *
      * @param User $user
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function changePassword(User $user = null)
@@ -95,6 +130,7 @@ class UserController extends Controller
      *
      * @param Request $request
      * @param User    $user
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function doChangePassword(Request $request, User $user = null)
@@ -120,6 +156,7 @@ class UserController extends Controller
      * Show user profile
      *
      * @param User|null $user
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|void
      */
     public function editProfile(User $user = null)
@@ -139,6 +176,7 @@ class UserController extends Controller
      *
      * @param Request   $request
      * @param User|null $user
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function doEditProfile(Request $request, User $user = null)
@@ -185,6 +223,7 @@ class UserController extends Controller
      * Process datatables ajax request for the list of users.
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function listUsersData(Request $request)
@@ -237,6 +276,7 @@ class UserController extends Controller
      * Save new user
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function doCreateUser(Request $request)

@@ -9,9 +9,27 @@ use Flash;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
+use Illuminate\Routing\Router;
 
 class SelectionController extends Controller
 {
+
+    /**
+     * Registers routes handled by this controller
+     *
+     * @param \Illuminate\Routing\Router $router
+     */
+    public static function registerRoutes(Router $router)
+    {
+        $router->get('/selections', ['as' => 'selections-lists', 'uses' => 'SelectionController@selectionsList']);
+        $router->any('/selections/data',
+            ['as' => 'selections-lists-data', 'uses' => 'SelectionController@selectionsData']);
+        $router->get('/selections/{selection}/download/{type}',
+            ['as' => 'selections-download', 'uses' => 'SelectionController@download']);
+        $router->get('/selections/{selection}/delete',
+            ['as' => 'selections-delete', 'uses' => 'SelectionController@delete']);
+    }
+
     /**
      * Prepare the list of selections
      *
@@ -50,6 +68,7 @@ class SelectionController extends Controller
      *
      * @param SampleSelection $selection
      * @param string          $type
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function download(SampleSelection $selection, $type)
@@ -84,6 +103,7 @@ class SelectionController extends Controller
      * Delete a selection
      *
      * @param SampleSelection $selection
+     *
      * @return mixed
      */
     public function delete(SampleSelection $selection)

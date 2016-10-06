@@ -17,13 +17,37 @@ use Illuminate\Http\Request;
 use App\Jobs\Factory as JobFactory;
 use App\Models\Job as JobData;
 use App\Http\Requests;
+use Illuminate\Routing\Router;
 
 class MappedSelectionController extends Controller
 {
 
     /**
+     * Registers routes handled by this controller
+     *
+     * @param \Illuminate\Routing\Router $router
+     */
+    public static function registerRoutes(Router $router)
+    {
+        $router->get('/selections/{selection}/map',
+            ['as' => 'mapped-selections-submit', 'uses' => 'MappedSelectionController@submitMappingForm']);
+        $router->post('/selections/{selection}/map',
+            ['as' => 'mapped-selections-do-submit', 'uses' => 'MappedSelectionController@submitMapping']);
+        $router->get('/selections/mapped',
+            ['as' => 'mapped-selections-lists', 'uses' => 'MappedSelectionController@selectionsList']);
+        $router->any('/selections/mapped/data',
+            ['as' => 'mapped-selections-lists-data', 'uses' => 'MappedSelectionController@selectionsData']);
+        $router->get('/selections/mapped/{selection}/download/{type}',
+            ['as' => 'mapped-selections-download', 'uses' => 'MappedSelectionController@download']);
+        $router->get('/selections/mapped/{selection}/delete',
+            ['as' => 'mapped-selections-delete', 'uses' => 'MappedSelectionController@delete']);
+
+    }
+
+    /**
      * @param Request         $request
      * @param SampleSelection $selection
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function submitMappingForm(Request $request, SampleSelection $selection)
@@ -73,7 +97,7 @@ class MappedSelectionController extends Controller
             $job = JobFactory::getQueueJob($jobData);
             $this->dispatch($job);
             Flash::success('Your import request has been submitted. Please check the Jobs panel in order to verify ' .
-                           'its status.');
+                'its status.');
         } catch (\Exception $e) {
             Flash::error('Error occurred while submitting job: ' . $e->getMessage());
         }
@@ -117,7 +141,8 @@ class MappedSelectionController extends Controller
      * Download a file from a mapped selection
      *
      * @param MappedSampleSelection $selection
-     * @param string          $type
+     * @param string                $type
+     *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
     public function download(MappedSampleSelection $selection, $type)
@@ -152,6 +177,7 @@ class MappedSelectionController extends Controller
      * Delete a mapped selection
      *
      * @param MappedSampleSelection $selection
+     *
      * @return mixed
      */
     public function delete(MappedSampleSelection $selection)

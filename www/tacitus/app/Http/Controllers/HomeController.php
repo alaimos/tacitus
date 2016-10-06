@@ -11,10 +11,20 @@ use App\Http\Requests;
 use App\Models\Dataset;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
 
 class HomeController extends Controller
 {
 
+    /**
+     * Registers routes handled by this controller
+     *
+     * @param \Illuminate\Routing\Router $router
+     */
+    public static function registerRoutes(Router $router)
+    {
+        $router->get('/', 'HomeController@index');
+    }
 
     /**
      * Show the application dashboard.

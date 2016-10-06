@@ -19,9 +19,38 @@ use Carbon\Carbon;
 use Datatables;
 use Flash;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
 
 class DatasetController extends Controller
 {
+
+    /**
+     * Registers routes handled by this controller
+     *
+     * @param \Illuminate\Routing\Router $router
+     */
+    public static function registerRoutes(Router $router)
+    {
+        $router->get('/datasets', ['as' => 'datasets-lists', 'uses' => 'DatasetController@datasetsList']);
+        $router->any('/datasets/data', ['as' => 'datasets-lists-data', 'uses' => 'DatasetController@datasetsData']);
+        $router->get('/datasets/{dataset}/selection', ['as'   => 'datasets-select',
+                                                       'uses' => 'DatasetController@sampleSelection']);
+        $router->any('/datasets/{dataset}/selection/data', ['as'   => 'datasets-lists-samples',
+                                                            'uses' => 'DatasetController@sampleSelectionData']);
+        $router->post('/datasets/{dataset}/selection', ['as'   => 'queue-dataset-selection',
+                                                        'uses' => 'DatasetController@queueSampleSelection']);
+        $router->get('/datasets/{dataset}/delete', ['as'         => 'datasets-delete',
+                                                    'uses'       => 'DatasetController@delete',
+                                                    'middleware' => ['permission:' . Permissions::DELETE_DATASETS]]);
+
+        $router->get('/datasets/submission', ['as'         => 'datasets-submission',
+                                              'uses'       => 'DatasetController@submission',
+                                              'middleware' => ['permission:' . Permissions::SUBMIT_DATASETS]]);
+
+        $router->post('/datasets/submission', ['as'         => 'datasets-submission-process',
+                                               'uses'       => 'DatasetController@processSubmission',
+                                               'middleware' => ['permission:' . Permissions::SUBMIT_DATASETS]]);
+    }
 
     /**
      * Prepare the list of datasets
@@ -73,6 +102,7 @@ class DatasetController extends Controller
      * Process dataset submission
      *
      * @param Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function processSubmission(Request $request)
@@ -98,7 +128,7 @@ class DatasetController extends Controller
             $job = JobFactory::getQueueJob($jobData);
             $this->dispatch($job);
             Flash::success('Your import request has been submitted. Please check the Jobs panel in order to verify ' .
-                           'its status.');
+                'its status.');
         } catch (\Exception $e) {
             Flash::error('Error occurred while submitting job: ' . $e->getMessage());
         }
@@ -110,6 +140,7 @@ class DatasetController extends Controller
      *
      * @param Request $request
      * @param Dataset $dataset
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function sampleSelection(Request $request, Dataset $dataset)
@@ -131,6 +162,7 @@ class DatasetController extends Controller
      *
      * @param Request $request
      * @param Dataset $dataset
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function sampleSelectionData(Request $request, Dataset $dataset)
@@ -151,6 +183,7 @@ class DatasetController extends Controller
      *
      * @param Request $request
      * @param Dataset $dataset
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function queueSampleSelection(Request $request, Dataset $dataset)
@@ -164,7 +197,7 @@ class DatasetController extends Controller
         $selectionName = $request->get('selectionName');
         if (empty($selectionName)) {
             $selectionName = 'Selection from ' . $dataset->source->display_name . ' dataset ' .
-                             $dataset->original_id . ' on ' . Carbon::now()->toDateTimeString();
+                $dataset->original_id . ' on ' . Carbon::now()->toDateTimeString();
         }
         $samples = $request->get('samples');
         if (empty($samples)) {
@@ -189,7 +222,7 @@ class DatasetController extends Controller
         $job = JobFactory::getQueueJob($jobData);
         $this->dispatch($job);
         Flash::success('Your selection request has been submitted. Please check the Jobs panel in order to verify ' .
-                       'its status.');
+            'its status.');
         return redirect()->route('datasets-lists');
     }
 
@@ -197,6 +230,7 @@ class DatasetController extends Controller
      * Delete a dataset
      *
      * @param Dataset $dataset
+     *
      * @return mixed
      */
     public function delete(Dataset $dataset)
@@ -212,7 +246,7 @@ class DatasetController extends Controller
         }
         $dataset->delete();
         Flash::success('Your deletion request has been submitted. Please check the Jobs panel in order to verify its ' .
-                       'status.');
+            'status.');
         return back();
     }
 }

@@ -9,21 +9,43 @@ namespace App\Http\Controllers;
 
 use App\Jobs\Factory;
 use App\Models\Job as JobData;
+use App\Utils\Permissions;
 use Auth;
 use Datatables;
 use Flash;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
 
 class JobsController extends Controller
 {
 
     /**
-     * Prepare the list of jobs
+     * Registers routes handled by this controller
      *
-     * @param Request $request
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @param \Illuminate\Routing\Router $router
      */
-    public function jobsList(Request $request)
+    public static function registerRoutes(Router $router)
+    {
+        $router->get('/jobs', ['as'         => 'jobs-list',
+                               'uses'       => 'JobsController@jobsList',
+                               'middleware' => ['permission:' . Permissions::VIEW_JOBS]]);
+        $router->any('/jobs/data', ['as'         => 'jobs-lists-data',
+                                    'uses'       => 'JobsController@jobsData',
+                                    'middleware' => ['permission:' . Permissions::VIEW_JOBS]]);
+        $router->any('/jobs/{job}/view', ['as'         => 'jobs-view',
+                                          'uses'       => 'JobsController@viewJob',
+                                          'middleware' => ['permission:' . Permissions::VIEW_JOBS]]);
+        $router->get('/jobs/{job}/delete', ['as'         => 'jobs-delete',
+                                            'uses'       => 'JobsController@delete',
+                                            'middleware' => ['permission:' . Permissions::VIEW_JOBS]]);
+    }
+
+    /**
+     * Prepare the list of jobs
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     *
+     */
+    public function jobsList()
     {
         return view('jobs.list');
     }
@@ -31,10 +53,9 @@ class JobsController extends Controller
     /**
      * Process datatables ajax request for the list of jobs.
      *
-     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function jobsData(Request $request)
+    public function jobsData()
     {
         /** @var \Yajra\Datatables\Engines\QueryBuilderEngine $table */
         $table = Datatables::of(JobData::listJobs());
@@ -68,12 +89,15 @@ class JobsController extends Controller
     /**
      * Return a job data
      *
-     * @param Request $request
      * @param JobData $job
+     *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function viewJob(Request $request, JobData $job)
+    public function viewJob(JobData $job)
     {
+        if (!$job || !$job->exists) {
+            abort(404, 'Unable to find the job.');
+        }
         return response()->json($job->toArray());
     }
 
@@ -82,6 +106,7 @@ class JobsController extends Controller
      * Delete a job
      *
      * @param JobData $job
+     *
      * @return mixed
      */
     public function delete(JobData $job)
