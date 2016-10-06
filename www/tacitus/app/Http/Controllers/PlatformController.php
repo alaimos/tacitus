@@ -16,6 +16,7 @@ use Auth;
 use Datatables;
 use DaveJamesMiller\Breadcrumbs\Exception;
 use Illuminate\Contracts\Support\MessageProvider;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 
 use Flash;
@@ -249,6 +250,42 @@ class PlatformController extends Controller
         $table = Datatables::of($platform->getMappingsCollection());
         $table->setTotalRecords($platform->getMappingsCollection()->count());
         return $table->make(true);
+    }
+
+    /**
+     * Lists all mappings for a platform
+     *
+     * @param Platform $platform
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function listMappings(Platform $platform)
+    {
+        if (!$platform || !$platform->exists) {
+            abort(404, 'Unable to find the dataset.');
+        }
+        if (!$platform->canUse()) {
+            abort(401, 'You are not allowed to use this dataset');
+        }
+        return response()->json($platform->mappingList());
+    }
+
+    /**
+     * Lists all platforms in json format
+     *
+     * @param Request $request
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function listPlatformsJson(Request $request)
+    {
+        $q = $request->get('q');
+        $perPage = (int)$request->get('perPage', 30);
+        $query = Platform::listPlatforms();
+        if (!empty($q)) {
+            $query->where(function (Builder $query) use ($q) {
+                $query->where('title', 'like', '%' . $q . '%')->orWhere('organism', 'like', '%' . $q . '%');
+            });
+        }
+        return $query->paginate($perPage, ['id', 'title', 'organism']);
     }
 
 }

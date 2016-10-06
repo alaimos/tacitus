@@ -90,6 +90,10 @@ Route::post('/platforms/submission/form',
 Route::get('/platforms/{platform}/delete', ['as' => 'platforms-delete', 'uses' => 'PlatformController@delete']);
 Route::get('/platforms/{platform}/view', ['as' => 'platforms-view', 'uses' => 'PlatformController@viewPlatform']);
 Route::any('/platforms/{platform}/data', ['as' => 'platforms-view-data', 'uses' => 'PlatformController@platformData']);
+Route::any('/platforms/list',
+    ['as' => 'platforms-list-json', 'uses' => 'PlatformController@listPlatformsJson']);
+Route::any('/platforms/{platform}/mappings',
+    ['as' => 'platforms-list-mappings', 'uses' => 'PlatformController@listMappings']);
 
 Route::get('/selections/{selection}/map',
     ['as' => 'mapped-selections-submit', 'uses' => 'MappedSelectionController@submitMappingForm']);

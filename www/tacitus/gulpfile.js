@@ -49,6 +49,7 @@ elixir(function (mix) {
         //vendors + 'datatables/media/css/jquery.dataTables.css',
         vendors + 'datatables/media/css/dataTables.bootstrap.css',
         vendors + 'metisMenu/dist/metisMenu.css',
+        vendors + 'select2/dist/css/select2.css',
         'theme.css',
         'timeline.css'
     ], 'public/css/base.css');
@@ -76,6 +77,7 @@ elixir(function (mix) {
         vendors + 'datatables-buttons/js/buttons.print.js',
         vendors + 'datatables-buttons/js/buttons.colVis.js',
         vendors + 'datatables-buttons/js/buttons.bootstrap.js',
+        vendors + 'select2/dist/js/select2.full.js',
         vendors + 'moment/moment.js',
         vendors + 'metisMenu/dist/metisMenu.js'
     ], 'public/js/base.js');
