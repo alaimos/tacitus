@@ -66,7 +66,7 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
         if (!is_array($mapFile)) {
             $mapFile = compact('mapFile', 'title', 'organism', 'private');
         }
-        $this->handleConfig($mapFile);
+        parent::__construct($mapFile);
     }
 
     /**
@@ -115,93 +115,33 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
     }
 
     /**
-     * Imports all mappings
-     *
-     * @param array $line
-     * @return void
-     */
-    protected function importMappings(array $line)
-    {
-        $this->mappings = [];
-        for ($i = 1; $i < count($line); $i++) {
-            $slug = str_slug($line[$i], '_');
-            PlatformMapping::create([
-                'platform_id' => $this->platform->getKey(),
-                'slug'        => $slug,
-                'name'        => $line[$i],
-            ]);
-            $this->mappings[$i] = $slug;
-        }
-    }
-
-    /**
-     * Import map data
-     *
-     * @param array $line
-     * @return void
-     */
-    protected function importMapData(array $line)
-    {
-        $data = [
-            'platform_id' => $this->platform->getKey(),
-            'probe'       => trim(stripcslashes($line[0]), '"\''),
-        ];
-        for ($i = 1; $i < count($line); $i++) {
-            $data[$this->mappings[$i]] = trim(stripcslashes($line[$i]), '"\'');
-        }
-        $this->collection->insertOne($data);
-    }
-
-    /**
      * Import a platform
      *
      * @return $this
      */
     public function import()
     {
-        $this->log('Importing new platform "' . $this->title . "\".\n", true);
-        if (Platform::whereTitle($this->title)->whereOrganism($this->organism)->first() !== null) {
-            throw new ImportException('Another platform with the same name for the same organism already exists.');
-        }
-        $this->platform = Platform::create([
-            'title'    => $this->title,
-            'organism' => $this->organism,
-            'private'  => $this->private,
-            'user_id'  => $this->user->id,
-            'status'   => Platform::PENDING,
+        $importer = new CSVFileImporter([
+            'title'       => $this->title,
+            'organism'    => $this->organism,
+            'csvFile'     => $this->mapFile,
+            'separator'   => "\t",
+            'comment'     => "#",
+            'identifier'  => 1,
+            'private'     => $this->private,
+            'user'        => $this->user,
+            'logCallback' => $this->logCallback,
         ]);
-        $tmp = new PlatformMapData();
-        $this->collection = \DB::connection($tmp->getConnectionName())->getCollection($tmp->getTable());
-        $currLineProcessed = 0;
-        $totalLines = $this->countLines($this->mapFile);
-        $currLine = 0;
-        $fp = MultiFile::fileOpen($this->mapFile, 'r');
-        if (!MultiFile::fileIsOpen($fp)) {
-            throw new ImportException("Unable to open file to import");
+        $toThrow = null;
+        try {
+            $importer->import();
+        } catch (\Exception $exception) {
+            $toThrow = $exception;
         }
-        $this->resetLogProgress();
-        $this->log('Importing mappings', true);
-        while (($line = MultiFile::fileReadLine($fp)) !== false) {
-            $currLine++;
-            $this->logProgress($currLine, $totalLines);
-            $line = trim($line);
-            if (empty($line) || $line{0} == '#') { //ignores empty lines or commented lines
-                continue;
-            }
-            $line = explode("\t", $line);
-            if (!$currLineProcessed && count($line) <= 1) {
-                throw new ImportException("The Map File should contain more than one field");
-            }
-            if ($currLineProcessed == 0) {
-                $this->importMappings($line);
-            } else {
-                $this->importMapData($line);
-            }
-            $currLineProcessed++;
+        $this->platform = $importer->getPlatform();
+        if ($toThrow !== null) {
+            throw new ImportException($toThrow->getMessage(), 0, $toThrow);
         }
-        $this->log("...OK\n", true);
-        $this->log("The platform is now ready to use!\n");
-        MultiFile::fileClose($fp);
         return $this;
     }
 

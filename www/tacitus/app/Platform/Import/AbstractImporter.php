@@ -9,8 +9,10 @@ namespace App\Platform\Import;
 
 
 use App\Dataset\Traits\InteractsWithLogCallback;
+use App\Models\Platform;
 use App\Platform\Import\Exception\ImportException;
 use App\Utils\Exception\DownloadException;
+use App\Utils\MultiFile;
 use App\Utils\Utils;
 
 abstract class AbstractImporter implements ImporterInterface
@@ -43,6 +45,16 @@ abstract class AbstractImporter implements ImporterInterface
      * @var integer
      */
     protected $prevPercentage;
+
+    /**
+     * Default constructor.
+     *
+     * @param array $config
+     */
+    public function __construct($config)
+    {
+        $this->handleConfig($config);
+    }
 
     /**
      * Download a file from a source
@@ -103,7 +115,7 @@ abstract class AbstractImporter implements ImporterInterface
      */
     protected function countLines($file)
     {
-        return intval(exec('wc -l ' . escapeshellarg($file)));
+        return MultiFile::countLines($file);
     }
 
     /**
@@ -120,6 +132,30 @@ abstract class AbstractImporter implements ImporterInterface
                 call_user_func([$this, $method], $value);
             }
         }
+    }
+
+    /**
+     * Checks and if it does not exist, creates a new platform
+     *
+     * @param string $title
+     * @param string $organism
+     * @return void
+     */
+    protected function checkAndCreatePlatform($title, $organism)
+    {
+        $found = Platform::whereTitle($title)->whereOrganism($organism)->first();
+        if ($found !== null && ($found->status == Platform::READY || $found->status == Platform::PENDING)) {
+            throw new ImportException('Another platform with the same name for the same organism already exists.');
+        } elseif ($found !== null && $found->status == Platform::FAILED) {
+            $found->delete();
+        }
+        $this->platform = Platform::create([
+            'title'    => $title,
+            'organism' => $organism,
+            'private'  => $this->private,
+            'user_id'  => $this->user->id,
+            'status'   => Platform::PENDING,
+        ]);
     }
 
     /**

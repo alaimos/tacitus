@@ -82,7 +82,7 @@
                 {data: 'probe', name: 'probe'},
                 /*<?php $i = 0; $mappings = $platform->mappingList(); $c = count($mappings) ?>
                 @foreach($mappings as $id => $ignore)<?php $i++ ?>*/
-                {data: '{{ $id }}', name: '{{ $id }}'}
+                {data: '{{ $id }}', name: '{{ $id }}', render: $.fn.dataTable.render.ellipsis(20, true)}
                 @if($i < $c),@endif
                 /*@endforeach*/
             ],

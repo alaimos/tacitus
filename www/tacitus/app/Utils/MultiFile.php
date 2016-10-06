@@ -51,6 +51,23 @@ class MultiFile
     }
 
     /**
+     * Count the number of lines in a file
+     *
+     * @param string $file
+     * @return integer
+     */
+    public static function countLines($file)
+    {
+        if (self::isGZipped($file)) {
+            return intval(exec('zcat ' . escapeshellarg($file) . ' | wc -l'));
+        } elseif (self::isBZipped($file)) {
+            return intval(exec('bzcat ' . escapeshellarg($file) . ' | wc -l'));
+        } else {
+            return intval(exec('wc -l ' . escapeshellarg($file)));
+        }
+    }
+
+    /**
      * Opens file or URL
      *
      * @param string $file

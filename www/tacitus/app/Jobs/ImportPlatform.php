@@ -109,7 +109,7 @@ class ImportPlatform extends Job implements ShouldQueue
                 }
                 $errorClass = join('', array_slice(explode('\\', get_class($e)), -1));
                 $this->jobData->log = $this->jobData->log . "\n\n" . 'Unable to complete job. Error "' . $errorClass .
-                                      '" with message "' . $e->getMessage() . "\".\n";
+                                      '" with message "' . $e->__toString() . "\".\n";
                 $this->sendNotification($user, 'exclamation-triangle',
                     'One of your jobs (id: ' . $this->jobData->id . ') failed processing. Please check the ' .
                     'error log, correct the errors and submit a new request. Contact us ' .

@@ -24,6 +24,7 @@ final class PlatformImportFactory
      * @var array
      */
     protected $classes = [
+        \App\Platform\Import\CSVFileImporter::class,
         \App\Platform\Import\MapFileImporter::class,
         \App\Platform\Import\SoftFileImporter::class,
         \App\Platform\Import\GEOPlatformImporter::class,

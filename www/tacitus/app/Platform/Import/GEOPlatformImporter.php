@@ -28,16 +28,6 @@ class GEOPlatformImporter extends AbstractImporter implements ImporterInterface
     protected $downloadDirectory;
 
     /**
-     * MapFileImporter constructor.
-     *
-     * @param string|array $config
-     */
-    public function __construct($config)
-    {
-        $this->handleConfig($config);
-    }
-
-    /**
      * Set the accession number of the GEO platform
      *
      * @param string $accessionNumber
@@ -84,12 +74,22 @@ class GEOPlatformImporter extends AbstractImporter implements ImporterInterface
             'user'        => $this->user,
             'logCallback' => $this->logCallback,
         ]);
-        $this->platform = $importer->import()->getPlatform();
+        $toThrow = null;
+        try {
+            $importer->import();
+        } catch (\Exception $exception) {
+            $toThrow = $exception;
+        }
+        $this->platform = $importer->getPlatform();
+        if ($toThrow !== null) {
+            throw new ImportException($toThrow->getMessage(), 0, $toThrow);
+        }
         return $this;
     }
 
     /**
      * Generate download URL on the basis of GEO rules
+     *
      * @return string
      */
     protected function getDownloadUrl()

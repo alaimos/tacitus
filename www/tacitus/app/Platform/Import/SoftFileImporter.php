@@ -45,16 +45,6 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
     protected $collection;
 
     /**
-     * MapFileImporter constructor.
-     *
-     * @param string|array $config
-     */
-    public function __construct($config)
-    {
-        $this->handleConfig($config);
-    }
-
-    /**
      * Set the name of a MapFile to import
      *
      * @param string $softFile
@@ -138,16 +128,7 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
             if (strtolower($line) == self::TABLE_BEGIN && ($title === null || $organism === null)) {
                 throw new ImportException('SOFT file is not correctly formatted: table begins before metadata are set.');
             } elseif (strtolower($line) == self::TABLE_BEGIN && $title !== null && $organism !== null) {
-                if (Platform::whereTitle($title)->whereOrganism($organism)->first() !== null) {
-                    throw new ImportException('Another platform with the same name for the same organism already exists.');
-                }
-                $this->platform = Platform::create([
-                    'title'    => $title,
-                    'organism' => $organism,
-                    'private'  => $this->private,
-                    'user_id'  => $this->user->id,
-                    'status'   => Platform::PENDING,
-                ]);
+                $this->checkAndCreatePlatform($title, $organism);
                 $readingMeta = false;
                 $readingTable = true;
                 continue;
@@ -164,7 +145,7 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
                     $organism = $matches[1];
                 }
             } elseif ($readingTable) {
-                $line = explode("\t", $line);
+                $line = str_getcsv($line, "\t", '"', '\\');
                 if (!$currLineProcessed && count($line) <= 1) {
                     throw new ImportException("SOFT file is not correctly formatted: it should contain more than one field");
                 }
