@@ -4,7 +4,6 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "6e41898b7e27c707fb2c6e369d845bb1",
     "content-hash": "bb91e61dfb3c6b0e6873ab054ce0efba",
     "packages": [
         {
@@ -1035,16 +1034,16 @@
         },
         {
             "name": "jenssegers/mongodb",
-            "version": "v3.1.0",
+            "version": "v3.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/jenssegers/laravel-mongodb.git",
-                "reference": "c64dc03a9161d25b2573bbd2f0168cfd82b8e16f"
+                "reference": "81ae5a63856a397f257b420876b644502a4a2ded"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/jenssegers/laravel-mongodb/zipball/c64dc03a9161d25b2573bbd2f0168cfd82b8e16f",
-                "reference": "c64dc03a9161d25b2573bbd2f0168cfd82b8e16f",
+                "url": "https://api.github.com/repos/jenssegers/laravel-mongodb/zipball/81ae5a63856a397f257b420876b644502a4a2ded",
+                "reference": "81ae5a63856a397f257b420876b644502a4a2ded",
                 "shasum": ""
             },
             "require": {
@@ -1092,7 +1091,7 @@
                 "mongo",
                 "mongodb"
             ],
-            "time": "2016-09-28 15:43:45"
+            "time": "2016-10-07 08:39:24"
         },
         {
             "name": "jeremeamia/SuperClosure",
@@ -1383,16 +1382,16 @@
         },
         {
             "name": "league/flysystem",
-            "version": "1.0.27",
+            "version": "1.0.28",
             "source": {
                 "type": "git",
                 "url": "https://github.com/thephpleague/flysystem.git",
-                "reference": "50e2045ed70a7e75a5e30bc3662904f3b67af8a9"
+                "reference": "a9663643ff2d16d7f66ed1e0d3212c5491bc9044"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/50e2045ed70a7e75a5e30bc3662904f3b67af8a9",
-                "reference": "50e2045ed70a7e75a5e30bc3662904f3b67af8a9",
+                "url": "https://api.github.com/repos/thephpleague/flysystem/zipball/a9663643ff2d16d7f66ed1e0d3212c5491bc9044",
+                "reference": "a9663643ff2d16d7f66ed1e0d3212c5491bc9044",
                 "shasum": ""
             },
             "require": {
@@ -1462,7 +1461,7 @@
                 "sftp",
                 "storage"
             ],
-            "time": "2016-08-10 08:55:11"
+            "time": "2016-10-07 12:20:37"
         },
         {
             "name": "league/fractal",
