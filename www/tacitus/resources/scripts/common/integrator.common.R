@@ -1,3 +1,4 @@
+library(inSilicoMerging)
 #######################################################################################################################
 # Read Selection Data and Metadata
 #######################################################################################################################
@@ -5,7 +6,7 @@
 #  - data.file    : character(1)  the path of the data file
 #  - metadata.file: character(1)  the path of the metadata file
 #######################################################################################################################
-# A "selection" list: a list which contains all data and metadata matrices
+# Returns a "selection" list: a list which contains all data and metadata matrices
 #######################################################################################################################
 read.selection <- function (data.file, metadata.file) {
   
@@ -13,7 +14,7 @@ read.selection <- function (data.file, metadata.file) {
   if (nrow(data) <= 1 || ncol(data) <= 1) {
     stop("Invalid data file: it should contain at least 1 sample and 1 probe.")
   }
-  metadata <- read.delim(file=metadata.file, header=TRUE, stringsAsFactors=FALSE)
+  metadata <- read.delim(file=metadata.file, header=TRUE, stringsAsFactors=FALSE, check.names=FALSE)
   if (nrow(metadata) != (ncol(data)-1)) {
     stop("Invalid metadata file: it should contain the same number of samples as the data one.")
   }
@@ -41,7 +42,7 @@ read.selection <- function (data.file, metadata.file) {
 # Parameters:
 #  - ...: multiple "selection" lists
 #######################################################################################################################
-# A "prepared.selections" list
+# Returns a "prepared.selections" list
 #######################################################################################################################
 prepare.selections <- function (...) {
   selections <- list(...)
@@ -70,4 +71,48 @@ prepare.selections <- function (...) {
   return (result)
 }
 
+#######################################################################################################################
+# Merge all metadata matrices
+#######################################################################################################################
+# Parameters:
+#  - selection: list(1) of class prepared.selections  a set of selections to merge
+#######################################################################################################################
+# Returns a data frame with the merged metadata
+#######################################################################################################################
+merge.metadata <- function (selection) {
+    matrices <- selection$metadata.matrices
+    all.metas <- Reduce(union, lapply(matrices, function (x) (colnames(x))))
+    n.samples <- sum(sapply(matrices, nrow))
+    values <- lapply(all.metas, function (col) {
+        Reduce(c, lapply(matrices, function (x, col) {
+            if (col %in% colnames(x)) {
+                return (x[,col])
+            } else {
+                return (rep(NA, nrow(x)))
+            }
+        }, col))
+    })
+    names(values) <- all.metas
+    df.merged <- data.frame(values, check.names=FALSE)
+    return (df.merged)
+}
+
+#######################################################################################################################
+# Merge all data matrices
+#######################################################################################################################
+# Parameters:
+#  - selection: list(1) of class prepared.selections  a set of selections to merge
+#######################################################################################################################
+# Returns a matrix with the merged data
+#######################################################################################################################
+merge.data <- function (selection, method="NONE", digits=getOption("digits")) {
+    merged.eset <- merge(selection$expression.matrices, method=method)
+    merged.mtx  <- format(exprs(merged.eset), digits=digits, scientific=FALSE)
+    final.mtx   <- matrix(data = NA, nrow=(nrow(merged.mtx)+1), ncol=(ncol(merged.mtx)+1))
+    final.mtx[1,1] <- "Probe"
+    final.mtx[2:nrow(final.mtx),1] <- selection$all.probes
+    final.mtx[1,2:ncol(final.mtx)] <- selection$all.samples
+    final.mtx[2:nrow(final.mtx),2:ncol(final.mtx)] <- merged.mtx
+    return (final.mtx)
+}
 
