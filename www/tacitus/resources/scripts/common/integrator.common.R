@@ -56,7 +56,7 @@ prepare.selections <- function (...) {
     stop("No common probes found between selections to integrate")
   }
   selected.probes <- lapply(selections, function (x, c) (which(x$data$probes %in% c)) , common.probes)
-  expression.matrices <- lapply(selections, function (x, c) (x$data$expression.matrix[which(x$data$probes %in% c),]) , common.probes)
+  expression.matrices <- lapply(selections, function (x, c) (ExpressionSet(assayData=x$data$expression.matrix[which(x$data$probes %in% c),])) , common.probes)
   all.samples <- Reduce(c, lapply(selections, function (x) (x$data$samples) ))
   metadata.matrices <- lapply(selections, function (x) (x$metadata) )
   result <- list(
