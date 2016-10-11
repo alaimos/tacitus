@@ -1,0 +1,27 @@
+{
+  "selections": [
+    {
+      "data": "E:/alaim/Download/1-mapped-example_selection-data.tsv",
+      "metatada": "E:/alaim/Download/1-mapped-example_selection-metadata.tsv"
+    },
+    {
+      "data": "E:/alaim/Download/1-mapped-example_selection-data.tsv",
+      "metatada": "E:/alaim/Download/1-mapped-example_selection-metadata.tsv"
+    },
+    {
+      "data": "E:/alaim/Download/1-mapped-example_selection-data.tsv",
+      "metatada": "E:/alaim/Download/1-mapped-example_selection-metadata.tsv"
+    },
+    {
+      "data": "E:/alaim/Download/1-mapped-example_selection-data.tsv",
+      "metatada": "E:/alaim/Download/1-mapped-example_selection-metadata.tsv"
+    }
+  ],
+  "output": {
+    "data": "test-merged-data.tsv",
+    "metadata": "test-merged-meta.tsv"
+  },
+  "method": "NONE",
+  "digits": 12,
+  "na.strings": ["---","NA","NULL"]
+}
