@@ -71,7 +71,7 @@ class Integration extends Model
     public static function getSupportedIntegrationAlgorithms()
     {
         return [
-            'none'     => [
+            'NONE'     => [
                 'None',
                 'Expression matrices are put together without the use of any normalization technique.'
             ],

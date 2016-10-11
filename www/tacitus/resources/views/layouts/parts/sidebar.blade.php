@@ -31,7 +31,9 @@
                         </li>
                         @if(user_can(\App\Utils\Permissions::INTEGRATE_DATASETS))
                             <li>
-                                <a href="{{ route('not-available') }}"><i class="fa fa-link fa-fw"></i> Integrator</a>
+                                <a href="{{ route('integrations-lists') }}">
+                                    <i class="fa fa-link fa-fw"></i> Integrator
+                                </a>
                             </li>
                         @endif
                     </ul>

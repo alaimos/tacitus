@@ -14,9 +14,9 @@ read.selection <- function (data.file, metadata.file, na.strings="NA") {
   if (nrow(data) <= 1 || ncol(data) <= 1) {
     stop("Invalid data file: it should contain at least 1 sample and 1 probe.")
   }
-  data <- data[-which(is.na(data[,1])),]
+  data <- data[!is.na(data[,1]),]
   if (nrow(data) <= 1 || ncol(data) <= 1) {
-      stop("Invalid data file: it should contain at least 1 sample and 1 probe.")
+    stop("Invalid data file: it should contain at least 1 sample and 1 probe.")
   }
   metadata <- read.delim(file=metadata.file, header=TRUE, stringsAsFactors=FALSE, check.names=FALSE, 
                          na.strings=na.strings)
@@ -62,20 +62,20 @@ prepare.selections <- function (selections) {
   }
   cat("...Sorting")
   for (i in 1:length(selections)) {
-      sorting <- order(selections[[i]]$data$probes)
-      selections[[i]]$data$probes <- selections[[i]]$data$probes[sorting]
-      selections[[i]]$data$expression.matrix <- selections[[i]]$data$expression.matrix[sorting,]
+    sorting <- order(selections[[i]]$data$probes)
+    selections[[i]]$data$probes <- selections[[i]]$data$probes[sorting]
+    selections[[i]]$data$expression.matrix <- selections[[i]]$data$expression.matrix[sorting,]
   }
   cat("...Selecting common probes")
   selected.probes <- lapply(selections, function (x, c) (which(x$data$probes %in% c)) , common.probes)
   for (i in 1:length(selections)) {
-      selections[[i]]$data$probes <- selections[[i]]$data$probes[selected.probes[[i]]]
-      selections[[i]]$data$expression.matrix <- selections[[i]]$data$expression.matrix[selected.probes[[i]],]
+    selections[[i]]$data$probes <- selections[[i]]$data$probes[selected.probes[[i]]]
+    selections[[i]]$data$expression.matrix <- selections[[i]]$data$expression.matrix[selected.probes[[i]],]
   }
   cat("...Matching duplicates")
   num.rows <- sapply(selections, function (x) (nrow(x$data$expression.matrix)))
   if (any(num.rows != num.rows[1])) {
-      stop("Unable to integrate dataset: no match for duplicate probes. Please, try to integrate unmapped selections.")
+    stop("Unable to integrate dataset: no match for duplicate probes. Please, try to integrate unmapped selections.")
   }
   expression.matrices <- lapply(selections, function (x) (ExpressionSet(assayData=x$data$expression.matrix)))
   all.samples <- Reduce(c, lapply(selections, function (x) (x$data$samples) ))
@@ -100,21 +100,21 @@ prepare.selections <- function (selections) {
 # Returns a data frame with the merged metadata
 #######################################################################################################################
 merge.metadata <- function (selection) {
-    matrices <- selection$metadata.matrices
-    all.metas <- Reduce(union, lapply(matrices, function (x) (colnames(x))))
-    n.samples <- sum(sapply(matrices, nrow))
-    values <- lapply(all.metas, function (col) {
-        Reduce(c, lapply(matrices, function (x, col) {
-            if (col %in% colnames(x)) {
-                return (x[,col])
-            } else {
-                return (rep(NA, nrow(x)))
-            }
-        }, col))
-    })
-    names(values) <- all.metas
-    df.merged <- data.frame(values, check.names=FALSE)
-    return (df.merged)
+  matrices <- selection$metadata.matrices
+  all.metas <- Reduce(union, lapply(matrices, function (x) (colnames(x))))
+  n.samples <- sum(sapply(matrices, nrow))
+  values <- lapply(all.metas, function (col) {
+    Reduce(c, lapply(matrices, function (x, col) {
+      if (col %in% colnames(x)) {
+        return (x[,col])
+      } else {
+        return (rep(NA, nrow(x)))
+      }
+    }, col))
+  })
+  names(values) <- all.metas
+  df.merged <- data.frame(values, check.names=FALSE)
+  return (df.merged)
 }
 
 #######################################################################################################################
@@ -126,13 +126,13 @@ merge.metadata <- function (selection) {
 # Returns a matrix with the merged data
 #######################################################################################################################
 merge.data <- function (selection, method="NONE", digits=getOption("digits")) {
-    merged.eset <- merge(selection$expression.matrices, method=method)
-    merged.mtx  <- format(exprs(merged.eset), digits=digits, scientific=FALSE, justify="none", trim=TRUE)
-    final.mtx   <- matrix(data = NA, nrow=(nrow(merged.mtx)+1), ncol=(ncol(merged.mtx)+1))
-    final.mtx[1,1] <- "Probe"
-    final.mtx[2:nrow(final.mtx),1] <- selection$all.probes
-    final.mtx[1,2:ncol(final.mtx)] <- selection$all.samples
-    final.mtx[2:nrow(final.mtx),2:ncol(final.mtx)] <- merged.mtx
-    return (final.mtx)
+  merged.eset <- merge(selection$expression.matrices, method=method)
+  merged.mtx  <- format(exprs(merged.eset), digits=digits, scientific=FALSE, justify="none", trim=TRUE)
+  final.mtx   <- matrix(data = NA, nrow=(nrow(merged.mtx)+1), ncol=(ncol(merged.mtx)+1))
+  final.mtx[1,1] <- "Probe"
+  final.mtx[2:nrow(final.mtx),1] <- selection$all.probes
+  final.mtx[1,2:ncol(final.mtx)] <- selection$all.samples
+  final.mtx[2:nrow(final.mtx),2:ncol(final.mtx)] <- merged.mtx
+  return (final.mtx)
 }
 

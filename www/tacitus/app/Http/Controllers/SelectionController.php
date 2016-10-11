@@ -6,9 +6,8 @@ use App\Models\SampleSelection;
 use App\Utils\Permissions;
 use Datatables;
 use Flash;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-
-use App\Http\Requests;
 use Illuminate\Routing\Router;
 
 class SelectionController extends Controller
@@ -24,6 +23,8 @@ class SelectionController extends Controller
         $router->get('/selections', ['as' => 'selections-lists', 'uses' => 'SelectionController@selectionsList']);
         $router->any('/selections/data',
             ['as' => 'selections-lists-data', 'uses' => 'SelectionController@selectionsData']);
+        $router->any('/selections/list',
+            ['as' => 'selections-lists-json', 'uses' => 'SelectionController@listSelectionsJson']);
         $router->get('/selections/{selection}/download/{type}',
             ['as' => 'selections-download', 'uses' => 'SelectionController@download']);
         $router->get('/selections/{selection}/delete',
@@ -61,6 +62,26 @@ class SelectionController extends Controller
             ])->render();
         });
         return $table->make(true);
+    }
+
+    /**
+     * Lists all selections in json format
+     *
+     * @param Request $request
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function listSelectionsJson(Request $request)
+    {
+        $q = $request->get('q');
+        $perPage = (int)$request->get('perPage', 30);
+        $query = SampleSelection::listSelections();
+        if (!empty($q)) {
+            $query->where(function (Builder $query) use ($q) {
+                $query->where('name', 'like', '%' . $q . '%');
+            });
+        }
+        return $query->paginate($perPage, ['id', 'name']);
     }
 
     /**

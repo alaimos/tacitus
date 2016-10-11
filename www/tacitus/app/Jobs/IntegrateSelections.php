@@ -134,7 +134,7 @@ class IntegrateSelections extends Job implements ShouldQueue
             ],
             'method'     => $this->jobData->job_data['method'],
             'digits'     => (int)$this->jobData->job_data['digits'],
-            'na.strings' => array_map('trim', explode(',', $this->jobData->job_data['na.strings'])),
+            'na.strings' => array_map('trim', explode(',', $this->jobData->job_data['na_strings'])),
         ];
         foreach ($integration->selections as $selection) {
             $config['selections'][] = [

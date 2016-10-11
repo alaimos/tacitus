@@ -13,6 +13,7 @@ use App\Utils\Permissions;
 use Auth;
 use Datatables;
 use Flash;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use App\Jobs\Factory as JobFactory;
 use App\Models\Job as JobData;
@@ -37,6 +38,8 @@ class MappedSelectionController extends Controller
             ['as' => 'mapped-selections-lists', 'uses' => 'MappedSelectionController@selectionsList']);
         $router->any('/selections/mapped/data',
             ['as' => 'mapped-selections-lists-data', 'uses' => 'MappedSelectionController@selectionsData']);
+        $router->any('/selections/mapped/list',
+            ['as' => 'mapped-selections-lists-json', 'uses' => 'MappedSelectionController@listSelectionsJson']);
         $router->get('/selections/mapped/{selection}/download/{type}',
             ['as' => 'mapped-selections-download', 'uses' => 'MappedSelectionController@download']);
         $router->get('/selections/mapped/{selection}/delete',
@@ -96,8 +99,7 @@ class MappedSelectionController extends Controller
             $jobData->save();
             $job = JobFactory::getQueueJob($jobData);
             $this->dispatch($job);
-            Flash::success('Your import request has been submitted. Please check the Jobs panel in order to verify ' .
-                'its status.');
+            Flash::success('Your request has been submitted. Please check the Jobs panel in order to verify its status.');
         } catch (\Exception $e) {
             Flash::error('Error occurred while submitting job: ' . $e->getMessage());
         }
@@ -115,6 +117,29 @@ class MappedSelectionController extends Controller
             abort(403);
         }
         return view('selections.mapped.list');
+    }
+
+    /**
+     * Lists all mapped selections in json format
+     *
+     * @param Request $request
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
+    public function listSelectionsJson(Request $request)
+    {
+        $q = $request->get('q');
+        $perPage = (int)$request->get('perPage', 30);
+        $query = MappedSampleSelection::listSelections();
+        if (!empty($q)) {
+            $query->where(function (Builder $query) use ($q) {
+                $query->where('sample_selections.name', 'like', '%' . $q . '%')
+                    ->orWhere('platforms.title', 'like', '%' . $q . '%')
+                    ->orWhere('platforms.organism', 'like', '%' . $q . '%')
+                    ->orWhere('platform_mappings.name', 'like', '%' . $q . '%');
+            });
+        }
+        return $query->paginate($perPage, ['id', 'name', 'platform', 'mapping', 'organism']);
     }
 
     /**

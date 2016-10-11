@@ -127,8 +127,7 @@ class DatasetController extends Controller
             $jobData->save();
             $job = JobFactory::getQueueJob($jobData);
             $this->dispatch($job);
-            Flash::success('Your import request has been submitted. Please check the Jobs panel in order to verify ' .
-                'its status.');
+            Flash::success('Your request has been submitted. Please check the Jobs panel in order to verify its status.');
         } catch (\Exception $e) {
             Flash::error('Error occurred while submitting job: ' . $e->getMessage());
         }
