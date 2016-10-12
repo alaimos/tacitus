@@ -33,6 +33,8 @@ class UserController extends Controller
                         'middleware' => ['permission:' . Permissions::USER_PANELS]],
             function (Router $router) {
                 $router->get('/alerts', ['as' => 'alerts', 'uses' => 'UserController@alerts']);
+                $router->get('/alerts/mark/{alert?}', ['as' => 'mark-alerts', 'uses' => 'UserController@markAlert']);
+                $router->get('/alerts/poll/', ['as' => 'poll-alerts', 'uses' => 'UserController@pollAlerts']);
                 $router->get('/list', ['as' => 'list', 'uses' => 'UserController@listUsers']);
                 $router->any('/list/data', ['as' => 'list-data', 'uses' => 'UserController@listUsersData']);
                 $router->get('/create', ['as' => 'create', 'uses' => 'UserController@createUser']);
@@ -60,6 +62,64 @@ class UserController extends Controller
     {
         return view('user.alerts', [
             'notifications' => Auth::user()->getNotificationsNotRead()
+        ]);
+    }
+
+    /**
+     * Returns the latest user alert
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function pollAlerts()
+    {
+        $message = null;
+        $data = [];
+        try {
+            foreach (Auth::user()->getNotificationsNotRead(5) as $notification) {
+                $data[] = [
+                    'id'      => $notification->id,
+                    'body'    => $notification->getNotifyBodyAttribute(),
+                    'created' => $notification->created_at->diffForHumans(),
+                    'url'     => route('user::mark-alerts', [$notification->id]),
+                ];
+            }
+            $message = Auth::user()->countNotificationsNotRead();
+            $ok = true;
+        } catch (\Exception $e) {
+            $ok = false;
+            $message = $e->__toString();
+        }
+        return response()->json([
+            'ok'      => $ok,
+            'data'    => $data,
+            'message' => $message,
+        ]);
+
+    }
+
+    /**
+     * Mark one notification as read. If no notification identifier is specified than all notifications are marked as
+     * read.
+     *
+     * @param null|integer $alert
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function markAlert($alert = null)
+    {
+        $message = null;
+        try {
+            if (empty($alert) || $alert === null) {
+                $ok = (\Notifynder::readAll(Auth::user()->id) > 0);
+            } else {
+                $ok = (\Notifynder::readOne((int)$alert) !== false);
+            }
+        } catch (\Exception $e) {
+            $ok = false;
+            $message = $e->__toString();
+        }
+        return response()->json([
+            'ok'      => $ok,
+            'message' => $message,
         ]);
     }
 
