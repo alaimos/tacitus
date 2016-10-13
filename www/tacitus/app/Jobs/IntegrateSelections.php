@@ -93,8 +93,7 @@ class IntegrateSelections extends Job implements ShouldQueue
      * @param PlatformMapping                     $mapping
      * @return Integration
      */
-    protected function createIntegration(array $selections, array $mappedSelections, Platform $platform,
-        PlatformMapping $mapping)
+    protected function createIntegration(array $selections, array $mappedSelections, $platform, $mapping)
     {
         $this->log('Building database object');
         $integration = Integration::create([
@@ -285,8 +284,10 @@ class IntegrateSelections extends Job implements ShouldQueue
                 if (!count($selections) && !count($mappedSelections)) {
                     throw new JobException("Unable to continue: you must specify at least one valid selection.");
                 }
-                $platform = Platform::whereId($this->jobData->job_data['platform'])->first();
-                $mapping = PlatformMapping::whereId($this->jobData->job_data['mapping'])->first();
+                $platformId = $this->jobData->job_data['platform'];
+                $platform = ($platformId) ? Platform::whereId($platformId)->first() : null;
+                $mappingId = $this->jobData->job_data['mapping'];
+                $mapping = ($mappingId) ? PlatformMapping::whereId($mappingId)->first() : null;
                 $integration = $this->createIntegration($selections, $mappedSelections, $platform, $mapping);
                 $this->log($this->runIntegrator($integration) . PHP_EOL);
                 $this->cleanDataFile($integration);

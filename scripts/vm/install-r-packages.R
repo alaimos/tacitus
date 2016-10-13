@@ -6,6 +6,8 @@ biocLite(ask=FALSE)
 
 biocLite("getopt",ask=FALSE)
 
+biocLite("rjson",ask=FALSE)
+
 biocLite("inSilicoDb",ask=FALSE)
 
 biocLite("inSilicoMerging",ask=FALSE)

@@ -81,19 +81,20 @@ class IntegratorController extends Controller
             'platform'            => 'required_with:enable_post_mapping|exists:platforms,id',
             'mapping'             => 'required_with:enable_post_mapping|exists:platform_mappings,id',
         ]);
+        $mappingEnabled = boolval($request->get('enable_post_mapping', false));
         $jobData = new JobData([
             'job_type' => 'integrate_selections',
             'status'   => JobData::QUEUED,
             'job_data' => [
                 'name'                => $request->get('name'),
-                'selections'          => (array)$request->get('selections'),
-                'mapped_selections'   => (array)$request->get('mapped_selections'),
+                'selections'          => array_map("intval", (array)$request->get('selections')),
+                'mapped_selections'   => array_map("intval", (array)$request->get('mapped_selections')),
                 'method'              => $request->get('method'),
                 'digits'              => (int)$request->get('digits'),
                 'na_strings'          => $request->get('na_strings'),
-                'enable_post_mapping' => boolval($request->get('enable_post_mapping', false)),
-                'platform'            => $request->get('platform'),
-                'mapping'             => $request->get('mapping'),
+                'enable_post_mapping' => $mappingEnabled,
+                'platform'            => ($mappingEnabled) ? (int)$request->get('platform') : null,
+                'mapping'             => ($mappingEnabled) ? (int)$request->get('mapping') : null,
             ],
             'log'      => ''
         ]);
