@@ -77,7 +77,8 @@ class Dataset extends Model
     public static function listDatasets()
     {
         /** @var \Illuminate\Database\Query\Builder $query */
-        $query = self::join('sources', 'datasets.source_id', '=', 'sources.id')
+        $query = self::select(['datasets.*', 'sources.name', 'sources.display_name'])
+            ->join('sources', 'datasets.source_id', '=', 'sources.id')
             ->where('datasets.status', '=', self::READY);
         if (user_can(Permissions::VIEW_DATASETS) && !user_can(Permissions::ADMINISTER)) {
             $owner = current_user();
