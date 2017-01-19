@@ -13,11 +13,11 @@ use App\Models\Dataset;
 use App\Models\Source;
 
 /**
- * Class ArrayExpressModelFactory
+ * Class GeoGSEModelFactory
  *
  * @package App\Dataset\ModelFactory
  */
-class ArrayExpressModelFactory extends AbstractModelFactory
+class GeoGSEModelFactory extends AbstractModelFactory
 {
 
     /**
@@ -35,7 +35,7 @@ class ArrayExpressModelFactory extends AbstractModelFactory
      */
     public function __construct()
     {
-        $this->source = Source::whereName('arrexp')->first();
+        $this->source = Source::whereName('geogse')->first();
     }
 
     /**
