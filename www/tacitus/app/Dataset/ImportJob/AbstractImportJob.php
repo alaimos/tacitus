@@ -29,6 +29,34 @@ abstract class AbstractImportJob implements ImportJobInterface
     protected $parserFactory;
 
     /**
+     * @var integer
+     */
+    protected $prevPercentage;
+
+    /**
+     * Initialize progress
+     */
+    protected function initProgress() {
+        $this->prevPercentage = 0;
+    }
+
+    /**
+     * Log progress percentage
+     *
+     * @param integer $current
+     * @param integer $total
+     */
+    protected function logProgress($current, $total)
+    {
+        $percentage = floor(min(100, ((float)$current / (float)$total) * 100));
+        if (($percentage % 10) == 0 && $percentage != 100 && $percentage != $this->prevPercentage) {
+            $this->log('...' . $percentage . '%', true);
+        }
+        $this->prevPercentage = $percentage;
+    }
+
+
+    /**
      * Set a ParserFactory instance
      *
      * @param \App\Dataset\Factory\ParserFactoryInterface $parserFactory

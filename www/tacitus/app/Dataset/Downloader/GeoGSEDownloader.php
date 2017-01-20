@@ -18,10 +18,52 @@ use App\Dataset\Downloader\Exception\DownloaderException;
 class GeoGSEDownloader extends AbstractDownloader
 {
 
+    /**
+     * Pattern used to build the GSE SOFT filename
+     */
     const GSE_SOFT_FILENAME = '%s_family.soft.gz';
+
+    /**
+     * Pattern used to build the URL for the download of the GSE SOFT file
+     */
     const GSE_SOFT_URL = 'https://ftp.ncbi.nlm.nih.gov/geo/series/%s/%s/soft/%s';
+
+    /**
+     * Pattern used to build the GSE Series Matrix filename with multiple platforms
+     */
+    const GSE_MATRIX_MULTI_PLATFORM_FILENAME = '%s-%s_series_matrix.txt.gz';
+
+    /**
+     * Pattern used to build the GSE Series Matrix filename with a single platform
+     */
     const GSE_MATRIX_FILENAME = '%s_series_matrix.txt.gz';
+
+    /**
+     * Pattern used to build the URL for the download of the GSE Series Matrix file
+     */
     const GSE_MATRIX_URL = 'https://ftp.ncbi.nlm.nih.gov/geo/series/%s/%s/matrix/%s';
+
+    /**
+     * Regular expression used to find GSE title in a SOFT file
+     */
+    const SOFT_TITLE_ROW = '/!series_title\s+=\s+(.*)/i';
+
+    /**
+     * Regular expression used to find GSE platforms in a SOFT file
+     */
+    const SOFT_PLATFORM_ROW = '/!series_platform_id\s+=\s+(.*)/i';
+
+    /**
+     * Regular expression used to find the beginning of the series section in the SOFT file
+     */
+    const SOFT_SERIES_BEGIN = '/^\\^series/i';
+
+    /**
+     * Regular expression used to find the end of the series section in the SOFT file
+     */
+    const SOFT_SERIES_END = '/^\\^(dataset|sample|series|platform|annotation)/i';
+
+
     const PREFIX_REGEXP = '/\\d{1,3}$/';
     const PREFIX_REPLACEMENT = 'nnn';
 
@@ -36,41 +78,46 @@ class GeoGSEDownloader extends AbstractDownloader
     }
 
     /**
-     * Read title from a GSE series matrix
+     * Read preliminary data from a GSE SOFT FILE
      *
      * @param string $file
      * @return array
      */
     protected function readGSEInfo($file)
     {
-        $fp = gzopen($file, 'r');
+        $fp = fopen($file, 'r');
         if (!$fp) {
             throw new DownloaderException('Unable to read GSE series matrix.');
         }
         $info = [
-            'id'       => $this->getDatasetId(),
-            'title'    => null,
-            'platform' => null,
+            'id'        => $this->getDatasetId(),
+            'title'     => null,
+            'platforms' => [],
+            'platform'  => null,
         ];
-        while (($data = fgetcsv($fp, null, "\t")) !== false) {
-            if (count($data) > 1) {
-                if (strtolower($data[0]) == '!series_title') {
-                    $info['title'] = $data[1];
-                } elseif (strtolower($data[0]) == '!series_platform_id') {
-                    $info['platform'] = $data[1];
-                }
-            }
-            if ($info['title'] !== null && $info['platform'] !== null) {
+        $inSeries = false;
+        while (($line = fgets($fp)) !== false) {
+            $line = trim($line);
+            $matches = null;
+            if (!$inSeries && preg_match(self::SOFT_SERIES_BEGIN, $line)) {
+                $inSeries = true;
+            } elseif ($inSeries && preg_match(self::SOFT_SERIES_END, $line)) {
                 break;
+            } elseif ($inSeries && preg_match(self::SOFT_TITLE_ROW, $line, $matches)) {
+                $info['title'] = $matches[1];
+            } elseif ($inSeries && preg_match(self::SOFT_PLATFORM_ROW, $line, $matches)) {
+                $info['platforms'][] = $matches[1];
             }
         }
         @fclose($fp);
         if ($info['title'] === null) {
             throw new DownloaderException('Unable to read GSE title');
         }
-        if ($info['platform'] === null) {
+        if (!count($info['platforms'])) {
             throw new DownloaderException('Unable to read GSE platform');
         }
+        $info['multi_platform'] = count($info['platforms']) > 1;
+        $info['platform'] = $info['platforms'][0];
         return $info;
     }
 
@@ -83,25 +130,32 @@ class GeoGSEDownloader extends AbstractDownloader
     public function download()
     {
         $id = $this->getDatasetId();
-        $prefix = preg_replace(self::PREFIX_REGEXP, self::PREFIX_REPLACEMENT, $id);
-        $matrixFilename = sprintf(self::GSE_MATRIX_FILENAME, $id);
-        $softFilename = sprintf(self::GSE_SOFT_FILENAME, $id);
-        $matrixDownloadUrl = sprintf(self::GSE_MATRIX_URL, $prefix, $id, $matrixFilename);
-        $softDownloadUrl = sprintf(self::GSE_SOFT_FILENAME, $prefix, $id, $softFilename);
         $descriptor = new Descriptor($this->jobData);
-        $this->downloadFile($matrixDownloadUrl, $matrixFilename);
+        $prefix = preg_replace(self::PREFIX_REGEXP, self::PREFIX_REPLACEMENT, $id);
+        $softFilename = sprintf(self::GSE_SOFT_FILENAME, $id);
+        $softDownloadUrl = sprintf(self::GSE_SOFT_URL, $prefix, $id, $softFilename);
         $this->downloadFile($softDownloadUrl, $softFilename);
-        $matrixFilename = $this->downloadDirectory . '/' . $matrixFilename;
-        $softFilename = $this->downloadDirectory . '/' . $softFilename;
-        if (!file_exists($matrixFilename)) {
-            throw new DownloaderException('Unable to download GSE series matrix.');
-        }
+        $softFilename = $this->downloadDirectory . '/' . $this->gunzipFile($softFilename);
         if (!file_exists($softFilename)) {
             throw new DownloaderException('Unable to download GSE SOFT file.');
         }
-        $descriptor->addDescriptor($this->readGSEInfo($matrixFilename));
-        $descriptor->addFile($matrixFilename, Descriptor::TYPE_DATA);
+        $this->log('Reading GSE Metadata from SOFT file', true);
+        $info = $this->readGSEInfo($softFilename);
+        $this->log("...OK\n", true);
+        $descriptor->addDescriptor($info);
         $descriptor->addFile($softFilename, Descriptor::TYPE_METADATA);
+        if ($info['multi_platform']) {
+            throw new DownloaderException('Multi-Platform Series are not supported. Please download each SubSeries.');
+        } else {
+            $matrixFilename = sprintf(self::GSE_MATRIX_FILENAME, $id);
+            $matrixDownloadUrl = sprintf(self::GSE_MATRIX_URL, $prefix, $id, $matrixFilename);
+            $this->downloadFile($matrixDownloadUrl, $matrixFilename);
+            $matrixFilename = $this->downloadDirectory . '/' . $this->gunzipFile($matrixFilename);
+            if (!file_exists($matrixFilename)) {
+                throw new DownloaderException('Unable to download GSE series matrix.');
+            }
+            $descriptor->addFile($matrixFilename, Descriptor::TYPE_DATA);
+        }
         return $descriptor;
     }
 }

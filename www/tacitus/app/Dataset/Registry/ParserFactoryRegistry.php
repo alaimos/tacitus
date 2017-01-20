@@ -25,6 +25,7 @@ class ParserFactoryRegistry
      */
     protected $classes = [
         \App\Dataset\Factory\Parser\ArrayExpressParserFactory::class,
+        \App\Dataset\Factory\Parser\GeoGSEParserFactory::class,
     ];
 
     /**

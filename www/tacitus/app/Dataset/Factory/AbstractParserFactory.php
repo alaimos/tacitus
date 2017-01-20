@@ -136,9 +136,9 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
                 } else {
                     $this->jobData->save();
                 }
-                /*if (self::DEBUG) {
-                    echo $message;
-                }*/
+                //if (self::DEBUG) {
+                echo $message;
+                //}
             };
         }
         return $this->logCallback;

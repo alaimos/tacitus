@@ -38,28 +38,47 @@ class TestImport extends Command
     public function handle()
     {
         /** @var JobData $jobData */
-        $jobData = JobData::findOrNew(1)->fill([
+        $jobData = JobData::findOrNew(50)->fill([
             'job_type' => 'import_dataset',
             'status'   => JobData::QUEUED,
             'log'      => '',
+            'user_id'  => 1,
             'job_data' => [
-                'source_type' => 'arrexp',
-                'originalId'  => 'E-MTAB-3732',
-                'user_id'     => 1,
+                'source_type' => 'geogse',
+                'original_id' => 'GSE1902', //'GSE14',
                 'private'     => false,
             ]
         ]);
         $jobData->log = '';
         $jobData->save();
 
-        $this->dispatch(Factory::getQueueJob($jobData));
+        /*$this->dispatch(Factory::getQueueJob($jobData));*/
 
-        /*
         $registry = new ParserFactoryRegistry();
-        $factories = $registry->getParsers('arrexp');
+        /** @var \App\Dataset\Factory\ParserFactoryInterface[] $factories */
+        $factories = $registry->getParsers('geogse');
         $jobData->status = JobData::PROCESSING;
         $jobData->save();
-        $ok = false;
+        /** @var \App\Dataset\Factory\ParserFactoryInterface $factory */
+        $factory = array_shift($factories);
+        $factory->setJobData($jobData);
+        $downloader = $factory->getDatasetDownloader();
+        $downloader->setDownloadDirectory($jobData->getJobDirectory());
+        $descriptor = $downloader->download();
+        $factory->setDescriptor($descriptor);
+        $parser = $factory->getDataParser();
+        $parser->start(Descriptor::TYPE_METADATA);
+        echo $parser->current() . " of " . $parser->count() . "\n";
+        while (($res = $parser->parse()) !== null) {
+            echo $parser->current() . " of " . $parser->count() . " - " . ($res ? "sample" : "false") . "\n";
+        }
+        $parser->start(Descriptor::TYPE_METADATA_INDEX);
+        while (($res = $parser->parse()) !== null) {
+            echo $parser->current() . " of " . $parser->count() . " - " . ($res ? "sample" : "false") . "\n";
+            dd($res);
+        }
+        //dd($res);
+        /*$ok = false;
         foreach ($factories as $factory) {
             $job = $factory->setJobData($jobData)->getRealImporter();
             if ($job->run()) {
@@ -72,5 +91,6 @@ class TestImport extends Command
         } else {
             $jobData->status = JobData::FAILED;
         }*/
+        return 0;
     }
 }

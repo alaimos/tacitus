@@ -97,11 +97,12 @@ abstract class AbstractDownloader implements DownloaderInterface
      */
     protected function gunzipFile($fileName)
     {
-        $fileName = $this->downloadDirectory . '/' . $fileName;
-        $outputDirectory = dirname($fileName);
-        $base = scandir($outputDirectory);
-        exec('gunzip -f ' . escapeshellarg($fileName));
-        return array_diff(scandir($outputDirectory), $base);
+        $filePath = $this->downloadDirectory . '/' . $fileName;
+        //$outputDirectory = dirname($fileName);
+        //$base = scandir($outputDirectory);
+        exec('gunzip -f ' . escapeshellarg($filePath));
+        return str_replace('.gz', '', $fileName);
+        //return array_diff(scandir($outputDirectory), $base);
     }
 
 }

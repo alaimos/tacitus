@@ -118,9 +118,11 @@ abstract class AbstractDataParser implements DataParserInterface
     {
         $tmp = $this->getDescriptor()->getFiles($this->currentType);
         $this->files = [];
-        foreach ($tmp as $file) {
-            if (!empty($file) && file_exists($file) && is_readable($file)) {
-                $this->files[] = $file;
+        if (is_array($tmp)) {
+            foreach ($tmp as $file) {
+                if (!empty($file) && file_exists($file) && is_readable($file)) {
+                    $this->files[] = $file;
+                }
             }
         }
         if (empty($this->files)) {

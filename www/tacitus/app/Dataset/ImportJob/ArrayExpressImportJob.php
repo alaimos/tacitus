@@ -19,26 +19,6 @@ class ArrayExpressImportJob extends AbstractImportJob
 {
 
     /**
-     * @var integer
-     */
-    protected $prevPercentage;
-
-    /**
-     * Log progress percentage
-     *
-     * @param integer $current
-     * @param integer $total
-     */
-    protected function logProgress($current, $total)
-    {
-        $percentage = floor(min(100, ((float)$current / (float)$total) * 100));
-        if (($percentage % 10) == 0 && $percentage != 100 && $percentage != $this->prevPercentage) {
-            $this->log('...' . $percentage . '%', true);
-        }
-        $this->prevPercentage = $percentage;
-    }
-
-    /**
      * Runs an import job.
      *
      * @return boolean
@@ -72,7 +52,7 @@ class ArrayExpressImportJob extends AbstractImportJob
             $this->log("...OK\n", true);
             $this->log('Parsing metadata', true);
             $dataParser->start(Descriptor::TYPE_METADATA);
-            $this->prevPercentage = 0;
+            $this->initProgress();
             while (($row = $dataParser->parse()) !== null) {
                 if (!empty($row)) {
                     $dataWriter->write(Descriptor::TYPE_SAMPLE, $row['sample']);
@@ -83,7 +63,7 @@ class ArrayExpressImportJob extends AbstractImportJob
             $this->log("...OK\n", true);
             $this->log('Parsing data', true);
             $dataParser->start(Descriptor::TYPE_DATA);
-            $this->prevPercentage = 0;
+            $this->initProgress();
             while (($row = $dataParser->parse()) !== null) {
                 if (!empty($row)) {
                     $dataWriter->write(Descriptor::TYPE_DATA, $row);
