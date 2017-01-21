@@ -41,8 +41,8 @@ class Integration extends Model
 {
 
     const PENDING = 'pending';
-    const READY = 'ready';
-    const FAILED = 'failed';
+    const READY   = 'ready';
+    const FAILED  = 'failed';
 
     /**
      * The attributes that should be cast to native types.
@@ -59,7 +59,7 @@ class Integration extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'slug', 'generated_files', 'status', 'enable_post_mapping', 'user_id', 'platform_id', 'mapping_id'
+        'name', 'slug', 'generated_files', 'status', 'enable_post_mapping', 'user_id', 'platform_id', 'mapping_id',
     ];
 
     /**
@@ -73,23 +73,23 @@ class Integration extends Model
         return [
             'NONE'     => [
                 'None',
-                'Expression matrices are put together without the use of any normalization technique.'
+                'Expression matrices are put together without the use of any normalization technique.',
             ],
             'BMC'      => [
                 'BMC (Sims et al. 2008)',
-                'A method which employs a technique similar to z-score normalization for merging expression datasets.'
+                'A method which employs a technique similar to z-score normalization for merging expression datasets.',
             ],
             'COMBAT'   => [
                 'COMBAT (Li and Rabinovic 2007)',
-                'A method which employs Empirical Bayes to estimates the parameters of a model for mean and variance for each gene and then adjusts the genes in each batch to meet the assumed model.'
+                'A method which employs Empirical Bayes to estimates the parameters of a model for mean and variance for each gene and then adjusts the genes in each batch to meet the assumed model.',
             ],
             'GENENORM' => [
                 'GENENORM (Benito et al. 2004)',
-                'Z-score normalization: for each gene expression value in each study separately all values are altered by subtracting the mean of the gene in that dataset divided by its standard deviation.'
+                'Z-score normalization: for each gene expression value in each study separately all values are altered by subtracting the mean of the gene in that dataset divided by its standard deviation.',
             ],
             'XPN'      => [
                 'XPN (Shabalin et al. 2008)',
-                'A method for cross-platform normalization. It finds blocks (clusters) of genes and samples in both studies that have similar expression characteristics.'
+                'A method for cross-platform normalization. It finds blocks (clusters) of genes and samples in both studies that have similar expression characteristics.',
             ],
         ];
     }
@@ -176,6 +176,7 @@ class Integration extends Model
      *
      * @param string $type
      * @param string $extension
+     *
      * @return string
      */
     public function getFileName($type, $extension)
@@ -187,6 +188,7 @@ class Integration extends Model
      * Set the filename for metadata
      *
      * @param string $filename
+     *
      * @return $this
      */
     public function setMetadataFilename($filename)
@@ -211,6 +213,7 @@ class Integration extends Model
      * Set the filename for data
      *
      * @param string $filename
+     *
      * @return $this
      */
     public function setDataFilename($filename)

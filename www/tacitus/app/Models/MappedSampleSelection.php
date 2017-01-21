@@ -35,8 +35,8 @@ use Illuminate\Database\Eloquent\Model;
 class MappedSampleSelection extends Model
 {
     const PENDING = 'pending';
-    const READY = 'ready';
-    const FAILED = 'failed';
+    const READY   = 'ready';
+    const FAILED  = 'failed';
 
     /**
      * The attributes that should be cast to native types.
@@ -53,7 +53,7 @@ class MappedSampleSelection extends Model
      * @var array
      */
     protected $fillable = [
-        'selection_id', 'platform_id', 'mapping_id', 'status', 'user_id', 'generated_files'
+        'selection_id', 'platform_id', 'mapping_id', 'status', 'user_id', 'generated_files',
     ];
 
     /**
@@ -66,16 +66,16 @@ class MappedSampleSelection extends Model
     {
         /** @var \Illuminate\Database\Query\Builder $query */
         $query = self::join('sample_selections', 'sample_selections.id', '=', 'mapped_sample_selections.selection_id')
-            ->join('platform_mappings', 'platform_mappings.id', '=', 'mapped_sample_selections.mapping_id')
-            ->join('platforms', 'platforms.id', '=', 'mapped_sample_selections.platform_id')
-            ->where('mapped_sample_selections.status', '=', self::READY)
-            ->select([
-                'mapped_sample_selections.*',
-                'platform_mappings.name AS mapping',
-                'platforms.title AS platform',
-                'platforms.organism AS organism',
-                'sample_selections.name',
-            ]);
+                     ->join('platform_mappings', 'platform_mappings.id', '=', 'mapped_sample_selections.mapping_id')
+                     ->join('platforms', 'platforms.id', '=', 'mapped_sample_selections.platform_id')
+                     ->where('mapped_sample_selections.status', '=', self::READY)
+                     ->select([
+                         'mapped_sample_selections.*',
+                         'platform_mappings.name AS mapping',
+                         'platforms.title AS platform',
+                         'platforms.organism AS organism',
+                         'sample_selections.name',
+                     ]);
         if (user_can(Permissions::USE_TOOLS) && !user_can(Permissions::ADMINISTER)) {
             $query->where('mapped_sample_selections.user_id', '=', current_user()->id);
             return $query;
@@ -138,6 +138,7 @@ class MappedSampleSelection extends Model
      *
      * @param string $type
      * @param string $extension
+     *
      * @return string
      */
     public function getFileName($type, $extension)
@@ -150,6 +151,7 @@ class MappedSampleSelection extends Model
      * Set the filename for metadata
      *
      * @param string $filename
+     *
      * @return $this
      */
     public function setMetadataFilename($filename)
@@ -174,6 +176,7 @@ class MappedSampleSelection extends Model
      * Set the filename for data
      *
      * @param string $filename
+     *
      * @return $this
      */
     public function setDataFilename($filename)

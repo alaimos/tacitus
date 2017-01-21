@@ -36,7 +36,8 @@ abstract class AbstractImportJob implements ImportJobInterface
     /**
      * Initialize progress
      */
-    protected function initProgress() {
+    protected function initProgress()
+    {
         $this->prevPercentage = 0;
     }
 
@@ -60,6 +61,7 @@ abstract class AbstractImportJob implements ImportJobInterface
      * Set a ParserFactory instance
      *
      * @param \App\Dataset\Factory\ParserFactoryInterface $parserFactory
+     *
      * @return $this
      */
     public function setParserFactory(ParserFactoryInterface $parserFactory)

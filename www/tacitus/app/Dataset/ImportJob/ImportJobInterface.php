@@ -7,9 +7,9 @@
 
 namespace App\Dataset\ImportJob;
 
-use App\Dataset\Factory\ParserFactoryInterface;
 use App\Dataset\Contracts\JobDataAwareInterface;
 use App\Dataset\Contracts\LogCallbackAwareInterface;
+use App\Dataset\Factory\ParserFactoryInterface;
 
 /**
  * Interface ImportJobInterface
@@ -23,6 +23,7 @@ interface ImportJobInterface extends JobDataAwareInterface, LogCallbackAwareInte
      * Set a ParserFactory instance
      *
      * @param \App\Dataset\Factory\ParserFactoryInterface $parserFactory
+     *
      * @return $this
      */
     public function setParserFactory(ParserFactoryInterface $parserFactory);

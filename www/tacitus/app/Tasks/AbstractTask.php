@@ -8,7 +8,6 @@
 namespace App\Tasks;
 
 use App\Models\Task;
-use Illuminate\Console\Scheduling\Schedule;
 
 abstract class AbstractTask implements TaskInterface
 {
@@ -34,6 +33,7 @@ abstract class AbstractTask implements TaskInterface
      * Common actions to perform after task completed
      *
      * @param bool $failed
+     *
      * @return $this
      */
     protected function after($failed = false)
@@ -49,6 +49,7 @@ abstract class AbstractTask implements TaskInterface
      *
      * @param string $message
      * @param bool   $commit
+     *
      * @return $this
      */
     protected function log($message, $commit = true)

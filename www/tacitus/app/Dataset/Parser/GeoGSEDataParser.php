@@ -56,11 +56,18 @@ class GeoGSEDataParser extends AbstractDataParser
     protected $identifierIndex = null;
 
     /**
-     * Index which stores the list of all metadata
+     * Get the position of a sample
+     *
+     * @var array
+     */
+    protected $sampleToPosition = [];
+
+    /**
+     * A list of supported metadata
      *
      * @var array|null
      */
-    protected $metadataIndex = [];
+    protected $supportedMetadata = [];
 
     /**
      * Index used to find samples associated with probes
@@ -84,9 +91,34 @@ class GeoGSEDataParser extends AbstractDataParser
     protected $inSeriesMatrix = false;
 
     /**
+     * Unesape a string
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    private function unescape($string)
+    {
+        return stripslashes(trim($string, '"\''));
+    }
+
+    /**
+     * Unescape a metadata name
+     *
+     * @param string $string
+     *
+     * @return string
+     */
+    private function unescapeMetadataName($string)
+    {
+        return ucwords(str_replace('_', ' ', $this->unescape($string)));
+    }
+
+    /**
      * Internal method to set the current type in order to use a fluent interface
      *
      * @param string $type
+     *
      * @return $this
      */
     protected function setCurrentType($type)
@@ -96,7 +128,7 @@ class GeoGSEDataParser extends AbstractDataParser
         if ($type == Descriptor::TYPE_METADATA_INDEX) {
             $this->identifierIndex = null;
         }
-        if ($type == Descriptor::TYPE_DATA) {
+        if ($type == Descriptor::TYPE_METADATA) {
             $this->lastSample = -1;
         }
         parent::setCurrentType($type);
@@ -104,47 +136,31 @@ class GeoGSEDataParser extends AbstractDataParser
     }
 
     /**
-     * Initializes the parsing of all data files associated with a specific type
-     *
-     * @param string $type
-     * @return \App\Dataset\Parser\DataParserInterface
-     * @throws \App\Dataset\Parser\Exception\DataParserException
-     */
-    public function start($type)
-    {
-        $this->reset()->setCurrentType($type)->initFilesList();
-        if ($type == Descriptor::TYPE_METADATA_INDEX) {
-            $this->totalCount = 1;
-            $this->currentIndex = 0;
-            return $this;
-        }
-        return $this->checkFiles()->initCounter();
-    }
-
-
-    /**
      * Parses metadata for a sample
      *
      * @param resource $fp
-     * @return array
+     *
+     * @return array|boolean
      */
-    private function parseMetadata($fp)
+    private function metadataParser($fp)
     {
         $metadata = [
             'sample'   => [
                 'name'     => null,
                 'platform' => null,
+                'position' => null,
             ],
             'metadata' => [],
         ];
         $inSample = false;
         $currentSample = null;
         $matches = null;
+        $filled = [];
         while (($row = fgets($fp)) !== false) {
             $row = trim($row);
             $matches = null;
             if (preg_match(self::METADATA_SAMPLE_BEGIN, $row, $matches)) {
-                $currentSample = $metadata['sample']['name'] = $matches[1];
+                $currentSample = $metadata['sample']['name'] = $this->unescape($matches[1]);
                 $inSample = true;
             } elseif ($inSample && preg_match(self::METADATA_SAMPLE_END, $row)) {
                 break;
@@ -153,14 +169,27 @@ class GeoGSEDataParser extends AbstractDataParser
                     $metadata['sample']['platform'] = $matches[2];
                     continue;
                 }
-                $this->metadataIndex[$matches[1]] = ['name' => ucwords(str_replace('_', ' ', $matches[1]))];
+                $filled[$matches[1]] = true;
                 $metadata['metadata'][] = [
-                    'name'       => $this->metadataIndex[$matches[1]]['name'],
-                    'value'      => $matches[2],
+                    'name'       => $this->supportedMetadata[$matches[1]],
+                    'value'      => $this->unescape($matches[2]),
                     'sampleName' => $currentSample,
                 ];
             }
             $this->currentIndex++;
+        }
+        if ($currentSample === null) {
+            return false;
+        }
+        $metadata['sample']['position'] = $this->sampleToPosition[$currentSample] = ++$this->lastSample;
+        foreach ($this->supportedMetadata as $key => $meta) {
+            if (!isset($filled[$key])) {
+                $metadata['metadata'][] = [
+                    'name'       => $meta,
+                    'value'      => '',
+                    'sampleName' => $currentSample,
+                ];
+            }
         }
         return $metadata;
     }
@@ -174,29 +203,20 @@ class GeoGSEDataParser extends AbstractDataParser
      */
     public function parse()
     {
-        if ($this->currentType == Descriptor::TYPE_METADATA_INDEX) {
-            if ($this->currentIndex == 0) {
-                $this->currentIndex++;
-                return array_values($this->metadataIndex);
+        $fp = $this->getFilePointer();
+        if ($fp) {
+            if ($this->currentType == Descriptor::TYPE_METADATA) {
+                return $this->metadataParser($fp);
             } else {
-                return null;
-            }
-        } else {
-            $fp = $this->getFilePointer();
-            if ($fp) {
-                if ($this->currentType == Descriptor::TYPE_METADATA) {
-                    return $this->parseMetadata($fp);
-                } else {
-                    $row = fgets($fp);
-                    if ($row !== false) {
-                        $row = trim($row);
-                        $this->currentIndex++;
-                        return $this->parser($row);
-                    }
+                $row = fgets($fp);
+                if ($row !== false) {
+                    $row = trim($row);
+                    $this->currentIndex++;
+                    return $this->parser($row);
                 }
             }
-            return null;
         }
+        return null;
     }
 
     /**
@@ -219,9 +239,32 @@ class GeoGSEDataParser extends AbstractDataParser
     }
 
     /**
+     * Parses metadata index file
+     *
+     * @param string $row
+     *
+     * @return array|bool
+     */
+    private function metadataIndexParser($row)
+    {
+        if (preg_match(self::METADATA_SAMPLE_ROW, $row, $matches)) {
+            $idx = $matches[1];
+            if (!isset($this->supportedMetadata[$idx])) {
+                $name = $this->unescapeMetadataName($matches[1]);
+                $this->supportedMetadata[$idx] = $name;
+                return [
+                    'name' => $name,
+                ];
+            }
+        }
+        return false;
+    }
+
+    /**
      * Parse a sample row
      *
      * @param string $row
+     *
      * @return array|boolean
      */
     protected function dataParser($row)
@@ -240,11 +283,13 @@ class GeoGSEDataParser extends AbstractDataParser
             if ($this->sampleIndex === null) {
                 array_shift($row);
                 if (!count($row)) {
-                    throw new DataParserException('No sample identified in the current file (' . $this->currentFile . ').');
+                    throw new DataParserException('No sample identified in the current file (' . $this->currentFile
+                                                  . ').');
                 }
                 $this->sampleIndex = [];
                 for ($i = 0; $i < count($row); $i++) {
-                    $this->sampleIndex[$i] = ++$this->lastSample;
+                    $row[$i] = $this->unescape($row[$i]);
+                    $this->sampleIndex[$i] = (isset($this->sampleToPosition[$row[$i]])) ? $this->sampleToPosition[$row[$i]] : null;
                 }
                 return false;
             }
@@ -252,10 +297,12 @@ class GeoGSEDataParser extends AbstractDataParser
             if (!count($row)) {
                 throw new DataParserException('No sample identified in the current file (' . $this->currentFile . ').');
             }
-            $probe = stripslashes(trim($probe, '"\''));
+            $probe = $this->unescape($probe);
             $data = [];
             for ($i = 0; $i < count($row); $i++) {
-                $data[$this->sampleIndex[$i]] = doubleval($row[$i]);
+                if ($this->sampleIndex[$i] !== null) {
+                    $data[$this->sampleIndex[$i]] = doubleval($row[$i]);
+                }
             }
             return [
                 'name' => $probe,
@@ -268,6 +315,7 @@ class GeoGSEDataParser extends AbstractDataParser
      * The real parser implementation
      *
      * @param string $row
+     *
      * @return mixed
      * @throws \App\Dataset\Parser\Exception\DataParserException
      */
@@ -275,6 +323,8 @@ class GeoGSEDataParser extends AbstractDataParser
     {
         if ($this->currentType == Descriptor::TYPE_DATA) {
             return $this->dataParser($row);
+        } elseif ($this->currentType == Descriptor::TYPE_METADATA_INDEX) {
+            return $this->metadataIndexParser($row);
         }
         throw new DataParserException('Unsupported data type "' . $this->currentType . '".');
     }

@@ -17,6 +17,7 @@ trait BulkModelInsertTrait
      * Insert each item as a row. Does not generate events.
      *
      * @param  array $items
+     *
      * @return bool
      */
     public function insertMany(array $items)
@@ -31,7 +32,7 @@ trait BulkModelInsertTrait
                 $item[self::UPDATED_AT] = $now;
             });
         }
-        $this->getConnection()->table($this->getTable())->insert($items);
+        return $this->getConnection()->table($this->getTable())->insert($items);
     }
 
 }

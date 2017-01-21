@@ -21,6 +21,7 @@ class Utils
      * Delete a file or a directory
      *
      * @param string $path something to delete
+     *
      * @return bool
      */
     public static function delete($path)
@@ -44,6 +45,7 @@ class Utils
      * Returns the size of a download
      *
      * @param string $url
+     *
      * @return int
      */
     public static function getDownloadSize($url)
@@ -89,6 +91,7 @@ class Utils
      * Returns size in a human readable format
      *
      * @param int $size
+     *
      * @return string
      */
     public static function displaySize($size)
@@ -107,6 +110,7 @@ class Utils
      * @param callable|null $afterCallback
      * @param callable|null $progressCallback
      * @param callable|null $fileExistsCallback
+     *
      * @throws DownloadException
      * @return bool
      */
@@ -178,6 +182,7 @@ class Utils
      * Checks if current user can do something
      *
      * @param string $permission
+     *
      * @return bool
      */
     public static function userCan($permission)

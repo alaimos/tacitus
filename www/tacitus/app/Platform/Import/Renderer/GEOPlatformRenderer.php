@@ -8,7 +8,6 @@
 namespace App\Platform\Import\Renderer;
 
 use App\Models\Job as JobData;
-use App\Platform\Import\Renderer\Exception\RendererException;
 use Illuminate\Http\Request;
 
 class GEOPlatformRenderer implements RendererInterface
@@ -38,6 +37,7 @@ class GEOPlatformRenderer implements RendererInterface
      * Run some actions before validation on a Request.
      *
      * @param Request $request
+     *
      * @return void
      * @throws \App\Platform\Import\Renderer\Exception\RendererException
      */
@@ -62,6 +62,7 @@ class GEOPlatformRenderer implements RendererInterface
      *
      * @param Request $request
      * @param JobData $jobData
+     *
      * @return array
      * @throws \App\Platform\Import\Renderer\Exception\RendererException
      */

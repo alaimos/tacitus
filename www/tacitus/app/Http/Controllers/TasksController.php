@@ -7,8 +7,6 @@ use App\Utils\Permissions;
 use Datatables;
 use Flash;
 use Illuminate\Http\Request;
-
-use App\Http\Requests;
 use Illuminate\Routing\Router;
 
 class TasksController extends Controller
@@ -74,7 +72,7 @@ class TasksController extends Controller
             return $text . ucfirst($task->status);
         })->addColumn('action', function (Task $task) {
             return view('tasks.list_action_column', [
-                'task' => $task
+                'task' => $task,
             ])->render();
         });
         return $table->make(true);

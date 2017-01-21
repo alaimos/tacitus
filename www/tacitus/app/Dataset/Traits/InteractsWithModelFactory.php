@@ -28,6 +28,7 @@ trait InteractsWithModelFactory
      * Set a model factory object
      *
      * @param \App\Dataset\Factory\ModelFactoryInterface $modelFactory
+     *
      * @return $this
      */
     public function setModelFactory(ModelFactoryInterface $modelFactory)

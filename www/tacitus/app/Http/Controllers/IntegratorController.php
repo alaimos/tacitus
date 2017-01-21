@@ -7,17 +7,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\Factory as JobFactory;
 use App\Models\Integration;
-use App\Models\MappedSampleSelection;
-use App\Models\SampleSelection;
+use App\Models\Job as JobData;
 use App\Utils\Permissions;
 use Auth;
 use Datatables;
 use Flash;
 use Illuminate\Http\Request;
-use App\Jobs\Factory as JobFactory;
-use App\Models\Job as JobData;
-use App\Http\Requests;
 use Illuminate\Routing\Router;
 
 class IntegratorController extends Controller
@@ -96,7 +93,7 @@ class IntegratorController extends Controller
                 'platform'            => ($mappingEnabled) ? (int)$request->get('platform') : null,
                 'mapping'             => ($mappingEnabled) ? (int)$request->get('mapping') : null,
             ],
-            'log'      => ''
+            'log'      => '',
         ]);
         $jobData->user()->associate(Auth::user());
         $jobData->save();
@@ -133,7 +130,7 @@ class IntegratorController extends Controller
         $table = Datatables::of(Integration::listIntegrations());
         $table->addColumn('action', function (Integration $integration) {
             return view('integrator.list_action_column', [
-                'integration' => $integration
+                'integration' => $integration,
             ])->render();
         });
         return $table->make(true);

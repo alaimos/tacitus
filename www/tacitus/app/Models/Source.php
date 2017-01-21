@@ -34,7 +34,7 @@ class Source extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'display_name'
+        'name', 'display_name',
     ];
 
     /**

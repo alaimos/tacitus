@@ -7,6 +7,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\Factory as JobFactory;
+use App\Models\Job as JobData;
 use App\Models\MappedSampleSelection;
 use App\Models\SampleSelection;
 use App\Utils\Permissions;
@@ -15,9 +17,6 @@ use Datatables;
 use Flash;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use App\Jobs\Factory as JobFactory;
-use App\Models\Job as JobData;
-use App\Http\Requests;
 use Illuminate\Routing\Router;
 
 class MappedSelectionController extends Controller
@@ -93,7 +92,7 @@ class MappedSelectionController extends Controller
                     'platform'  => $request->get('platform'),
                     'mapping'   => $request->get('mapping'),
                 ],
-                'log'      => ''
+                'log'      => '',
             ]);
             $jobData->user()->associate(Auth::user());
             $jobData->save();
@@ -134,9 +133,9 @@ class MappedSelectionController extends Controller
         if (!empty($q)) {
             $query->where(function (Builder $query) use ($q) {
                 $query->where('sample_selections.name', 'like', '%' . $q . '%')
-                    ->orWhere('platforms.title', 'like', '%' . $q . '%')
-                    ->orWhere('platforms.organism', 'like', '%' . $q . '%')
-                    ->orWhere('platform_mappings.name', 'like', '%' . $q . '%');
+                      ->orWhere('platforms.title', 'like', '%' . $q . '%')
+                      ->orWhere('platforms.organism', 'like', '%' . $q . '%')
+                      ->orWhere('platform_mappings.name', 'like', '%' . $q . '%');
             });
         }
         return $query->paginate($perPage, ['id', 'name', 'platform', 'mapping', 'organism']);
@@ -156,7 +155,7 @@ class MappedSelectionController extends Controller
         $table = Datatables::of(MappedSampleSelection::listSelections());
         $table->addColumn('action', function (MappedSampleSelection $mappedSelection) {
             return view('selections.mapped.list_action_column', [
-                'mappedSelection' => $mappedSelection
+                'mappedSelection' => $mappedSelection,
             ])->render();
         });
         return $table->make(true);

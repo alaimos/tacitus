@@ -8,12 +8,12 @@
 namespace App\Jobs;
 
 use App\Jobs\Exception\JobException;
+use App\Models\Job as JobData;
 use App\Models\Platform;
 use App\Platform\Import\Factory\PlatformImportFactory;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Job as JobData;
 
 class ImportPlatform extends Job implements ShouldQueue
 {

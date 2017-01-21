@@ -42,9 +42,11 @@ class ArrayExpressModelFactory extends AbstractModelFactory
      * Get a Dataset object associated with the current descriptor.
      * If no Dataset object is available, it will be instantiated.
      *
-     * @return \App\Models\Dataset
+     * @param array $options
+     *
+     * @return Dataset
      */
-    public function getDataset()
+    public function getDataset(array $options = [])
     {
         if ($this->dataset === null) {
             $descriptors = $this->descriptor->getDescriptors();

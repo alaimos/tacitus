@@ -36,10 +36,10 @@ use Illuminate\Database\Eloquent\Model;
 class Job extends Model
 {
 
-    const QUEUED = 'queued';
+    const QUEUED     = 'queued';
     const PROCESSING = 'processing';
-    const COMPLETED = 'completed';
-    const FAILED = 'failed';
+    const COMPLETED  = 'completed';
+    const FAILED     = 'failed';
 
     /**
      * The attributes that should be cast to native types.
@@ -47,7 +47,7 @@ class Job extends Model
      * @var array
      */
     protected $casts = [
-        'job_data' => 'array'
+        'job_data' => 'array',
     ];
 
     /**
@@ -56,7 +56,7 @@ class Job extends Model
      * @var array
      */
     protected $fillable = [
-        'job_type', 'status', 'job_data', 'log', 'user_id'
+        'job_type', 'status', 'job_data', 'log', 'user_id',
     ];
 
     /**

@@ -80,6 +80,7 @@ abstract class AbstractDataParser implements DataParserInterface
      * Count the number of lines in a text file
      *
      * @param string $file
+     *
      * @return integer
      */
     protected function countLines($file)
@@ -101,6 +102,7 @@ abstract class AbstractDataParser implements DataParserInterface
      * Internal method to set the current type in order to use a fluent interface
      *
      * @param string $type
+     *
      * @return $this
      */
     protected function setCurrentType($type)
@@ -217,6 +219,7 @@ abstract class AbstractDataParser implements DataParserInterface
      * Initializes the parsing of all data files associated with a specific type
      *
      * @param string $type
+     *
      * @return \App\Dataset\Parser\DataParserInterface
      * @throws \App\Dataset\Parser\Exception\DataParserException
      */
@@ -269,6 +272,7 @@ abstract class AbstractDataParser implements DataParserInterface
      * The real parser implementation
      *
      * @param string $row
+     *
      * @return mixed
      * @throws \App\Dataset\Parser\Exception\DataParserException
      */

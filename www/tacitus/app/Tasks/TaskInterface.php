@@ -16,6 +16,7 @@ interface TaskInterface
      * Schedule this command
      *
      * @param \Illuminate\Console\Scheduling\Event $event
+     *
      * @return $this
      */
     public function schedule(Event $event);

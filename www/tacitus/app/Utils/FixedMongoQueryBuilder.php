@@ -2,17 +2,7 @@
 
 namespace App\Utils;
 
-use Closure;
-use DateTime;
-use Illuminate\Database\Query\Builder as BaseBuilder;
-use Illuminate\Database\Query\Expression;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
-use Jenssegers\Mongodb\Connection;
 use Jenssegers\Mongodb\Query\Builder;
-use MongoDB\BSON\ObjectID;
-use MongoDB\BSON\Regex;
-use MongoDB\BSON\UTCDateTime;
 
 class FixedMongoQueryBuilder extends Builder
 {
@@ -56,6 +46,7 @@ class FixedMongoQueryBuilder extends Builder
      * Set the "limit" value of the query.
      *
      * @param  int $value
+     *
      * @return $this
      */
     public function limit($value)
@@ -68,6 +59,7 @@ class FixedMongoQueryBuilder extends Builder
      * Set the "offset" value of the query.
      *
      * @param  int $value
+     *
      * @return $this
      */
     public function offset($value)

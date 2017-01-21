@@ -44,8 +44,8 @@ class SampleSelection extends Model
 {
 
     const PENDING = 'pending';
-    const READY = 'ready';
-    const FAILED = 'failed';
+    const READY   = 'ready';
+    const FAILED  = 'failed';
 
     /**
      * The attributes that should be cast to native types.
@@ -63,7 +63,7 @@ class SampleSelection extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'slug', 'selected_samples', 'generated_files', 'status', 'dataset_id', 'user_id', 'platform_id'
+        'name', 'slug', 'selected_samples', 'generated_files', 'status', 'dataset_id', 'user_id', 'platform_id',
     ];
 
     /**
@@ -131,6 +131,7 @@ class SampleSelection extends Model
      *
      * @param string $type
      * @param string $extension
+     *
      * @return string
      */
     public function getFileName($type, $extension)
@@ -142,6 +143,7 @@ class SampleSelection extends Model
      * Set the filename for metadata
      *
      * @param string $filename
+     *
      * @return $this
      */
     public function setMetadataFilename($filename)
@@ -166,6 +168,7 @@ class SampleSelection extends Model
      * Set the filename for data
      *
      * @param string $filename
+     *
      * @return $this
      */
     public function setDataFilename($filename)

@@ -2,17 +2,12 @@
 
 namespace App\Console\Commands;
 
-use App\Dataset\Descriptor;
-use App\Dataset\Registry\ParserFactoryRegistry;
 use App\Models\Dataset;
 use App\Models\Job as JobData;
 use App\Models\Probe;
 use App\Models\Sample;
-use App\Models\User;
-use App\Utils\Bench;
 use DB;
 use Illuminate\Console\Command;
-use SplFileObject;
 
 class TestSelection extends Command
 {
@@ -48,7 +43,7 @@ class TestSelection extends Command
         /** @var Dataset $dataset */
         //$dataset = Dataset::whereId($jobData->job_data['dataset_id'])->first();
         $count = DB::connection('mongodb')->getCollection('probes')
-            ->count(['dataset_id' => $jobData->job_data['dataset_id']]);
+                   ->count(['dataset_id' => $jobData->job_data['dataset_id']]);
         echo $count . "\n";
         $times = [];
         for ($i = 0; $i < $count; $i++) {

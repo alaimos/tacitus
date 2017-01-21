@@ -19,10 +19,10 @@ use Illuminate\Console\Scheduling\Event;
 class CleanUpTask extends AbstractTask
 {
 
-    const OLD_JOB_OFFSET = 30;
+    const OLD_JOB_OFFSET       = 30;
     const OLD_SELECTION_OFFSET = 7;
-    const OLD_DATASET_OFFSET = 365;
-    const OLD_TASKS_OFFSET = 2;
+    const OLD_DATASET_OFFSET   = 365;
+    const OLD_TASKS_OFFSET     = 2;
 
     /**
      * Returns the description of this task
@@ -134,11 +134,11 @@ class CleanUpTask extends AbstractTask
         $failed = false;
         try {
             $this->log("Starting Clean Up Task\n")
-                ->cleanUpOldSelections()
-                ->cleanUpOldDatasets()
-                ->cleanUpOldJobs()
-                ->cleanUpOldTasks()
-                ->log("DONE!\n");
+                 ->cleanUpOldSelections()
+                 ->cleanUpOldDatasets()
+                 ->cleanUpOldJobs()
+                 ->cleanUpOldTasks()
+                 ->log("DONE!\n");
         } catch (Exception $e) {
             $this->log("\nFAILED: An error occurred!!\n\n" . $e->__toString());
             $failed = true;
@@ -151,6 +151,7 @@ class CleanUpTask extends AbstractTask
      * Schedule this command
      *
      * @param \Illuminate\Console\Scheduling\Event $event
+     *
      * @return $this
      */
     public function schedule(Event $event)

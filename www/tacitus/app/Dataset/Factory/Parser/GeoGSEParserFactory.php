@@ -7,15 +7,12 @@
 
 namespace App\Dataset\Factory\Parser;
 
-use App\Dataset\Downloader\ArrayExpressDownloader;
 use App\Dataset\Downloader\GeoGSEDownloader;
 use App\Dataset\Factory\AbstractParserFactory;
-use App\Dataset\Factory\Model\ArrayExpressModelFactory;
 use App\Dataset\Factory\Model\GeoGSEModelFactory;
-use App\Dataset\ImportJob\ArrayExpressImportJob;
-use App\Dataset\Parser\ArrayExpressDataParser;
+use App\Dataset\ImportJob\GeoGSEImportJob;
 use App\Dataset\Parser\GeoGSEDataParser;
-use App\Dataset\Writer\DefaultDatasetWriter;
+use App\Dataset\Writer\GeoGSEWriter;
 
 /**
  * Class GeoGSEParserFactory
@@ -51,14 +48,14 @@ class GeoGSEParserFactory extends AbstractParserFactory
      *
      * @var string
      */
-    protected $datasetWriterClass = DefaultDatasetWriter::class;
+    protected $datasetWriterClass = GeoGSEWriter::class;
 
     /**
      * Class name of the real importer object
      *
      * @var string
      */
-    protected $importJobClass = null;
+    protected $importJobClass = GeoGSEImportJob::class;
 
     /**
      * Register this object. Returns the list of data sources this parser is able to handle.

@@ -18,10 +18,10 @@ use App\Dataset\Downloader\Exception\DownloaderException;
 class ArrayExpressDownloader extends AbstractDownloader
 {
 
-    const DATASET_INFO_URL = 'http://www.ebi.ac.uk/arrayexpress/json/v2/experiments/%s';
+    const DATASET_INFO_URL  = 'http://www.ebi.ac.uk/arrayexpress/json/v2/experiments/%s';
     const DATASET_FILES_URL = 'http://www.ebi.ac.uk/arrayexpress/json/v2/files/%s';
-    const METADATA_KIND = 'sdrf';
-    const DATA_KIND = 'processed';
+    const METADATA_KIND     = 'sdrf';
+    const DATA_KIND         = 'processed';
 
     /**
      * @var array

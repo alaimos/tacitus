@@ -24,9 +24,9 @@ use Illuminate\Database\Eloquent\Model;
  */
 class Task extends Model
 {
-    const RUNNING = 'running';
+    const RUNNING   = 'running';
     const COMPLETED = 'completed';
-    const FAILED = 'failed';
+    const FAILED    = 'failed';
 
     /**
      * The attributes that are mass assignable.
@@ -34,7 +34,7 @@ class Task extends Model
      * @var array
      */
     protected $fillable = [
-        'description', 'status', 'log'
+        'description', 'status', 'log',
     ];
 
     /**

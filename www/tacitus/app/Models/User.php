@@ -97,13 +97,13 @@ class User extends Authenticatable
             'all'     => Dataset::whereUserId($this->id)->count(),
             'pending' => Dataset::whereUserId($this->id)->whereStatus(Dataset::PENDING)->count(),
             'ready'   => Dataset::whereUserId($this->id)->whereStatus(Dataset::READY)->count(),
-            'failed'  => Dataset::whereUserId($this->id)->whereStatus(Dataset::FAILED)->count()
+            'failed'  => Dataset::whereUserId($this->id)->whereStatus(Dataset::FAILED)->count(),
         ];
         $stats['selections'] = [
             'all'     => SampleSelection::whereUserId($this->id)->count(),
             'pending' => SampleSelection::whereUserId($this->id)->whereStatus(SampleSelection::PENDING)->count(),
             'ready'   => SampleSelection::whereUserId($this->id)->whereStatus(SampleSelection::READY)->count(),
-            'failed'  => SampleSelection::whereUserId($this->id)->whereStatus(SampleSelection::FAILED)->count()
+            'failed'  => SampleSelection::whereUserId($this->id)->whereStatus(SampleSelection::FAILED)->count(),
         ];
         $stats['notifications'] = $this->countNotificationsNotRead();
         if (user_can(Permissions::ADMINISTER) && $this->can(Permissions::ADMINISTER)) {
@@ -119,13 +119,13 @@ class User extends Authenticatable
                     'all'     => Dataset::count(),
                     'pending' => Dataset::whereStatus(Dataset::PENDING)->count(),
                     'ready'   => Dataset::whereStatus(Dataset::READY)->count(),
-                    'failed'  => Dataset::whereStatus(Dataset::FAILED)->count()
+                    'failed'  => Dataset::whereStatus(Dataset::FAILED)->count(),
                 ],
                 'selections'   => [
                     'all'     => SampleSelection::count(),
                     'pending' => SampleSelection::whereStatus(SampleSelection::PENDING)->count(),
                     'ready'   => SampleSelection::whereStatus(SampleSelection::READY)->count(),
-                    'failed'  => SampleSelection::whereStatus(SampleSelection::FAILED)->count()
+                    'failed'  => SampleSelection::whereStatus(SampleSelection::FAILED)->count(),
                 ],
                 'failed-tasks' => Task::whereStatus(Task::FAILED)->count(),
             ];

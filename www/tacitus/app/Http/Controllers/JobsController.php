@@ -10,10 +10,8 @@ namespace App\Http\Controllers;
 use App\Jobs\Factory;
 use App\Models\Job as JobData;
 use App\Utils\Permissions;
-use Auth;
 use Datatables;
 use Flash;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 
 class JobsController extends Controller
@@ -42,6 +40,7 @@ class JobsController extends Controller
 
     /**
      * Prepare the list of jobs
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      *
      */
@@ -80,7 +79,7 @@ class JobsController extends Controller
             return $text . ucfirst($jobData->status);
         })->addColumn('action', function (JobData $jobData) {
             return view('jobs.list_action_column', [
-                'jobData' => $jobData
+                'jobData' => $jobData,
             ])->render();
         });
         return $table->make(true);

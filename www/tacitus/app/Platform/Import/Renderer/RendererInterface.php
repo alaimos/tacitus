@@ -31,6 +31,7 @@ interface RendererInterface
      * Run some actions before validation on a Request.
      *
      * @param Request $request
+     *
      * @return void
      * @throws \App\Platform\Import\Renderer\Exception\RendererException
      */
@@ -48,6 +49,7 @@ interface RendererInterface
      *
      * @param Request $request
      * @param JobData $jobData
+     *
      * @return array
      * @throws \App\Platform\Import\Renderer\Exception\RendererException
      */

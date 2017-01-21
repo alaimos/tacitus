@@ -7,19 +7,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Platform;
 use App\Jobs\Factory as JobFactory;
 use App\Models\Job as JobData;
+use App\Models\Platform;
 use App\Platform\Import\Factory\PlatformImportFactory;
 use App\Utils\Permissions;
 use Auth;
 use Datatables;
 use DaveJamesMiller\Breadcrumbs\Exception;
-use Illuminate\Contracts\Support\MessageProvider;
+use Flash;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-
-use Flash;
 use Illuminate\Routing\Router;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
@@ -82,7 +80,7 @@ class PlatformController extends Controller
         $table = Datatables::of(Platform::listPlatforms());
         $table->addColumn('action', function ($platform) {
             return view('platforms.list_action_column', [
-                'platform' => $platform
+                'platform' => $platform,
             ])->render();
         });
         return $table->make(true);
@@ -100,7 +98,7 @@ class PlatformController extends Controller
         $factory = new PlatformImportFactory();
         return view('platforms.submissionForm', [
             'importers' => $factory->getImportersList(),
-            'input'     => $request->old()
+            'input'     => $request->old(),
         ]);
     }
 
@@ -201,7 +199,7 @@ class PlatformController extends Controller
                     'importer_type'   => $importerType,
                     'importer_config' => [],
                 ],
-                'log'      => ''
+                'log'      => '',
             ]);
             $jobData->user()->associate(Auth::user());
             $jobData->save();
@@ -304,7 +302,7 @@ class PlatformController extends Controller
         }
         return response()->json([
             'ok'   => true,
-            'data' => $platform->mappingList(true)
+            'data' => $platform->mappingList(true),
         ]);
     }
 

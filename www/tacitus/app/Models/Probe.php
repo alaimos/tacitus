@@ -43,7 +43,7 @@ class Probe extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'data', 'dataset_id'
+        'name', 'data', 'dataset_id',
     ];
 
     /**

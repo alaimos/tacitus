@@ -8,12 +8,8 @@
 namespace App\Platform\Import;
 
 
-use App\Models\Platform;
-use App\Models\PlatformMapData;
-use App\Models\PlatformMapping;
 use App\Platform\Import\Exception\ImportException;
 use App\Platform\Import\Renderer\MapFileRenderer;
-use App\Utils\MultiFile;
 
 class MapFileImporter extends AbstractImporter implements ImporterInterface
 {
@@ -73,6 +69,7 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
      * Set the name of a MapFile to import
      *
      * @param string $mapFile
+     *
      * @return $this
      */
     public function setMapFile($mapFile)
@@ -88,6 +85,7 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
      * Set the title
      *
      * @param string $title
+     *
      * @return $this
      */
     public function setTitle($title)
@@ -103,6 +101,7 @@ class MapFileImporter extends AbstractImporter implements ImporterInterface
      * Set the organism
      *
      * @param string $organism
+     *
      * @return $this
      */
     public function setOrganism($organism)

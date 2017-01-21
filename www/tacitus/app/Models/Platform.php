@@ -42,8 +42,8 @@ class Platform extends Model
     use HybridRelations;
 
     const PENDING = 'pending';
-    const READY = 'ready';
-    const FAILED = 'failed';
+    const READY   = 'ready';
+    const FAILED  = 'failed';
 
     /**
      * The connection name for the model.
@@ -58,7 +58,7 @@ class Platform extends Model
      * @var array
      */
     protected $fillable = [
-        'title', 'organism', 'private', 'user_id', 'status'
+        'title', 'organism', 'private', 'user_id', 'status',
     ];
 
     /**
@@ -169,6 +169,7 @@ class Platform extends Model
      * Get mapping array
      *
      * @param PlatformMapping|integer $mapping
+     *
      * @return array
      */
     public function getMapArray($mapping)
@@ -187,8 +188,8 @@ class Platform extends Model
         $query = \DB::connection($tmp->getConnectionName())->collection($tmp->getTable());
         $field = $mapping->slug;
         $this->cache[$mapping->getKey()] = $query->select([$field, 'probe'])
-            ->where('platform_id', '=', $this->getKey())
-            ->pluck($field, 'probe');
+                                                 ->where('platform_id', '=', $this->getKey())
+                                                 ->pluck($field, 'probe');
         return $this->cache[$mapping->getKey()];
     }
 
@@ -197,6 +198,7 @@ class Platform extends Model
      *
      * @param PlatformMapping|integer $mapping
      * @param array                   $data
+     *
      * @return array
      */
     public function mapValues($mapping, array $data)
@@ -213,6 +215,7 @@ class Platform extends Model
      * Generate a map from mapping id to mapping name
      *
      * @param bool $byId
+     *
      * @return array|Collection
      */
     public function mappingList($byId = false)

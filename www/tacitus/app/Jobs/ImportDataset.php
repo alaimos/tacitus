@@ -9,10 +9,10 @@ namespace App\Jobs;
 
 use App\Dataset\Registry\ParserFactoryRegistry;
 use App\Jobs\Exception\JobException;
+use App\Models\Job as JobData;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Job as JobData;
 
 class ImportDataset extends Job implements ShouldQueue
 {

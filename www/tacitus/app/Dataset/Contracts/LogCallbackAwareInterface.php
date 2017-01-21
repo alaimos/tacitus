@@ -35,6 +35,7 @@ interface LogCallbackAwareInterface
      * Write a message to the log
      *
      * @param string $message
+     *
      * @return $this
      */
     public function log($message);

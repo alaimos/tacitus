@@ -19,6 +19,11 @@ class GeoGSEDownloader extends AbstractDownloader
 {
 
     /**
+     * Pattern used to build the URL for the download of the GPL SOFT file
+     */
+    const GPL_SOFT_URL = 'https://ftp.ncbi.nlm.nih.gov/geo/platforms/%s/%s/soft/%s';
+
+    /**
      * Pattern used to build the GSE SOFT filename
      */
     const GSE_SOFT_FILENAME = '%s_family.soft.gz';
@@ -64,7 +69,7 @@ class GeoGSEDownloader extends AbstractDownloader
     const SOFT_SERIES_END = '/^\\^(dataset|sample|series|platform|annotation)/i';
 
 
-    const PREFIX_REGEXP = '/\\d{1,3}$/';
+    const PREFIX_REGEXP      = '/\\d{1,3}$/';
     const PREFIX_REPLACEMENT = 'nnn';
 
     /**
@@ -81,6 +86,7 @@ class GeoGSEDownloader extends AbstractDownloader
      * Read preliminary data from a GSE SOFT FILE
      *
      * @param string $file
+     *
      * @return array
      */
     protected function readGSEInfo($file)
@@ -142,7 +148,7 @@ class GeoGSEDownloader extends AbstractDownloader
         $this->log('Reading GSE Metadata from SOFT file', true);
         $info = $this->readGSEInfo($softFilename);
         $this->log("...OK\n", true);
-        $descriptor->addDescriptor($info);
+        $descriptor->addFile($softFilename, Descriptor::TYPE_METADATA_INDEX);
         $descriptor->addFile($softFilename, Descriptor::TYPE_METADATA);
         if ($info['multi_platform']) {
             throw new DownloaderException('Multi-Platform Series are not supported. Please download each SubSeries.');
@@ -155,7 +161,18 @@ class GeoGSEDownloader extends AbstractDownloader
                 throw new DownloaderException('Unable to download GSE series matrix.');
             }
             $descriptor->addFile($matrixFilename, Descriptor::TYPE_DATA);
+            $platform = $info['platform'];
+            $platformPrefix = preg_replace(self::PREFIX_REGEXP, self::PREFIX_REPLACEMENT, $platform);
+            $platformFilename = sprintf(self::GSE_SOFT_FILENAME, $platform);
+            $platformDownloadUrl = sprintf(self::GPL_SOFT_URL, $platformPrefix, $platform, $platformFilename);
+            $this->downloadFile($platformDownloadUrl, $platformFilename);
+            $platformFilename = $this->downloadDirectory . '/' . $platformFilename;
+            if (!file_exists($platformFilename)) {
+                throw new DownloaderException('Unable to download GPL SOFT file.');
+            }
+            $info['platform_file'] = $platformFilename;
         }
+        $descriptor->addDescriptor($info);
         return $descriptor;
     }
 }

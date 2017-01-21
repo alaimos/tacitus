@@ -9,11 +9,11 @@ namespace App\Jobs;
 
 use App\Jobs\Exception\JobException;
 use App\Models\Dataset;
+use App\Models\Job as JobData;
 use App\Models\SampleSelection;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Job as JobData;
 
 
 class DeleteDataset extends Job implements ShouldQueue
@@ -46,6 +46,7 @@ class DeleteDataset extends Job implements ShouldQueue
      * Print a log message
      *
      * @param string $message
+     *
      * @return $this
      */
     protected function log($message)
@@ -93,7 +94,8 @@ class DeleteDataset extends Job implements ShouldQueue
                 } catch (\Exception $e) {
                     $this->log("\n");
                     $errorClass = join('', array_slice(explode('\\', get_class($e)), -1));
-                    $this->log('Unable to complete job. Error "' . $errorClass . '" with message "' . $e->getMessage() . "\".\n");
+                    $this->log('Unable to complete job. Error "' . $errorClass . '" with message "' . $e->getMessage()
+                               . "\".\n");
                     $ok = false;
                 }
             }

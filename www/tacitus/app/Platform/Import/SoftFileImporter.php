@@ -8,7 +8,6 @@
 namespace App\Platform\Import;
 
 
-use App\Models\Platform;
 use App\Models\PlatformMapData;
 use App\Models\PlatformMapping;
 use App\Platform\Import\Exception\ImportException;
@@ -18,10 +17,10 @@ use App\Utils\MultiFile;
 class SoftFileImporter extends AbstractImporter implements ImporterInterface
 {
 
-    const PLATFORM_TITLE_REGEXP = '/!Platform_title\s+=\s+(.*)/i';
+    const PLATFORM_TITLE_REGEXP    = '/!Platform_title\s+=\s+(.*)/i';
     const PLATFORM_ORGANISM_REGEXP = '/!Platform_organism\s+=\s+(.*)/i';
-    const TABLE_BEGIN = '!platform_table_begin';
-    const TABLE_END = '!platform_table_end';
+    const TABLE_BEGIN              = '!platform_table_begin';
+    const TABLE_END                = '!platform_table_end';
 
     /**
      * The path of a SoftFile to import
@@ -29,6 +28,13 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
      * @var string
      */
     protected $softFile;
+
+    /**
+     * When importing dataset in case of duplicate platform it will not throw an exception.
+     *
+     * @var boolean
+     */
+    protected $importingDataset;
 
     /**
      * A List of imported mappings
@@ -45,9 +51,27 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
     protected $collection;
 
     /**
+     * @return bool
+     */
+    public function isImportingDataset()
+    {
+        return $this->importingDataset;
+    }
+
+    /**
+     * @param bool $importingDataset
+     */
+    public function setImportingDataset($importingDataset)
+    {
+        $this->importingDataset = $importingDataset;
+    }
+
+
+    /**
      * Set the name of a MapFile to import
      *
      * @param string $softFile
+     *
      * @return $this
      */
     public function setSoftFile($softFile)
@@ -63,6 +87,7 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
      * Imports all mappings
      *
      * @param array $line
+     *
      * @return void
      */
     protected function importMappings(array $line)
@@ -83,6 +108,7 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
      * Import map data
      *
      * @param array $line
+     *
      * @return void
      */
     protected function importMapData(array $line)
@@ -128,7 +154,14 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
             if (strtolower($line) == self::TABLE_BEGIN && ($title === null || $organism === null)) {
                 throw new ImportException('SOFT file is not correctly formatted: table begins before metadata are set.');
             } elseif (strtolower($line) == self::TABLE_BEGIN && $title !== null && $organism !== null) {
-                $this->checkAndCreatePlatform($title, $organism);
+                try {
+                    $this->checkAndCreatePlatform($title, $organism);
+                } catch (ImportException $e) {
+                    if ($this->importingDataset) {
+                        break;
+                    }
+                    throw new ImportException($e->getMessage(), 0, $e);
+                }
                 $readingMeta = false;
                 $readingTable = true;
                 continue;

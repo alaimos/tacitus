@@ -8,21 +8,16 @@
 namespace App\Jobs;
 
 use App\Jobs\Exception\JobException;
-use App\Models\Dataset;
 use App\Models\Integration;
+use App\Models\Job as JobData;
 use App\Models\MappedSampleSelection;
 use App\Models\Platform;
 use App\Models\PlatformMapping;
-use App\Models\Probe;
-use App\Models\Sample;
 use App\Models\SampleSelection;
 use App\Utils\MultiFile;
-use DB;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Job as JobData;
-use Illuminate\Support\Str;
 
 class IntegrateSelections extends Job implements ShouldQueue
 {
@@ -59,6 +54,7 @@ class IntegrateSelections extends Job implements ShouldQueue
      * Print a log message
      *
      * @param string $message
+     *
      * @return $this
      */
     protected function log($message)
@@ -73,6 +69,7 @@ class IntegrateSelections extends Job implements ShouldQueue
      *
      * @param integer $current
      * @param integer $total
+     *
      * @return void
      */
     protected function logProgress($current, $total)
@@ -91,6 +88,7 @@ class IntegrateSelections extends Job implements ShouldQueue
      * @param \App\Models\MappedSampleSelection[] $mappedSelections
      * @param Platform                            $platform
      * @param PlatformMapping                     $mapping
+     *
      * @return Integration
      */
     protected function createIntegration(array $selections, array $mappedSelections, $platform, $mapping)
@@ -104,7 +102,7 @@ class IntegrateSelections extends Job implements ShouldQueue
             'user_id'             => $this->jobData->user->id,
             'platform_id'         => ($platform === null) ? null : $platform->id,
             'mapping_id'          => ($mapping === null) ? null : $mapping->id,
-            'generated_files'     => []
+            'generated_files'     => [],
         ]);
         foreach ($selections as $selection) {
             $integration->selections()->attach($selection->id);
@@ -121,6 +119,7 @@ class IntegrateSelections extends Job implements ShouldQueue
      * Create the configuration file to run the integrator script
      *
      * @param Integration $integration
+     *
      * @return array
      */
     protected function createConfigFile(Integration $integration)
@@ -156,6 +155,7 @@ class IntegrateSelections extends Job implements ShouldQueue
      * Runs the integration procedure
      *
      * @param Integration $integration
+     *
      * @return string
      */
     protected function runIntegrator(Integration $integration)
@@ -186,6 +186,7 @@ class IntegrateSelections extends Job implements ShouldQueue
      * Get the results of the integrator execution
      *
      * @param Integration $integration
+     *
      * @return boolean
      */
     protected function getIntegratorResult(Integration $integration)

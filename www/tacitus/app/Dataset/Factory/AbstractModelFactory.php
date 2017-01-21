@@ -29,10 +29,11 @@ abstract class AbstractModelFactory implements ModelFactoryInterface
      *
      * @param string $name
      * @param array  $data
+     * @param array  $options
      *
-     * @return \App\Models\Probe
+     * @return Probe
      */
-    public function getProbe($name, $data)
+    public function getProbe($name, $data, array $options = [])
     {
         $dataset = $this->getDataset();
         /** @var \App\Models\Probe $probe */
@@ -57,10 +58,11 @@ abstract class AbstractModelFactory implements ModelFactoryInterface
      * @param string             $name
      * @param string             $value
      * @param \App\Models\Sample $sample
+     * @param array              $options
      *
-     * @return \App\Models\Metadata
+     * @return Metadata
      */
-    public function getMetadata($name, $value, Sample $sample)
+    public function getMetadata($name, $value, Sample $sample, array $options = [])
     {
         $metadata = new Metadata(['name' => $name, 'value' => $value]);
         $metadata->sample()->associate($sample);
@@ -71,10 +73,11 @@ abstract class AbstractModelFactory implements ModelFactoryInterface
      * Create a new Metadata Index Model
      *
      * @param string $name
+     * @param array  $options
      *
-     * @return \App\Models\MetadataIndex
+     * @return MetadataIndex
      */
-    public function getMetadataIndex($name)
+    public function getMetadataIndex($name, array $options = [])
     {
         $index = new MetadataIndex(['name' => $name]);
         $index->dataset()->associate($this->getDataset());
@@ -85,10 +88,11 @@ abstract class AbstractModelFactory implements ModelFactoryInterface
      * Create a new Sample Model
      *
      * @param string $name
+     * @param array  $options
      *
-     * @return \App\Models\Sample
+     * @return Sample
      */
-    public function getSample($name)
+    public function getSample($name, array $options = [])
     {
         $sample = new Sample(['name' => $name]);
         $sample->dataset()->associate($this->getDataset());

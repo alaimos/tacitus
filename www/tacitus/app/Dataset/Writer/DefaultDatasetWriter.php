@@ -23,23 +23,26 @@ class DefaultDatasetWriter extends AbstractDatasetWriter
      * Write a sample object
      *
      * @param mixed $data
+     *
      * @return \App\Models\Sample|boolean
      */
     public function writeSample($data)
     {
         if ($this->is2DArray($data)) {
             throw new DatasetWriterException('Bulk insertion is not supported for samples.');
+        } else {
+            $this->currentSample = $this->modelFactory->getSample($data['name']);
+            $this->currentSample->save();
+            $this->sampleRegistry->register($this->currentSample);
+            return $this->currentSample;
         }
-        $this->currentSample = $this->modelFactory->getSample($data['name']);
-        $this->currentSample->save();
-        $this->sampleRegistry->register($this->currentSample);
-        return $this->currentSample;
     }
 
     /**
      * Write a Data object
      *
      * @param mixed $data
+     *
      * @return \App\Models\Probe|boolean
      */
     public function writeData($data)
@@ -51,16 +54,18 @@ class DefaultDatasetWriter extends AbstractDatasetWriter
                 }
             }
             return true;
+        } else {
+            $probe = $this->modelFactory->getProbe($data['name'], $data['data']);
+            $probe->save();
+            return $probe;
         }
-        $probe = $this->modelFactory->getProbe($data['name'], $data['data']);
-        $probe->save();
-        return $probe;
     }
 
     /**
      * Write a Metadata object
      *
      * @param mixed $data
+     *
      * @return \App\Models\Metadata
      */
     public function writeMetadata($data)
@@ -71,15 +76,14 @@ class DefaultDatasetWriter extends AbstractDatasetWriter
             $metaModel->save();
             return $metaModel;
         } else {
-            $data = array_map(function ($item) {
+            $data = array_filter(array_map(function ($item) {
+                if (!is_array($item) || !isset($item['name']) || !isset($item['value'])) return false;
                 $sample = $this->getSample($item);
+                if ($sample === null) return false;
                 $this->removeSample($item);
                 $item['sample_id'] = $sample->getKey();
                 return $item;
-            }, array_filter($data, function ($item) {
-                return (is_array($item) && isset($item['name']) && isset($item['value'])
-                        && $this->getSample($item) !== null);
-            }));
+            }, $data));
             return with(new Metadata)->insertMany($data);
         }
     }
@@ -88,6 +92,7 @@ class DefaultDatasetWriter extends AbstractDatasetWriter
      * Write a MetadataIndex object
      *
      * @param mixed $data
+     *
      * @return \App\Models\MetadataIndex
      */
     public function writeMetadataIndex($data)
@@ -97,13 +102,12 @@ class DefaultDatasetWriter extends AbstractDatasetWriter
             $indexModel->save();
             return $indexModel;
         } else {
-            $data = array_map(function ($item) {
+            $data = array_filter(array_map(function ($item) {
+                if (!is_array($item) || !isset($item['name'])) return false;
                 $this->removeSample($item);
-                $item['dataset_id'] = $this->dataset->id;
+                $item['dataset_id'] = $this->dataset->getKey();
                 return $item;
-            }, array_filter($data, function ($item) {
-                return (is_array($item) && isset($item['name']));
-            }));
+            }, $data));
             return with(new MetadataIndex)->insertMany($data);
         }
     }

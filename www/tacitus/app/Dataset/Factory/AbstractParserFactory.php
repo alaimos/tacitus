@@ -11,8 +11,8 @@ use App\Dataset\Contracts\DescriptorAwareInterface;
 use App\Dataset\Contracts\JobDataAwareInterface;
 use App\Dataset\Contracts\LogCallbackAwareInterface;
 use App\Dataset\Contracts\ModelFactoryAwareInterface;
-use App\Dataset\Registry\SampleRegistry;
 use App\Dataset\Contracts\SampleRegistryAwareInterface;
+use App\Dataset\Registry\SampleRegistry;
 use App\Dataset\Traits\InteractsWithDescriptor;
 use App\Dataset\Traits\InteractsWithJobData;
 
@@ -137,7 +137,7 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
                     $this->jobData->save();
                 }
                 //if (self::DEBUG) {
-                echo $message;
+                //echo $message;
                 //}
             };
         }

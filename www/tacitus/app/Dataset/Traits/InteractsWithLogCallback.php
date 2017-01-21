@@ -50,6 +50,7 @@ trait InteractsWithLogCallback
      *
      * @param string $message
      * @param bool   $autoCommit
+     *
      * @return $this
      */
     public function log($message, $autoCommit = false)

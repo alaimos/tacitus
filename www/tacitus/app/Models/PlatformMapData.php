@@ -52,7 +52,7 @@ class PlatformMapData extends Model implements BulkInsertableInterface
      * @var array
      */
     protected $fillable = [
-        'platform_id', 'probe'
+        'platform_id', 'probe',
     ];
 
     /**

@@ -14,6 +14,27 @@ class GEOPlatformImporter extends AbstractImporter implements ImporterInterface
 {
 
     /**
+     * Pattern used to build the URL for the download of the GPL SOFT file
+     */
+    const GPL_SOFT_URL = 'https://ftp.ncbi.nlm.nih.gov/geo/platforms/%s/%s/soft/%s';
+
+    /**
+     * Pattern used to build the GSE SOFT filename
+     */
+    const GPL_SOFT_FILENAME = '%s_family.soft.gz';
+
+    /**
+     * Pattern used to build URL prefix
+     */
+    const PREFIX_REGEXP = '/\\d{1,3}$/';
+
+    /**
+     * Replacement for the URL prefix
+     */
+    const PREFIX_REPLACEMENT = 'nnn';
+
+
+    /**
      * The accession number of the GEO platform
      *
      * @var string
@@ -31,6 +52,7 @@ class GEOPlatformImporter extends AbstractImporter implements ImporterInterface
      * Set the accession number of the GEO platform
      *
      * @param string $accessionNumber
+     *
      * @return $this
      */
     public function setAccessionNumber($accessionNumber)
@@ -46,6 +68,7 @@ class GEOPlatformImporter extends AbstractImporter implements ImporterInterface
      * Set the download directory where all files will be stored
      *
      * @param string $downloadDirectory
+     *
      * @return $this
      */
     public function setDownloadDirectory($downloadDirectory)
@@ -95,17 +118,10 @@ class GEOPlatformImporter extends AbstractImporter implements ImporterInterface
     protected function getDownloadUrl()
     {
         $acc = strtoupper($this->accessionNumber);
-        $base = 'ftp://ftp.ncbi.nlm.nih.gov/geo/platforms/';
-        if (strlen($acc) <= 6) {
-            return $base . 'GPLnnn/' . $acc . '/soft/' . $acc . '_family.soft.gz';
-        } elseif (strlen($acc) <= 7) {
-            $nr = $acc{3};
-            return $base . 'GPL' . $nr . 'nnn/' . $acc . '/soft/' . $acc . '_family.soft.gz';
-        } elseif (strlen($acc) <= 8) {
-            $nr = $acc{3} . $acc{4};
-            return $base . 'GPL' . $nr . 'nnn/' . $acc . '/soft/' . $acc . '_family.soft.gz';
-        }
-        throw new ImportException('Unsupported accession number format.');
+        $prefix = preg_replace(self::PREFIX_REGEXP, self::PREFIX_REPLACEMENT, $acc);
+        $fileName = sprintf(self::GPL_SOFT_FILENAME, $acc);
+        $url = sprintf(self::GPL_SOFT_URL, $prefix, $acc, $fileName);
+        return $url;
     }
 
     /**

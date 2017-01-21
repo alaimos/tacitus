@@ -47,7 +47,7 @@ class Metadata extends Model implements BulkInsertableInterface
      * @var array
      */
     protected $fillable = [
-        'name', 'value', 'sample_id'
+        'name', 'value', 'sample_id',
     ];
 
     /**

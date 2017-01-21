@@ -60,6 +60,7 @@ class ArrayExpressDataParser extends AbstractDataParser
      * Internal method to set the current type in order to use a fluent interface
      *
      * @param string $type
+     *
      * @return $this
      */
     protected function setCurrentType($type)
@@ -102,6 +103,7 @@ class ArrayExpressDataParser extends AbstractDataParser
      * Parse a metadata row
      *
      * @param array $row
+     *
      * @return array
      */
     protected function metadataParser(array $row)
@@ -114,7 +116,7 @@ class ArrayExpressDataParser extends AbstractDataParser
         }
         $result = [
             'sample'   => [
-                'name' => $row[$this->identifierIndex]
+                'name' => $row[$this->identifierIndex],
             ],
             'metadata' => [],
         ];
@@ -135,6 +137,7 @@ class ArrayExpressDataParser extends AbstractDataParser
      * Parse the metadata index and stores their positions
      *
      * @param array $row
+     *
      * @return array
      */
     protected function metadataIndexParser(array $row)
@@ -175,6 +178,7 @@ class ArrayExpressDataParser extends AbstractDataParser
      * Parse a sample row
      *
      * @param array $row
+     *
      * @return array
      */
     protected function dataParser(array $row)
@@ -208,6 +212,7 @@ class ArrayExpressDataParser extends AbstractDataParser
      * The real parser implementation
      *
      * @param string $row
+     *
      * @return mixed
      * @throws \App\Dataset\Parser\Exception\DataParserException
      */

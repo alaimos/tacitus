@@ -38,6 +38,7 @@ class MapFileRenderer implements RendererInterface
      * Run some actions before validation on a Request.
      *
      * @param Request $request
+     *
      * @return void
      * @throws \App\Platform\Import\Renderer\Exception\RendererException
      */
@@ -64,6 +65,7 @@ class MapFileRenderer implements RendererInterface
      *
      * @param Request $request
      * @param JobData $jobData
+     *
      * @return array
      * @throws \App\Platform\Import\Renderer\Exception\RendererException
      */

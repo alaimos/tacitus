@@ -24,6 +24,7 @@ class Bench
      *
      * @param string   $name
      * @param callable $callback
+     *
      * @return $this
      */
     public function addBench($name, callable $callback)
@@ -31,7 +32,7 @@ class Bench
         $this->benches[$name] = [
             'callback' => $callback,
             'measures' => [],
-            'started'  => false
+            'started'  => false,
         ];
         return $this;
     }

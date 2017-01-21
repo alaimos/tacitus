@@ -14,8 +14,6 @@ use Auth;
 use Datatables;
 use Flash;
 use Illuminate\Http\Request;
-
-use App\Http\Requests;
 use Illuminate\Routing\Router;
 
 class UserController extends Controller
@@ -61,7 +59,7 @@ class UserController extends Controller
     public function alerts()
     {
         return view('user.alerts', [
-            'notifications' => Auth::user()->getNotificationsNotRead()
+            'notifications' => Auth::user()->getNotificationsNotRead(),
         ]);
     }
 
@@ -102,6 +100,7 @@ class UserController extends Controller
      * read.
      *
      * @param null|integer $alert
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function markAlert($alert = null)
@@ -164,7 +163,7 @@ class UserController extends Controller
             'user'       => $user,
             'statistics' => $user->statistics(),
             'isCurrent'  => $currentUser->id == $user->id,
-            'isAdmin'    => user_can(Permissions::ADMINISTER)
+            'isAdmin'    => user_can(Permissions::ADMINISTER),
         ]);
     }
 
@@ -181,7 +180,7 @@ class UserController extends Controller
         return view('user.change_password', [
             'user'      => $user,
             'isCurrent' => $currentUser->id == $user->id,
-            'isAdmin'   => user_can(Permissions::ADMINISTER)
+            'isAdmin'   => user_can(Permissions::ADMINISTER),
         ]);
     }
 
@@ -295,7 +294,7 @@ class UserController extends Controller
         $table = Datatables::of(User::query());
         $table->addColumn('action', function (User $user) {
             return view('user.list_action_column', [
-                'user' => $user
+                'user' => $user,
             ])->render();
         });
         return $table->make(true);

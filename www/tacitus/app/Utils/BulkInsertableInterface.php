@@ -19,6 +19,7 @@ interface BulkInsertableInterface
      * Insert each item as a row. Does not generate events.
      *
      * @param  array $items
+     *
      * @return bool
      */
     public function insertMany(array $items);

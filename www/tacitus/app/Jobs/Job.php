@@ -53,8 +53,8 @@ abstract class Job
         $data['user'] = $to;
         Mail::send($view, $data, function (Message $message) use ($subject, $to) {
             $message->to($to->email, $to->name)
-                ->replyTo(env('MAIL_REPLY_TO'))
-                ->subject($subject);
+                    ->replyTo(env('MAIL_REPLY_TO'))
+                    ->subject($subject);
         });
     }
 

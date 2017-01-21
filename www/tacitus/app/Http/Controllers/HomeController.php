@@ -7,10 +7,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests;
 use App\Models\Dataset;
 use App\Models\User;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 
 class HomeController extends Controller

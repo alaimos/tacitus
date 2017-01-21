@@ -89,6 +89,7 @@ final class PlatformImportFactory
      *
      * @param string $name
      * @param array  $config
+     *
      * @return \App\Platform\Import\ImporterInterface
      */
     public function getImporter($name, array $config)
@@ -104,6 +105,7 @@ final class PlatformImportFactory
      * Get a renderer
      *
      * @param string $name
+     *
      * @return \App\Platform\Import\Renderer\RendererInterface
      */
     public function getRenderer($name)

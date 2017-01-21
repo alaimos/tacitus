@@ -48,6 +48,7 @@ abstract class AbstractDownloader implements DownloaderInterface
      *
      * @param string $source
      * @param string $targetFileName
+     *
      * @return bool
      */
     protected function downloadFile($source, $targetFileName)
@@ -74,6 +75,7 @@ abstract class AbstractDownloader implements DownloaderInterface
      *
      * @param string $fileName
      * @param string $outputDirectory
+     *
      * @return array
      */
     protected function unzipFile($fileName, $outputDirectory)
@@ -93,6 +95,7 @@ abstract class AbstractDownloader implements DownloaderInterface
      * Unzip a file compressed with gzip and return the new filename
      *
      * @param string $fileName
+     *
      * @return string
      */
     protected function gunzipFile($fileName)

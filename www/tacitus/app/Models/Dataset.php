@@ -3,12 +3,12 @@
 namespace App\Models;
 
 use App\Jobs\Factory;
+use App\Models\Job as JobData;
 use App\Utils\Permissions;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\Collection;
-use App\Models\Job as JobData;
 use Jenssegers\Mongodb\Eloquent\HybridRelations;
 
 /**
@@ -49,8 +49,8 @@ class Dataset extends Model
     use HybridRelations, DispatchesJobs;
 
     const PENDING = 'pending';
-    const READY = 'ready';
-    const FAILED = 'failed';
+    const READY   = 'ready';
+    const FAILED  = 'failed';
 
     /**
      * The connection name for the model.
@@ -65,7 +65,7 @@ class Dataset extends Model
      * @var array
      */
     protected $fillable = [
-        'original_id', 'source_id', 'user_id', 'title', 'private', 'status', 'platform_id'
+        'original_id', 'source_id', 'user_id', 'title', 'private', 'status', 'platform_id',
     ];
 
     /**
@@ -78,8 +78,8 @@ class Dataset extends Model
     {
         /** @var \Illuminate\Database\Query\Builder $query */
         $query = self::select(['datasets.*', 'sources.name', 'sources.display_name'])
-            ->join('sources', 'datasets.source_id', '=', 'sources.id')
-            ->where('datasets.status', '=', self::READY);
+                     ->join('sources', 'datasets.source_id', '=', 'sources.id')
+                     ->where('datasets.status', '=', self::READY);
         if (user_can(Permissions::VIEW_DATASETS) && !user_can(Permissions::ADMINISTER)) {
             $owner = current_user();
             if ($owner === null) {
@@ -175,6 +175,7 @@ class Dataset extends Model
      * Returns a collection of samples to be used as table source
      *
      * @param array $selection
+     *
      * @return Collection
      */
     public function getMetadataSamplesCollection(array $selection = [])
@@ -198,6 +199,7 @@ class Dataset extends Model
      * Delete a sample metadata
      *
      * @param string $sampleId
+     *
      * @return void
      */
     protected function deleteSampleMetadata($sampleId)
@@ -253,9 +255,10 @@ class Dataset extends Model
             'job_type' => 'delete_dataset',
             'status'   => JobData::QUEUED,
             'job_data' => [
-                'dataset_id' => $this->id
+                'dataset_id' => $this->id,
             ],
-            'log'      => ''
+            'user_id'  => \Auth::user()->id,
+            'log'      => '',
         ]);
         $jobData->save();
         $this->dispatch(Factory::getQueueJob($jobData));

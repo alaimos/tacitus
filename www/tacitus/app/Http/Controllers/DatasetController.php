@@ -10,10 +10,9 @@ namespace App\Http\Controllers;
 use App\Dataset\Registry\ParserFactoryRegistry;
 use App\Jobs\Factory as JobFactory;
 use App\Models\Dataset;
-use App\Models\Platform;
+use App\Models\Job as JobData;
 use App\Models\Source;
 use App\Utils\Permissions;
-use App\Models\Job as JobData;
 use Auth;
 use Carbon\Carbon;
 use Datatables;
@@ -79,7 +78,7 @@ class DatasetController extends Controller
         $table = Datatables::of(Dataset::listDatasets());
         $table->addColumn('action', function (Dataset $dataset) {
             return view('datasets.list_action_column', [
-                'dataset' => $dataset
+                'dataset' => $dataset,
             ])->render();
         });
         return $table->make(true);
@@ -121,7 +120,7 @@ class DatasetController extends Controller
                     'source_type' => $request->get('source_type'),
                     'private'     => boolval($request->get('private', false)),
                 ],
-                'log'      => ''
+                'log'      => '',
             ]);
             $jobData->user()->associate(Auth::user());
             $jobData->save();
@@ -196,7 +195,7 @@ class DatasetController extends Controller
         $selectionName = $request->get('selectionName');
         if (empty($selectionName)) {
             $selectionName = 'Selection from ' . $dataset->source->display_name . ' dataset ' .
-                $dataset->original_id . ' on ' . Carbon::now()->toDateTimeString();
+                             $dataset->original_id . ' on ' . Carbon::now()->toDateTimeString();
         }
         $samples = $request->get('samples');
         if (empty($samples)) {
@@ -212,16 +211,16 @@ class DatasetController extends Controller
             'job_data' => [
                 'dataset_id'    => $dataset->id,
                 'selectionName' => $selectionName,
-                'samples'       => $samples
+                'samples'       => $samples,
             ],
-            'log'      => ''
+            'log'      => '',
         ]);
         $jobData->user()->associate(Auth::user());
         $jobData->save();
         $job = JobFactory::getQueueJob($jobData);
         $this->dispatch($job);
         Flash::success('Your selection request has been submitted. Please check the Jobs panel in order to verify ' .
-            'its status.');
+                       'its status.');
         return redirect()->route('datasets-lists');
     }
 
@@ -245,7 +244,7 @@ class DatasetController extends Controller
         }
         $dataset->delete();
         Flash::success('Your deletion request has been submitted. Please check the Jobs panel in order to verify its ' .
-            'status.');
+                       'status.');
         return back();
     }
 }

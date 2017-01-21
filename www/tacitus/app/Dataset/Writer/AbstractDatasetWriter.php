@@ -55,6 +55,7 @@ abstract class AbstractDatasetWriter implements DatasetWriterInterface
      * Checks if an array appears to be 2-dimensional
      *
      * @param array $data
+     *
      * @return bool
      */
     protected function is2DArray(array $data)
@@ -66,6 +67,7 @@ abstract class AbstractDatasetWriter implements DatasetWriterInterface
      * Get a sample object from a data array, looking up at the sample registry if needed.
      *
      * @param array $data
+     *
      * @return \App\Models\Sample|null
      */
     protected function getSample(array $data)
@@ -96,6 +98,7 @@ abstract class AbstractDatasetWriter implements DatasetWriterInterface
      * Remove sample object from a data array
      *
      * @param array $data
+     *
      * @return void
      */
     protected function removeSample(array &$data)
@@ -119,6 +122,7 @@ abstract class AbstractDatasetWriter implements DatasetWriterInterface
      *
      * @param string $type
      * @param mixed  $data
+     *
      * @return object
      * @throws \App\Dataset\Writer\Exception\DatasetWriterException
      */

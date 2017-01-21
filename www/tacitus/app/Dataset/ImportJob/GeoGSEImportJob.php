@@ -9,13 +9,16 @@ namespace App\Dataset\ImportJob;
 
 use App\Dataset\Descriptor;
 use App\Models\Dataset;
+use App\Models\Platform;
+use App\Platform\Import\Exception\ImportException;
+use App\Platform\Import\Factory\PlatformImportFactory;
 
 /**
- * Class ArrayExpressImportJob
+ * Class GeoGSEImportJob
  *
  * @package App\Dataset\ImportJob
  */
-class ArrayExpressImportJob extends AbstractImportJob
+class GeoGSEImportJob extends AbstractImportJob
 {
 
     /**
@@ -32,10 +35,26 @@ class ArrayExpressImportJob extends AbstractImportJob
         $dataset = null;
         $ok = false;
         try {
-            $this->log("Starting ArrayExpress import job.\n", true);
+            $this->log("Starting NCBI GEO (GSE) import job.\n", true);
             $jobDirectory = $this->jobData->getJobDirectory();
             $downloader = $this->parserFactory->getDatasetDownloader()->setDownloadDirectory($jobDirectory);
             $descriptor = $downloader->download();
+            $vars = $descriptor->getDescriptors();
+            $factory = new PlatformImportFactory();
+            $platform = $factory->getImporter('SoftFile', [
+                'softFile'         => $vars['platform_file'],
+                'private'          => $this->jobData->job_data['private'],
+                'logCallback'      => $this->getLogCallback(),
+                'user'             => $this->jobData->user,
+                'importingDataset' => true,
+            ])->import()->getPlatform();
+            if ($platform !== null) {
+                $platform->status = Platform::READY;
+                $platform->save();
+            } else {
+                throw new ImportException('Unable to import GEO platform.');
+            }
+            $descriptor->addDescriptor($platform->getKey(), 'platform_id');
             $this->parserFactory->setDescriptor($descriptor);
             $dataParser = $this->parserFactory->getDataParser();
             $dataWriter = $this->parserFactory->getDatasetWriter();
@@ -44,17 +63,19 @@ class ArrayExpressImportJob extends AbstractImportJob
             $this->log("...OK\n", true);
             $this->log('Parsing metadata index', true);
             $dataParser->start(Descriptor::TYPE_METADATA_INDEX);
+            $this->initProgress();
             while (($row = $dataParser->parse()) !== null) {
-                if (!empty($row)) {
+                if ($row) {
                     $dataWriter->write(Descriptor::TYPE_METADATA_INDEX, $row);
                 }
+                $this->logProgress($dataParser->current(), $dataParser->count());
             }
             $this->log("...OK\n", true);
             $this->log('Parsing metadata', true);
             $dataParser->start(Descriptor::TYPE_METADATA);
             $this->initProgress();
             while (($row = $dataParser->parse()) !== null) {
-                if (!empty($row)) {
+                if ($row) {
                     $dataWriter->write(Descriptor::TYPE_SAMPLE, $row['sample']);
                     $dataWriter->write(Descriptor::TYPE_METADATA, $row['metadata']);
                 }
@@ -65,7 +86,7 @@ class ArrayExpressImportJob extends AbstractImportJob
             $dataParser->start(Descriptor::TYPE_DATA);
             $this->initProgress();
             while (($row = $dataParser->parse()) !== null) {
-                if (!empty($row)) {
+                if ($row) {
                     $dataWriter->write(Descriptor::TYPE_DATA, $row);
                 }
                 $this->logProgress($dataParser->current(), $dataParser->count());

@@ -11,14 +11,15 @@ namespace App\Utils;
 class MultiFile
 {
 
-    const FILE_IS_GZIP = 1;
-    const FILE_IS_BZIP = 2;
+    const FILE_IS_GZIP  = 1;
+    const FILE_IS_BZIP  = 2;
     const FILE_IS_OTHER = 0;
 
     /**
      * Get the mime type of a file
      *
      * @param string $file
+     *
      * @return string
      */
     public static function getFileType($file)
@@ -31,6 +32,7 @@ class MultiFile
      * Checks if a file is gzipped
      *
      * @param string $file
+     *
      * @return boolean
      */
     public static function isGZipped($file)
@@ -42,18 +44,20 @@ class MultiFile
      * Checks if a file is bzipped
      *
      * @param string $file
+     *
      * @return boolean
      */
     public static function isBZipped($file)
     {
         return in_array(self::getFileType($file), ['application/x-bzip2', 'application/x-bzip', 'application/bzip2',
-            'application/bzip']);
+                                                   'application/bzip']);
     }
 
     /**
      * Count the number of lines in a file
      *
      * @param string $file
+     *
      * @return integer
      */
     public static function countLines($file)
@@ -72,6 +76,7 @@ class MultiFile
      *
      * @param string $file
      * @param string $mode
+     *
      * @return array
      */
     public static function fileOpen($file, $mode = 'r')
@@ -89,6 +94,7 @@ class MultiFile
      * Checks if a pointer is correctly opened
      *
      * @param array $pointer
+     *
      * @return bool
      */
     public static function fileIsOpen($pointer)
@@ -102,6 +108,7 @@ class MultiFile
      * @param array    $pointer
      * @param mixed    $content
      * @param int|null $length
+     *
      * @return int
      */
     public static function fileWrite($pointer, $content, $length = null)
@@ -120,6 +127,7 @@ class MultiFile
      *
      * @param array $pointer
      * @param int   $length
+     *
      * @return int
      */
     public static function fileRead($pointer, $length)
@@ -137,6 +145,7 @@ class MultiFile
      * Tests for end-of-file on a file pointer
      *
      * @param array $pointer
+     *
      * @return bool|int
      */
     public static function fileEOF($pointer)
@@ -153,6 +162,7 @@ class MultiFile
      *
      * @param array    $pointer
      * @param int|null $length
+     *
      * @return bool|string
      */
     public static function fileReadLine($pointer, $length = null)
@@ -182,6 +192,7 @@ class MultiFile
      * Closes an open file pointer
      *
      * @param array $pointer
+     *
      * @return bool|int
      */
     public static function fileClose($pointer)

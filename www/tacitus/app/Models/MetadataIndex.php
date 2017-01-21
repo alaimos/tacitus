@@ -50,7 +50,7 @@ class MetadataIndex extends Model implements BulkInsertableInterface
      * @var array
      */
     protected $fillable = [
-        'name', 'dataset_id'
+        'name', 'dataset_id',
     ];
 
     /**

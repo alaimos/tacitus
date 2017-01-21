@@ -38,6 +38,7 @@ class SampleRegistry
      *
      * @param Sample       $sample
      * @param null|integer $position
+     *
      * @return SampleRegistry
      */
     public function register(Sample $sample, $position = null)
@@ -61,6 +62,7 @@ class SampleRegistry
      * Get a sample by its identifier
      *
      * @param integer $sampleId
+     *
      * @return \App\Models\Sample|null
      */
     public function get($sampleId)
@@ -72,6 +74,7 @@ class SampleRegistry
      * Get a sample by its name
      *
      * @param string $sampleName
+     *
      * @return \App\Models\Sample|null
      */
     public function getByName($sampleName)
@@ -83,6 +86,7 @@ class SampleRegistry
      * Get a sample by its position
      *
      * @param integer $position
+     *
      * @return \App\Models\Sample|null
      */
     public function getByPosition($position)

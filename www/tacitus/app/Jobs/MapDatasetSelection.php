@@ -8,20 +8,15 @@
 namespace App\Jobs;
 
 use App\Jobs\Exception\JobException;
-use App\Models\Dataset;
+use App\Models\Job as JobData;
 use App\Models\MappedSampleSelection;
 use App\Models\Platform;
 use App\Models\PlatformMapping;
-use App\Models\Probe;
-use App\Models\Sample;
 use App\Models\SampleSelection;
 use App\Utils\MultiFile;
-use DB;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
-use App\Models\Job as JobData;
-use Illuminate\Support\Str;
 
 class MapDatasetSelection extends Job implements ShouldQueue
 {
@@ -58,6 +53,7 @@ class MapDatasetSelection extends Job implements ShouldQueue
      * Print a log message
      *
      * @param string $message
+     *
      * @return $this
      */
     protected function log($message)
@@ -72,6 +68,7 @@ class MapDatasetSelection extends Job implements ShouldQueue
      *
      * @param integer $current
      * @param integer $total
+     *
      * @return void
      */
     protected function logProgress($current, $total)
@@ -89,6 +86,7 @@ class MapDatasetSelection extends Job implements ShouldQueue
      * @param \App\Models\SampleSelection $selection
      * @param \App\Models\Platform        $platform
      * @param \App\Models\PlatformMapping $mapping
+     *
      * @return MappedSampleSelection
      */
     protected function createMappedSampleSelection(SampleSelection $selection, Platform $platform,
@@ -112,6 +110,7 @@ class MapDatasetSelection extends Job implements ShouldQueue
      *
      * @param \App\Models\MappedSampleSelection $mappedSelection
      * @param \App\Models\SampleSelection       $sampleSelection
+     *
      * @return void
      */
     protected function buildMetadataFile(MappedSampleSelection $mappedSelection, SampleSelection $sampleSelection)
@@ -214,7 +213,8 @@ class MapDatasetSelection extends Job implements ShouldQueue
                         } catch (\Exception $e) {
                             $this->log("\n");
                             $errorClass = join('', array_slice(explode('\\', get_class($e)), -1));
-                            $this->log('Unable to complete job. Error "' . $errorClass . '" with message "' . $e->getMessage() . "\".\n");
+                            $this->log('Unable to complete job. Error "' . $errorClass . '" with message "'
+                                       . $e->getMessage() . "\".\n");
                             if ($mappedSelection !== null && $mappedSelection instanceof MappedSampleSelection) {
                                 $mappedSelection->delete();
                                 $mappedSelection = null;

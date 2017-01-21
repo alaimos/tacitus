@@ -61,6 +61,7 @@ abstract class AbstractImporter implements ImporterInterface
      *
      * @param string $source
      * @param string $target
+     *
      * @return bool
      */
     protected function downloadFile($source, $target)
@@ -111,6 +112,7 @@ abstract class AbstractImporter implements ImporterInterface
      * Count the number of lines in a text file
      *
      * @param string $file
+     *
      * @return integer
      */
     protected function countLines($file)
@@ -122,6 +124,7 @@ abstract class AbstractImporter implements ImporterInterface
      * Handles setting up configuration
      *
      * @param array $config
+     *
      * @return void
      */
     protected function handleConfig(array $config)
@@ -139,12 +142,14 @@ abstract class AbstractImporter implements ImporterInterface
      *
      * @param string $title
      * @param string $organism
+     *
      * @return void
      */
     protected function checkAndCreatePlatform($title, $organism)
     {
         $found = Platform::whereTitle($title)->whereOrganism($organism)->first();
         if ($found !== null && ($found->status == Platform::READY || $found->status == Platform::PENDING)) {
+            $this->platform = $found;
             throw new ImportException('Another platform with the same name for the same organism already exists.');
         } elseif ($found !== null && $found->status == Platform::FAILED) {
             $found->delete();
@@ -162,6 +167,7 @@ abstract class AbstractImporter implements ImporterInterface
      * Set if the imported platform will be private
      *
      * @param boolean $private
+     *
      * @return $this
      */
     public function setPrivate($private)
@@ -174,6 +180,7 @@ abstract class AbstractImporter implements ImporterInterface
      * Set the current user model
      *
      * @param \App\Models\User $user
+     *
      * @return $this
      */
     public function setUser($user)

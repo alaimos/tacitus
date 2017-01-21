@@ -8,17 +8,16 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Jenssegers\Mongodb\Eloquent\HybridRelations;
 
 /**
  * App\Models\PlatformMapping
  *
- * @property integer $id
- * @property integer $platform_id
- * @property string $name
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property string $slug
+ * @property integer                   $id
+ * @property integer                   $platform_id
+ * @property string                    $name
+ * @property \Carbon\Carbon            $created_at
+ * @property \Carbon\Carbon            $updated_at
+ * @property string                    $slug
  * @property-read \App\Models\Platform $platform
  * @method static \Illuminate\Database\Query\Builder|\App\Models\PlatformMapping whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\PlatformMapping wherePlatformId($value)
@@ -51,7 +50,7 @@ class PlatformMapping extends Model
      * @var array
      */
     protected $fillable = [
-        'platform_id', 'slug', 'name'
+        'platform_id', 'slug', 'name',
     ];
 
     /**

@@ -58,7 +58,7 @@ class SelectionController extends Controller
         $table = Datatables::of(SampleSelection::listSelections());
         $table->addColumn('action', function (SampleSelection $selection) {
             return view('selections.list_action_column', [
-                'selection' => $selection
+                'selection' => $selection,
             ])->render();
         });
         return $table->make(true);

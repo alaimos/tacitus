@@ -43,7 +43,7 @@ class Sample extends Model
      * @var array
      */
     protected $fillable = [
-        'name', 'position', 'dataset_id'
+        'name', 'position', 'dataset_id',
     ];
 
     /**

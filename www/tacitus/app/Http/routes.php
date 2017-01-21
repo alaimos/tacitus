@@ -1,7 +1,5 @@
 <?php
 
-use App\Utils\Permissions;
-
 /** @var \Illuminate\Routing\Router $router */
 
 Route::auth();

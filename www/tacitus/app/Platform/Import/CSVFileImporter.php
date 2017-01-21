@@ -8,12 +8,10 @@
 namespace App\Platform\Import;
 
 
-use App\Models\Platform;
 use App\Models\PlatformMapData;
 use App\Models\PlatformMapping;
 use App\Platform\Import\Exception\ImportException;
 use App\Platform\Import\Renderer\CSVFileRenderer;
-use App\Platform\Import\Renderer\MapFileRenderer;
 use App\Utils\MultiFile;
 
 class CSVFileImporter extends AbstractImporter implements ImporterInterface
@@ -79,6 +77,7 @@ class CSVFileImporter extends AbstractImporter implements ImporterInterface
      * Set the name of a CSV file to import
      *
      * @param string $csvFile
+     *
      * @return $this
      */
     public function setCsvFile($csvFile)
@@ -94,6 +93,7 @@ class CSVFileImporter extends AbstractImporter implements ImporterInterface
      * Set the title
      *
      * @param string $title
+     *
      * @return $this
      */
     public function setTitle($title)
@@ -109,6 +109,7 @@ class CSVFileImporter extends AbstractImporter implements ImporterInterface
      * Set the organism
      *
      * @param string $organism
+     *
      * @return $this
      */
     public function setOrganism($organism)
@@ -124,6 +125,7 @@ class CSVFileImporter extends AbstractImporter implements ImporterInterface
      * Set the separator character
      *
      * @param string $separator
+     *
      * @return $this
      */
     public function setSeparator($separator)
@@ -139,6 +141,7 @@ class CSVFileImporter extends AbstractImporter implements ImporterInterface
      * Set the comment character
      *
      * @param string $comment
+     *
      * @return $this
      */
     public function setComment($comment)
@@ -154,6 +157,7 @@ class CSVFileImporter extends AbstractImporter implements ImporterInterface
      * Set the identifier field number
      *
      * @param int $identifier
+     *
      * @return $this
      */
     public function setIdentifier($identifier)
@@ -170,6 +174,7 @@ class CSVFileImporter extends AbstractImporter implements ImporterInterface
      * Imports all mappings
      *
      * @param array $line
+     *
      * @return void
      */
     protected function importMappings(array $line)
@@ -197,6 +202,7 @@ class CSVFileImporter extends AbstractImporter implements ImporterInterface
      * Import map data
      *
      * @param array $line
+     *
      * @return void
      */
     protected function importMapData(array $line)

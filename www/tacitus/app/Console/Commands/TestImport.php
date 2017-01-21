@@ -2,12 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\Dataset\Descriptor;
 use App\Dataset\Registry\ParserFactoryRegistry;
-use App\Jobs\Factory;
-use App\Jobs\ImportDataset;
 use App\Models\Job as JobData;
-use App\Models\User;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
@@ -47,7 +43,7 @@ class TestImport extends Command
                 'source_type' => 'geogse',
                 'original_id' => 'GSE1902', //'GSE14',
                 'private'     => false,
-            ]
+            ],
         ]);
         $jobData->log = '';
         $jobData->save();
@@ -62,20 +58,42 @@ class TestImport extends Command
         /** @var \App\Dataset\Factory\ParserFactoryInterface $factory */
         $factory = array_shift($factories);
         $factory->setJobData($jobData);
-        $downloader = $factory->getDatasetDownloader();
+        $importer = $factory->getRealImporter();
+        $importer->run();
+        return 0;
+
+        /*$downloader = $factory->getDatasetDownloader();
         $downloader->setDownloadDirectory($jobData->getJobDirectory());
         $descriptor = $downloader->download();
+        dump($descriptor);
         $factory->setDescriptor($descriptor);
         $parser = $factory->getDataParser();
+        $parser->start(Descriptor::TYPE_METADATA_INDEX);
+        $first = false;
+        while (($res = $parser->parse()) !== null) {
+            if (!$first && $res) {
+                dump($res);
+                $first = true;
+            }
+            //$parser->current() . " of " . $parser->count() . " - " . ($res ? "sample" : "false") . "\n";
+        }
         $parser->start(Descriptor::TYPE_METADATA);
+        //echo $parser->current() . " of " . $parser->count() . "\n";
+        $first = false;
+        while (($res = $parser->parse()) !== null) {
+            if (!$first && $res) {
+                dump($res);
+                $first = true;
+            }
+            //echo $parser->current() . " of " . $parser->count() . " - " . ($res ? "sample" : "false") . "\n";
+        }
+        $parser->start(Descriptor::TYPE_DATA);
         echo $parser->current() . " of " . $parser->count() . "\n";
         while (($res = $parser->parse()) !== null) {
-            echo $parser->current() . " of " . $parser->count() . " - " . ($res ? "sample" : "false") . "\n";
-        }
-        $parser->start(Descriptor::TYPE_METADATA_INDEX);
-        while (($res = $parser->parse()) !== null) {
-            echo $parser->current() . " of " . $parser->count() . " - " . ($res ? "sample" : "false") . "\n";
-            dd($res);
+            //echo $parser->current() . " of " . $parser->count() . " - " . ($res ? "sample" : "false") . "\n";
+            if ($res) {
+                  dd($res);
+            }
         }
         //dd($res);
         /*$ok = false;

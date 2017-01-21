@@ -20,6 +20,7 @@ class Mailer
      * @param array         $options
      * @param array         $variables
      * @param callable|null $callback
+     *
      * @return array
      */
     protected static function prepareParameters(array $options, array $variables, callable $callback = null)
@@ -59,8 +60,8 @@ class Mailer
         }
         $callback = function (Message $message) use ($to, $toName, $subject, $callback) {
             $message->from(env('MAIL_FROM_ADDRESS', 'tacitus@local'), env('MAIL_FROM_NAME'))
-                ->to($to, $toName)
-                ->subject($subject);
+                    ->to($to, $toName)
+                    ->subject($subject);
             $replyTo = env('MAIL_REPLY_TO');
             if ($replyTo) {
                 $message->replyTo($replyTo);
@@ -77,6 +78,7 @@ class Mailer
      *
      * @param array         $options
      * @param callable|null $callback
+     *
      * @return mixed
      */
     public static function send(array $options, callable $callback = null)
@@ -91,6 +93,7 @@ class Mailer
      *
      * @param array         $options
      * @param callable|null $callback
+     *
      * @return mixed
      */
     public static function enqueue(array $options, callable $callback = null)

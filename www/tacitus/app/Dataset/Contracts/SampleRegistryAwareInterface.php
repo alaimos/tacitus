@@ -22,6 +22,7 @@ interface SampleRegistryAwareInterface
      * Set a sample registry object
      *
      * @param \App\Dataset\Registry\SampleRegistry $sampleRegistry
+     *
      * @return $this
      */
     public function setSampleRegistry(SampleRegistry $sampleRegistry);

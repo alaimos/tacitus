@@ -7,7 +7,7 @@
 
 namespace App\Dataset;
 
-use \App\Models\Job as JobData;
+use App\Models\Job as JobData;
 
 /**
  * Dataset Descriptor
@@ -17,9 +17,9 @@ use \App\Models\Job as JobData;
 class Descriptor
 {
 
-    const TYPE_SAMPLE = 'sample';
-    const TYPE_DATA = 'data';
-    const TYPE_METADATA = 'metadata';
+    const TYPE_SAMPLE         = 'sample';
+    const TYPE_DATA           = 'data';
+    const TYPE_METADATA       = 'metadata';
     const TYPE_METADATA_INDEX = 'metadataIndex';
 
     /**
@@ -71,6 +71,7 @@ class Descriptor
      *
      * @param string|array $localPath
      * @param string       $type
+     *
      * @return \App\Dataset\Descriptor  $this
      */
     public function addFile($localPath, $type)
@@ -96,6 +97,7 @@ class Descriptor
      * Clear all files
      *
      * @param string|null $type
+     *
      * @return \App\Dataset\Descriptor  $this
      */
     public function clearFiles($type = null)
@@ -114,6 +116,7 @@ class Descriptor
      * Return all files, or files of a specific type
      *
      * @param string|null $type
+     *
      * @return array
      */
     public function getFiles($type = null)
@@ -133,6 +136,7 @@ class Descriptor
      *
      * @param mixed       $value
      * @param string|null $name
+     *
      * @return \App\Dataset\Descriptor  $this
      */
     public function addDescriptor($value, $name = null)
