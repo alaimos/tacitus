@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Dataset\Descriptor;
 use App\Dataset\Registry\ParserFactoryRegistry;
 use App\Models\Job as JobData;
 use Illuminate\Console\Command;
@@ -41,7 +42,7 @@ class TestImport extends Command
             'user_id'  => 1,
             'job_data' => [
                 'source_type' => 'geogse',
-                'original_id' => 'GSE1902', //'GSE14',
+                'original_id' => 'GSE30611', //'GSE14',
                 'private'     => false,
             ],
         ]);
@@ -70,31 +71,37 @@ class TestImport extends Command
         $parser = $factory->getDataParser();
         $parser->start(Descriptor::TYPE_METADATA_INDEX);
         $first = false;
+        echo "Metadata index";
         while (($res = $parser->parse()) !== null) {
             if (!$first && $res) {
                 dump($res);
                 $first = true;
             }
-            //$parser->current() . " of " . $parser->count() . " - " . ($res ? "sample" : "false") . "\n";
+            echo ".";
+            //echo $parser->current() . " of " . $parser->count() . " - " . ($res ? "sample" : "false") . "\n";
         }
+        echo "\n";
         $parser->start(Descriptor::TYPE_METADATA);
         //echo $parser->current() . " of " . $parser->count() . "\n";
         $first = false;
         while (($res = $parser->parse()) !== null) {
+            if ($res) {
+                dd($res);
+            }
             if (!$first && $res) {
                 dump($res);
                 $first = true;
             }
-            //echo $parser->current() . " of " . $parser->count() . " - " . ($res ? "sample" : "false") . "\n";
+            echo $parser->current() . " of " . $parser->count() . " - " . ($res ? "sample" : "false") . "\n";
         }
-        $parser->start(Descriptor::TYPE_DATA);
+        /*$parser->start(Descriptor::TYPE_DATA);
         echo $parser->current() . " of " . $parser->count() . "\n";
         while (($res = $parser->parse()) !== null) {
-            //echo $parser->current() . " of " . $parser->count() . " - " . ($res ? "sample" : "false") . "\n";
-            if ($res) {
+            echo $parser->current() . " of " . $parser->count() . " - " . ($res ? "sample" : "false") . "\n";
+            /*if ($res) {
                   dd($res);
-            }
-        }
+            }*/
+        //}
         //dd($res);
         /*$ok = false;
         foreach ($factories as $factory) {

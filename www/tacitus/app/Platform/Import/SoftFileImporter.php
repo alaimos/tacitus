@@ -192,7 +192,11 @@ class SoftFileImporter extends AbstractImporter implements ImporterInterface
         }
         MultiFile::fileClose($fp);
         $this->log("...OK\n", true);
-        $this->log("The platform is now ready to use!\n");
+        if ($this->platform !== null) {
+            $this->log("The platform is now ready to use!\n");
+        } else {
+            $this->log("No platform table found. Nothing to import!\n");
+        }
         return $this;
     }
 

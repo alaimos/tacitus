@@ -10,7 +10,6 @@ namespace App\Dataset\ImportJob;
 use App\Dataset\Descriptor;
 use App\Models\Dataset;
 use App\Models\Platform;
-use App\Platform\Import\Exception\ImportException;
 use App\Platform\Import\Factory\PlatformImportFactory;
 
 /**
@@ -51,10 +50,10 @@ class GeoGSEImportJob extends AbstractImportJob
             if ($platform !== null) {
                 $platform->status = Platform::READY;
                 $platform->save();
+                $descriptor->addDescriptor($platform->getKey(), 'platform_id');
             } else {
-                throw new ImportException('Unable to import GEO platform.');
+                $descriptor->addDescriptor(null, 'platform_id');
             }
-            $descriptor->addDescriptor($platform->getKey(), 'platform_id');
             $this->parserFactory->setDescriptor($descriptor);
             $dataParser = $this->parserFactory->getDataParser();
             $dataWriter = $this->parserFactory->getDatasetWriter();
@@ -76,8 +75,19 @@ class GeoGSEImportJob extends AbstractImportJob
             $this->initProgress();
             while (($row = $dataParser->parse()) !== null) {
                 if ($row) {
-                    $dataWriter->write(Descriptor::TYPE_SAMPLE, $row['sample']);
-                    $dataWriter->write(Descriptor::TYPE_METADATA, $row['metadata']);
+                    if (is_array($row) && count($row) > 0
+                        && !isset($row['sample'])
+                    ) { //No terminators, multi-sample case
+                        foreach ($row as $meta) {
+                            if (isset($meta['sample']) && isset($meta['metadata'])) {
+                                $dataWriter->write(Descriptor::TYPE_SAMPLE, $meta['sample']);
+                                $dataWriter->write(Descriptor::TYPE_METADATA, $meta['metadata']);
+                            }
+                        }
+                    } else { //Terminators found in soft file
+                        $dataWriter->write(Descriptor::TYPE_SAMPLE, $row['sample']);
+                        $dataWriter->write(Descriptor::TYPE_METADATA, $row['metadata']);
+                    }
                 }
                 $this->logProgress($dataParser->current(), $dataParser->count());
             }

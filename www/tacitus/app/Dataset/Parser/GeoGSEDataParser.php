@@ -136,6 +136,35 @@ class GeoGSEDataParser extends AbstractDataParser
     }
 
     /**
+     * Checks and completes meta array
+     *
+     * @param array  $metadata
+     * @param string $currentSample
+     * @param array  $filled
+     *
+     * @return bool
+     */
+    private function checkMetaArray(array &$metadata, &$currentSample, array &$filled)
+    {
+        if ($currentSample === null) return false;
+        if (!isset($this->sampleToPosition[$currentSample])) {
+            $this->sampleToPosition[$currentSample] = ++$this->lastSample;
+        }
+        $metadata['sample']['position'] = $this->sampleToPosition[$currentSample];
+        foreach ($this->supportedMetadata as $key => $meta) {
+            if (!isset($filled[$key])) {
+                $metadata['metadata'][] = [
+                    'name'       => $meta,
+                    'value'      => '',
+                    'sampleName' => $currentSample,
+                ];
+                $filled[$key] = true;
+            }
+        }
+        return true;
+    }
+
+    /**
      * Parses metadata for a sample
      *
      * @param resource $fp
@@ -144,6 +173,7 @@ class GeoGSEDataParser extends AbstractDataParser
      */
     private function metadataParser($fp)
     {
+        $allMeta = [];
         $metadata = [
             'sample'   => [
                 'name'     => null,
@@ -153,13 +183,14 @@ class GeoGSEDataParser extends AbstractDataParser
             'metadata' => [],
         ];
         $inSample = false;
+        $multiSample = false;
         $currentSample = null;
         $matches = null;
         $filled = [];
         while (($row = fgets($fp)) !== false) {
             $row = trim($row);
             $matches = null;
-            if (preg_match(self::METADATA_SAMPLE_BEGIN, $row, $matches)) {
+            if (!$inSample && preg_match(self::METADATA_SAMPLE_BEGIN, $row, $matches)) {
                 $currentSample = $metadata['sample']['name'] = $this->unescape($matches[1]);
                 $inSample = true;
             } elseif ($inSample && preg_match(self::METADATA_SAMPLE_END, $row)) {
@@ -175,23 +206,32 @@ class GeoGSEDataParser extends AbstractDataParser
                     'value'      => $this->unescape($matches[2]),
                     'sampleName' => $currentSample,
                 ];
+            } elseif ($inSample && preg_match(self::METADATA_SAMPLE_BEGIN, $row, $matches)) {
+                $multiSample = true;
+                if ($this->checkMetaArray($metadata, $currentSample, $filled)) {
+                    $allMeta[] = $metadata;
+                }
+                $metadata = [
+                    'sample'   => [
+                        'name'     => $this->unescape($matches[1]),
+                        'platform' => null,
+                        'position' => null,
+                    ],
+                    'metadata' => [],
+                ];
+                $filled = [];
+                $currentSample = $metadata['sample']['name'];
             }
             $this->currentIndex++;
         }
-        if ($currentSample === null) {
-            return false;
-        }
-        $metadata['sample']['position'] = $this->sampleToPosition[$currentSample] = ++$this->lastSample;
-        foreach ($this->supportedMetadata as $key => $meta) {
-            if (!isset($filled[$key])) {
-                $metadata['metadata'][] = [
-                    'name'       => $meta,
-                    'value'      => '',
-                    'sampleName' => $currentSample,
-                ];
+        if (!$this->checkMetaArray($metadata, $currentSample, $filled)) {
+            if (!$multiSample) return false;
+        } else {
+            if ($multiSample) {
+                $allMeta[] = $metadata;
             }
         }
-        return $metadata;
+        return ($multiSample) ? $allMeta : $metadata;
     }
 
     /**

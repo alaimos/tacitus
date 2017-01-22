@@ -9,6 +9,8 @@ namespace App\Dataset\Downloader;
 
 use App\Dataset\Descriptor;
 use App\Dataset\Downloader\Exception\DownloaderException;
+use App\Dataset\Parser\GeoGSEDataParser;
+use App\Utils\MultiFile;
 
 /**
  * Class GeoGSEDownloader
@@ -91,8 +93,8 @@ class GeoGSEDownloader extends AbstractDownloader
      */
     protected function readGSEInfo($file)
     {
-        $fp = fopen($file, 'r');
-        if (!$fp) {
+        $fp = MultiFile::fileOpen($file);
+        if (!MultiFile::fileIsOpen($fp)) {
             throw new DownloaderException('Unable to read GSE series matrix.');
         }
         $info = [
@@ -102,7 +104,7 @@ class GeoGSEDownloader extends AbstractDownloader
             'platform'  => null,
         ];
         $inSeries = false;
-        while (($line = fgets($fp)) !== false) {
+        while (($line = MultiFile::fileReadLine($fp)) !== false) {
             $line = trim($line);
             $matches = null;
             if (!$inSeries && preg_match(self::SOFT_SERIES_BEGIN, $line)) {
@@ -115,7 +117,7 @@ class GeoGSEDownloader extends AbstractDownloader
                 $info['platforms'][] = $matches[1];
             }
         }
-        @fclose($fp);
+        MultiFile::fileClose($fp);
         if ($info['title'] === null) {
             throw new DownloaderException('Unable to read GSE title');
         }
@@ -125,6 +127,33 @@ class GeoGSEDownloader extends AbstractDownloader
         $info['multi_platform'] = count($info['platforms']) > 1;
         $info['platform'] = $info['platforms'][0];
         return $info;
+    }
+
+    /**
+     * Count the number of probes in the series matrix file
+     *
+     * @param string $matrixFilename
+     *
+     * @return int
+     */
+    protected function countProbes($matrixFilename)
+    {
+        $fp = MultiFile::fileOpen($matrixFilename);
+        if (!MultiFile::fileIsOpen($fp)) return NAN;
+        $inMatrix = false;
+        $counter = -1; //First line is always ignored
+        while (($line = MultiFile::fileReadLine($fp)) !== null) {
+            $line = trim($line);
+            if (!$inMatrix && preg_match(GeoGSEDataParser::SERIES_MATRIX_BEGIN, $line)) {
+                $inMatrix = true;
+            } elseif ($inMatrix && preg_match(GeoGSEDataParser::SERIES_MATRIX_END, $line)) {
+                break;
+            } elseif ($inMatrix) {
+                ++$counter;
+            }
+        }
+        MultiFile::fileClose($fp);
+        return $counter;
     }
 
     /**
@@ -156,6 +185,10 @@ class GeoGSEDownloader extends AbstractDownloader
             $matrixFilename = sprintf(self::GSE_MATRIX_FILENAME, $id);
             $matrixDownloadUrl = sprintf(self::GSE_MATRIX_URL, $prefix, $id, $matrixFilename);
             $this->downloadFile($matrixDownloadUrl, $matrixFilename);
+            $probes = $this->countProbes($this->downloadDirectory . '/' . $matrixFilename);
+            if (!$probes) {
+                throw new DownloaderException('Series will not be imported since no probes can be found inside. Maybe non-standard matrix file format?');
+            }
             $matrixFilename = $this->downloadDirectory . '/' . $this->gunzipFile($matrixFilename);
             if (!file_exists($matrixFilename)) {
                 throw new DownloaderException('Unable to download GSE series matrix.');
