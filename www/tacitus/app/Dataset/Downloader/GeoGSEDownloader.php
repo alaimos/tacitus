@@ -157,6 +157,65 @@ class GeoGSEDownloader extends AbstractDownloader
     }
 
     /**
+     * Download, check, unzip and store series matrix file
+     *
+     * @param string                  $id
+     * @param string                  $prefix
+     * @param \App\Dataset\Descriptor $descriptor
+     * @param null|string             $platform
+     * @param null|int                $count
+     *
+     * @return void
+     */
+    protected function gatherSeriesMatrix($id, $prefix, Descriptor $descriptor, $platform = null, &$count = null)
+    {
+        if ($platform !== null) {
+            $matrixFilename = sprintf(self::GSE_MATRIX_MULTI_PLATFORM_FILENAME, $id, $platform);
+        } else {
+            $matrixFilename = sprintf(self::GSE_MATRIX_FILENAME, $id);
+        }
+        $matrixDownloadUrl = sprintf(self::GSE_MATRIX_URL, $prefix, $id, $matrixFilename);
+        $this->downloadFile($matrixDownloadUrl, $matrixFilename);
+        $probes = $this->countProbes($this->downloadDirectory . '/' . $matrixFilename);
+        if (!$probes && $platform === null) {
+            throw new DownloaderException('Series will not be imported since no probes can be found. Maybe non-standard matrix file format?');
+        }
+        if ($count !== null) {
+            $count += $probes;
+        }
+        $matrixFilename = $this->downloadDirectory . '/' . $this->gunzipFile($matrixFilename);
+        if (!file_exists($matrixFilename)) {
+            throw new DownloaderException('Unable to download GSE series matrix.');
+        }
+        $metadata = null;
+        if ($platform !== null) {
+            $metadata = ['platform' => $platform];
+        }
+        $descriptor->addFile($matrixFilename, Descriptor::TYPE_DATA, $metadata);
+    }
+
+    /**
+     * Download, check and store GEO platform SOFT file
+     *
+     * @param string $platform
+     *
+     * @return string
+     */
+    protected function gatherPlatform($platform)
+    {
+        $platformPrefix = preg_replace(self::PREFIX_REGEXP, self::PREFIX_REPLACEMENT, $platform);
+        $platformFilename = sprintf(self::GSE_SOFT_FILENAME, $platform);
+        $platformDownloadUrl = sprintf(self::GPL_SOFT_URL, $platformPrefix, $platform, $platformFilename);
+        $this->downloadFile($platformDownloadUrl, $platformFilename);
+        $platformFilename = $this->downloadDirectory . '/' . $platformFilename;
+        if (!file_exists($platformFilename)) {
+            throw new DownloaderException('Unable to download GPL SOFT file.');
+        }
+        return $platformFilename;
+    }
+
+
+    /**
      * Run dataset download
      *
      * @return \App\Dataset\Descriptor
@@ -181,29 +240,20 @@ class GeoGSEDownloader extends AbstractDownloader
         $descriptor->addFile($softFilename, Descriptor::TYPE_METADATA);
         if ($info['multi_platform']) {
             throw new DownloaderException('Multi-Platform Series are not supported. Please download each SubSeries.');
+            $count = 0; //Not supported right now!
+            foreach ($info['platforms'] as $platform) {
+                $this->gatherSeriesMatrix($id, $prefix, $descriptor, $platform, $count);
+            }
+            if (!$count) {
+                throw new DownloaderException('Series will not be imported since no probes can be found. Maybe non-standard matrix file format?');
+            }
+            $info['platform_file'] = [];
+            foreach ($info['platforms'] as $platform) {
+                $info['platform_file'][$platform] = $this->gatherPlatform($platform);
+            }
         } else {
-            $matrixFilename = sprintf(self::GSE_MATRIX_FILENAME, $id);
-            $matrixDownloadUrl = sprintf(self::GSE_MATRIX_URL, $prefix, $id, $matrixFilename);
-            $this->downloadFile($matrixDownloadUrl, $matrixFilename);
-            $probes = $this->countProbes($this->downloadDirectory . '/' . $matrixFilename);
-            if (!$probes) {
-                throw new DownloaderException('Series will not be imported since no probes can be found inside. Maybe non-standard matrix file format?');
-            }
-            $matrixFilename = $this->downloadDirectory . '/' . $this->gunzipFile($matrixFilename);
-            if (!file_exists($matrixFilename)) {
-                throw new DownloaderException('Unable to download GSE series matrix.');
-            }
-            $descriptor->addFile($matrixFilename, Descriptor::TYPE_DATA);
-            $platform = $info['platform'];
-            $platformPrefix = preg_replace(self::PREFIX_REGEXP, self::PREFIX_REPLACEMENT, $platform);
-            $platformFilename = sprintf(self::GSE_SOFT_FILENAME, $platform);
-            $platformDownloadUrl = sprintf(self::GPL_SOFT_URL, $platformPrefix, $platform, $platformFilename);
-            $this->downloadFile($platformDownloadUrl, $platformFilename);
-            $platformFilename = $this->downloadDirectory . '/' . $platformFilename;
-            if (!file_exists($platformFilename)) {
-                throw new DownloaderException('Unable to download GPL SOFT file.');
-            }
-            $info['platform_file'] = $platformFilename;
+            $this->gatherSeriesMatrix($id, $prefix, $descriptor);
+            $info['platform_file'] = $this->gatherPlatform($info['platform']);
         }
         $descriptor->addDescriptor($info);
         return $descriptor;

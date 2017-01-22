@@ -21,6 +21,7 @@ class Descriptor
     const TYPE_DATA           = 'data';
     const TYPE_METADATA       = 'metadata';
     const TYPE_METADATA_INDEX = 'metadataIndex';
+    const TYPE_OTHER          = 'other';
 
     /**
      * The job data model object
@@ -34,10 +35,14 @@ class Descriptor
      *
      * @var array
      */
-    protected $files = [
-        self::TYPE_DATA     => [],
-        self::TYPE_METADATA => [],
-    ];
+    protected $files = [];
+
+    /**
+     * A list of metadata for each file in the "files" array
+     *
+     * @var array
+     */
+    protected $filesMetadata = [];
 
     /**
      * A list of dataset descriptor variables
@@ -71,14 +76,15 @@ class Descriptor
      *
      * @param string|array $localPath
      * @param string       $type
+     * @param array        $metadata
      *
-     * @return \App\Dataset\Descriptor  $this
+     * @return \App\Dataset\Descriptor $this
      */
-    public function addFile($localPath, $type)
+    public function addFile($localPath, $type, array $metadata = null)
     {
         if (is_array($localPath)) {
             foreach ($localPath as $path) {
-                $this->addFile($path, $type);
+                $this->addFile($path, $type, $metadata);
             }
         } else {
             if (!isset($this->files[$type])) {
@@ -88,6 +94,16 @@ class Descriptor
             if ($localPath) {
                 $this->files[$type][] = $localPath;
                 $this->files[$type] = array_unique($this->files[$type]);
+            }
+            if ($metadata !== null && !empty($metadata)) {
+                if (!isset($this->filesMetadata[$type])) {
+                    $this->filesMetadata[$type] = [];
+                }
+                if (isset($this->filesMetadata[$type][$localPath])) {
+                    $this->filesMetadata[$type][$localPath] += $metadata;
+                } else {
+                    $this->filesMetadata[$type][$localPath] = $metadata;
+                }
             }
         }
         return $this;
@@ -105,9 +121,11 @@ class Descriptor
         if ($type === null) {
             foreach ($this->files as $type => $ignore) {
                 $this->files[$type] = [];
+                $this->filesMetadata[$type] = [];
             }
         } else {
             $this->files[$type] = [];
+            $this->filesMetadata[$type] = [];
         }
         return $this;
     }
@@ -128,6 +146,29 @@ class Descriptor
                 return null;
             }
             return $this->files[$type];
+        }
+    }
+
+    /**
+     * Returns file metadata
+     *
+     * @param string|null $type
+     * @param string|null $file
+     *
+     * @return array|null
+     */
+    public function getFilesMetadata($type = null, $file = null)
+    {
+        if ($type === null) {
+            return $this->filesMetadata;
+        } else {
+            if (!isset($this->filesMetadata[$type])) return null;
+            if ($file === null) {
+                return $this->filesMetadata[$type];
+            } else {
+                if (!isset($this->filesMetadata[$type][$file])) return null;
+                return $this->filesMetadata[$type][$file];
+            }
         }
     }
 
