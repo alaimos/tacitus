@@ -71,6 +71,7 @@ class ArrayExpressImportJob extends AbstractImportJob
                 $this->logProgress($dataParser->current(), $dataParser->count());
             }
             $this->log("...OK\n", true);
+            $dataParser->end();
             $this->log("Dataset parsed and ready!\n", true);
             $dataset->status = Dataset::READY;
             $ok = true;

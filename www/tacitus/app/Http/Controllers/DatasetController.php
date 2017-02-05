@@ -16,9 +16,12 @@ use App\Utils\Permissions;
 use Auth;
 use Carbon\Carbon;
 use Datatables;
+use Exception;
 use Flash;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
 
 class DatasetController extends Controller
 {
@@ -45,6 +48,10 @@ class DatasetController extends Controller
         $router->get('/datasets/submission', ['as'         => 'datasets-submission',
                                               'uses'       => 'DatasetController@submission',
                                               'middleware' => ['permission:' . Permissions::SUBMIT_DATASETS]]);
+
+        $router->post('/datasets/submission/form', ['as'         => 'datasets-submission-form',
+                                                    'uses'       => 'DatasetController@submissionForm',
+                                                    'middleware' => ['permission:' . Permissions::SUBMIT_DATASETS]]);
 
         $router->post('/datasets/submission', ['as'         => 'datasets-submission-process',
                                                'uses'       => 'DatasetController@processSubmission',
@@ -87,13 +94,112 @@ class DatasetController extends Controller
     /**
      * Import dataset submission form
      *
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function submission()
+    public function submission(Request $request)
     {
         new ParserFactoryRegistry(); //Init Parser Factory Registry to setup all sources
         return view('datasets.submissionForm', [
             'sources' => Source::all()->pluck('display_name', 'name'),
+            'input'   => $request->old(),
+        ]);
+    }
+
+    /**
+     * Generate an error bag from a request
+     *
+     * @param Request $request
+     *
+     * @return ViewErrorBag
+     */
+    protected function makeErrorBag(Request $request)
+    {
+        $errors = json_decode($request->get('errors', '{}'), true);
+        $bag = new ViewErrorBag();
+        foreach ($errors as $key => $messages) {
+            $bag->put($key, new MessageBag($messages));
+        }
+        return $bag;
+    }
+
+    /**
+     * Fill old input into current session
+     *
+     * @param Request $request
+     */
+    protected function fillOldInput(Request $request)
+    {
+        $oldInput = json_decode($request->get('input', '{}'), true);
+        $request->session()->set('_old_input', $oldInput);
+    }
+
+    /**
+     * Remove old input from current session
+     *
+     * @param Request $request
+     */
+    protected function removeOldInput(Request $request)
+    {
+        if ($request->session()->has('_old_input')) {
+            $request->session()->remove('_old_input');
+        }
+    }
+
+    /**
+     * Get the Renderer for the source type specified in the current request
+     *
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \App\Dataset\Renderer\RendererInterface|null
+     */
+    protected function getRendererFromRequest(Request $request)
+    {
+        $sourceType = $request->get('source_type');
+        if (empty($sourceType)) {
+            throw new \RuntimeException('Empty source type.');
+        }
+        $registry = new ParserFactoryRegistry();
+        $factories = $registry->getParsers($sourceType);
+        if (empty($factories)) {
+            throw new \RuntimeException('Unsupported source type "' . $sourceType . '".');
+        }
+        /** @var \App\Dataset\Renderer\RendererInterface|null $renderer */
+        $renderer = null;
+        while (($renderer === null) && !empty($factories)) {
+            $factory = array_shift($factories);
+            $renderer = $factory->getFormRenderer();
+        }
+        return $renderer;
+    }
+
+    /**
+     * Renders the submission for for a specific source type
+     *
+     * @param Request $request
+     *
+     * @return \Illuminate\Http\JsonResponse.
+     */
+    public function submissionForm(Request $request)
+    {
+        try {
+            $renderer = $this->getRendererFromRequest($request);
+            $ok = true;
+            if ($renderer === null) {
+                $content = '';
+            } else {
+                $this->fillOldInput($request);
+                $content = $renderer->renderForm()->with('errors', $this->makeErrorBag($request))->render();
+                $this->removeOldInput($request);
+            }
+        } catch (Exception $e) {
+            $ok = false;
+            $content = $e->getMessage();
+        }
+        return response()->json([
+            'ok'      => $ok,
+            'content' => $content,
         ]);
     }
 
@@ -106,11 +212,15 @@ class DatasetController extends Controller
      */
     public function processSubmission(Request $request)
     {
-        $this->validate($request, [
+        $defaultRules = [
             'source_type' => 'required|exists:sources,name',
             'accession'   => 'required|max:255',
             'private'     => 'sometimes|boolean',
-        ]);
+        ];
+        $renderer = $this->getRendererFromRequest($request);
+        if ($renderer !== null) $renderer->beforeValidation($request);
+        $this->validate($request,
+            ($renderer === null) ? $defaultRules : array_merge($renderer->validationRules(), $defaultRules));
         try {
             $jobData = new JobData([
                 'job_type' => 'import_dataset',
@@ -123,6 +233,9 @@ class DatasetController extends Controller
                 'log'      => '',
             ]);
             $jobData->user()->associate(Auth::user());
+            $jobData->save();
+            $otherConfig = ($renderer !== null) ? $renderer->afterValidation($request, $jobData) : [];
+            $jobData->job_data = array_merge($otherConfig, $jobData->job_data);
             $jobData->save();
             $job = JobFactory::getQueueJob($jobData);
             $this->dispatch($job);

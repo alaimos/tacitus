@@ -279,6 +279,17 @@ abstract class AbstractDataParser implements DataParserInterface
     protected abstract function parser($row);
 
     /**
+     * End parse and closes all pointers
+     *
+     * @return \App\Dataset\Parser\DataParserInterface
+     */
+    public function end()
+    {
+        $this->reset();
+        return $this;
+    }
+
+    /**
      * Class Destructor
      *
      * @return void

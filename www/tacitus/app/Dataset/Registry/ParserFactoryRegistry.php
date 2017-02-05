@@ -23,10 +23,7 @@ class ParserFactoryRegistry
      *
      * @var array
      */
-    protected $classes = [
-        \App\Dataset\Factory\Parser\ArrayExpressParserFactory::class,
-        \App\Dataset\Factory\Parser\GeoGSEParserFactory::class,
-    ];
+    protected $classes = [];
 
     /**
      * A list of handlers
@@ -40,15 +37,37 @@ class ParserFactoryRegistry
      */
     public function __construct()
     {
-        $this->setupSourcesList()->setupHandlerClasses();
+        $this->initializeClassesList()->initializeSourcesList()->initializeHandlerClasses();
     }
 
     /**
-     * Setup list of supported sources
+     * Initializes the list of classes
      *
      * @return $this
      */
-    protected function setupSourcesList()
+    private function initializeClassesList()
+    {
+        $path = app_path('Dataset/Factory/Parser/');
+        $iterator = new \DirectoryIterator($path);
+        foreach ($iterator as $file) {
+            if ($file->isDot() || $file->isDir()) continue;
+            $filename = $file->getFilename();
+            if ($filename{0} != '.' && $file->getExtension() == 'php') {
+                $className = '\App\Dataset\Factory\Parser\\' . $file->getBasename('.php');
+                if (class_exists($className)) {
+                    $this->classes[] = $className;
+                }
+            }
+        }
+        return $this;
+    }
+
+    /**
+     * Initializes list of supported sources
+     *
+     * @return $this
+     */
+    private function initializeSourcesList()
     {
         foreach (Source::all() as $source) {
             $this->registeredHandlers[$source->name] = [];
@@ -57,11 +76,11 @@ class ParserFactoryRegistry
     }
 
     /**
-     * Setup handlers
+     * Initializes handler classes
      *
      * @return $this
      */
-    protected function setupHandlerClasses()
+    protected function initializeHandlerClasses()
     {
         foreach ($this->classes as $class) {
             $result = forward_static_call([$class, 'register']);

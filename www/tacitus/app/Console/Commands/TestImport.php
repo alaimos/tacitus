@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Dataset\Descriptor;
 use App\Dataset\Registry\ParserFactoryRegistry;
+use App\Jobs\Factory;
 use App\Models\Job as JobData;
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -18,7 +19,7 @@ class TestImport extends Command
      *
      * @var string
      */
-    protected $signature = 'test:import';
+    protected $signature = 'test:import {id?}';
 
     /**
      * The console command description.
@@ -35,7 +36,7 @@ class TestImport extends Command
     public function handle()
     {
         /** @var JobData $jobData */
-        $jobData = JobData::findOrNew(50)->fill([
+        /*$jobData = JobData::findOrNew(50)->fill([
             'job_type' => 'import_dataset',
             'status'   => JobData::QUEUED,
             'log'      => '',
@@ -47,20 +48,48 @@ class TestImport extends Command
             ],
         ]);
         $jobData->log = '';
-        $jobData->save();
-
-        /*$this->dispatch(Factory::getQueueJob($jobData));*/
-
+        $jobData->save();*/
+        $id = ($this->hasArgument('id')) ? intval($this->argument('id')) : 66;
+        $jobData = JobData::whereId($id)->first();
+        $this->dispatchNow(Factory::getQueueJob($jobData));
+        return 0;
         $registry = new ParserFactoryRegistry();
         /** @var \App\Dataset\Factory\ParserFactoryInterface[] $factories */
-        $factories = $registry->getParsers('geogse');
+        $factories = $registry->getParsers('userdata');
         $jobData->status = JobData::PROCESSING;
         $jobData->save();
         /** @var \App\Dataset\Factory\ParserFactoryInterface $factory */
         $factory = array_shift($factories);
         $factory->setJobData($jobData);
-        $importer = $factory->getRealImporter();
-        $importer->run();
+        $downloader = $factory->getDatasetDownloader();
+        $downloader->setDownloadDirectory($jobData->getJobDirectory());
+        $descriptor = $downloader->download();
+        $factory->setDescriptor($descriptor);
+        $parser = $factory->getDataParser();
+        $parser->start(Descriptor::TYPE_METADATA_INDEX);
+        while (($res = $parser->parse()) !== null) {
+            dump($res);
+        }
+        $parser->start(Descriptor::TYPE_METADATA);
+        while (($res = $parser->parse()) !== null) {
+            if ($res === false) continue;
+            //dump($res);
+        }
+        $parser->start(Descriptor::TYPE_DATA);
+        while (($res = $parser->parse()) !== null) {
+            if ($res === false) continue;
+            dd($res);
+        }
+        dd($downloader->download());
+
+
+
+        //$this->dispatchNow(Factory::getQueueJob($jobData));
+
+//        /*$this->dispatch(Factory::getQueueJob($jobData));*/
+//
+        /*$importer = $factory->getRealImporter();
+        $importer->run();*/
         return 0;
 
         /*$downloader = $factory->getDatasetDownloader();

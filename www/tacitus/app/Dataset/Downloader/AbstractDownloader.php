@@ -73,19 +73,20 @@ abstract class AbstractDownloader implements DownloaderInterface
     /**
      * Unzip a file and returns the list of output files
      *
-     * @param string $fileName
+     * @param string $filename
      * @param string $outputDirectory
+     * @param bool   $fullPath
      *
      * @return array
      */
-    protected function unzipFile($fileName, $outputDirectory)
+    protected function unzipFile($filename, $outputDirectory, $fullPath = false)
     {
-        $fileName = $this->downloadDirectory . '/' . $fileName;
-        $outputDirectory = $this->downloadDirectory . '/' . $outputDirectory;
+        $filename = ($fullPath) ? $filename : $this->downloadDirectory . '/' . $filename;
+        $outputDirectory = ($fullPath) ? $outputDirectory : $this->downloadDirectory . '/' . $outputDirectory;
         if (!file_exists($outputDirectory)) {
             mkdir($outputDirectory);
         }
-        exec('unzip -o -d ' . escapeshellarg($outputDirectory) . ' ' . escapeshellarg($fileName));
+        exec('unzip -o -d ' . escapeshellarg($outputDirectory) . ' ' . escapeshellarg($filename));
         return array_map(function ($x) use ($outputDirectory) {
             return $outputDirectory . '/' . $x;
         }, array_diff(scandir($outputDirectory), ['.', '..']));
@@ -95,12 +96,13 @@ abstract class AbstractDownloader implements DownloaderInterface
      * Unzip a file compressed with gzip and return the new filename
      *
      * @param string $fileName
+     * @param bool   $fullPath
      *
      * @return string
      */
-    protected function gunzipFile($fileName)
+    protected function gunzipFile($fileName, $fullPath = false)
     {
-        $filePath = $this->downloadDirectory . '/' . $fileName;
+        $filePath = ($fullPath) ? $fileName : $this->downloadDirectory . '/' . $fileName;
         //$outputDirectory = dirname($fileName);
         //$base = scandir($outputDirectory);
         exec('gunzip -f ' . escapeshellarg($filePath));

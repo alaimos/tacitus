@@ -50,5 +50,12 @@ interface DataParserInterface extends DescriptorAwareInterface
      */
     public function current();
 
+    /**
+     * End parse and closes all pointers
+     *
+     * @return \App\Dataset\Parser\DataParserInterface
+     */
+    public function end();
+
 
 }

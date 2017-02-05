@@ -29,6 +29,19 @@ class MultiFile
     }
 
     /**
+     * Checks if a file is zipped
+     *
+     * @param string $file
+     *
+     * @return boolean
+     */
+    public static function isZipped($file)
+    {
+        return in_array(self::getFileType($file), ['application/zip', 'application/x-zip']);
+    }
+
+
+    /**
      * Checks if a file is gzipped
      *
      * @param string $file

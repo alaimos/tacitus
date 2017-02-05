@@ -93,4 +93,12 @@ interface ParserFactoryInterface
      */
     public function getRealImporter();
 
+    /**
+     * Get a form renderer for this type of parser factory.
+     * If null is returned this factory does not require any optional user parameters
+     *
+     * @return \App\Dataset\Renderer\RendererInterface|null
+     */
+    public function getFormRenderer();
+
 }

@@ -137,7 +137,7 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
                     $this->jobData->save();
                 }
                 //if (self::DEBUG) {
-                echo $message;
+                //echo $message;
                 //}
             };
         }
@@ -228,6 +228,18 @@ abstract class AbstractParserFactory implements ParserFactoryInterface
     function __destruct()
     {
         $this->commitLog();
+    }
+
+    /**
+     * Get a form renderer for this type of parser factory.
+     * If null is returned this factory does not require any optional user parameters.
+     * This is the default implementation of the method.
+     *
+     * @return \App\Dataset\Renderer\RendererInterface|null
+     */
+    public function getFormRenderer()
+    {
+        return null;
     }
 
 

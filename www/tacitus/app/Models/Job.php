@@ -126,4 +126,71 @@ class Job extends Model
         return (user_can(Permissions::VIEW_JOBS) && (user_can(Permissions::ADMINISTER) || $isOwned));
     }
 
+    /**
+     * Get the value of a parameter for this job
+     *
+     * @param string|array|null $parameter
+     * @param mixed             $default
+     *
+     * @return mixed
+     */
+    public function getData($parameter = null, $default = null)
+    {
+        if ($parameter === null) {
+            return $this->job_data;
+        } elseif (is_array($parameter)) {
+            $slice = [];
+            foreach ($parameter as $key) {
+                $slice[$key] = (isset($this->job_data[$key])) ? $this->job_data[$key] : $default;
+            }
+            return $slice;
+        }
+        return (isset($this->job_data[$parameter])) ? $this->job_data[$parameter] : $default;
+    }
+
+    /**
+     * Set the value of a parameter for this job
+     *
+     * @param string $parameter
+     * @param mixed  $value
+     *
+     * @return $this
+     */
+    public function setData($parameter, $value)
+    {
+        $tmp = $this->job_data;
+        $tmp[$parameter] = $value;
+        $this->job_data = $tmp;
+        return $this;
+    }
+
+    /**
+     * Add parameters to this job
+     *
+     * @param array $parameters
+     *
+     * @return $this
+     */
+    public function addData($parameters)
+    {
+        foreach ($parameters as $param => $value) {
+            $this->setData($param, $value);
+        }
+        return $this;
+    }
+
+    /**
+     * Set parameters to this job
+     *
+     * @param array $parameters
+     *
+     * @return $this
+     */
+    public function setParameters($parameters)
+    {
+        $this->job_data = [];
+        return $this->addData($parameters);
+    }
+
+
 }

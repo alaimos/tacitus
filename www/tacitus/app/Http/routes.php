@@ -25,8 +25,3 @@ $routesLookup('\App\Http\Controllers\\', '/Controllers/');
 Route::get('/not-available', ['as' => 'not-available', function () {
     return view('errors.feature_not_available');
 }]);
-
-
-Route::get('/not-available', ['as' => 'not-available', function () {
-    return view('errors.feature_not_available');
-}]);

@@ -19,11 +19,11 @@
         <div class="col-md-offset-2 col-md-8">
             <div class="panel panel-default">
                 <div class="panel-body">
-                    {!! Form::open(['class' => 'form-horizontal', 'method' => 'POST', 'route' => 'datasets-submission-process']) !!}
+                    {!! Form::open(['class' => 'form-horizontal', 'method' => 'POST', 'route' => 'datasets-submission-process', 'enctype' => 'multipart/form-data']) !!}
                     <div class="form-group{{ $errors->has('source_type') ? ' has-error' : '' }}">
                         {!! Form::label('source_type', 'Source', ['class' => 'col-md-3 control-label']) !!}
                         <div class="col-md-9">
-                            {!! Form::select('source_type', $sources, null, ['class' => 'form-control']) !!}
+                            {!! Form::select('source_type', $sources, null, ['class' => 'form-control source-type']) !!}
                             <span class="help-block">
                                 Chose a data source.</span>
                             @if ($errors->has('source_type'))
@@ -47,6 +47,7 @@
                             @endif
                         </div>
                     </div>
+                    <div class="import-form-content"></div>
                     <div class="form-group{{ $errors->has('private') ? ' has-error' : '' }}">
                         <div class="col-md-offset-3 col-md-9">
                             <div class="checkbox">
@@ -74,10 +75,37 @@
     </div>
 
 @endsection
-
 @push('scripts')
 <script>
     $(function () {
+        var container = $('.import-form-content');
+        $('.source-type').change(function () {
+            container.html('<div class="text-center"><i class="fa fa-spinner faa-spin fa-3x fa-fw ' +
+                'animated"></i><span class="sr-only">Loading...</span></div>');
+            var sourceType = $(this).val();
+            $.ajax({
+                dataType: 'json',
+                method: 'POST',
+                url: '{{ route('datasets-submission-form') }}',
+                data: {
+                    'source_type': sourceType,
+                    'input': '{!! json_encode($input) !!}',
+                    'errors': '{!! json_encode($errors->getBags()) !!}'
+                },
+                success: function (data) {
+                    if (data.ok) {
+                        container.html(data.content);
+                    } else {
+                        container.html('');
+                        alert(data.content);
+                    }
+                },
+                error: function () {
+                    container.html('');
+                    alert('Unknown error');
+                }
+            });
+        }).change();
     });
 </script>
 @endpush
