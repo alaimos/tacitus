@@ -1,0 +1,6 @@
+{
+  "input_data": "6-mapped-lung_cancer_samples-data.tsv",
+  "input_meta": "6-mapped-lung_cancer_samples-metadata.tsv",
+  "output_data": "6-output-data.tab",
+  "output_meta": "6-output-metadata.tab"
+}
