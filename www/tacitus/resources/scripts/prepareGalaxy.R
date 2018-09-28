@@ -74,8 +74,8 @@ main <- function (args) {
         rownames(meta) <- meta[,1]
         meta    <- meta[samples,]
         for (c in colnames(meta)[-1]) {
-            meta[[c]] <- make.names(clean.factor(meta[[c]]))
-            meta[[c]][meta[[c]] %in% c("X.","NA.","X..")] <- NA
+            meta[[c]] <- gsub(".","_", make.names(clean.factor(meta[[c]])), fixed = TRUE)
+            meta[[c]][meta[[c]] %in% c("X_","NA_","X__")] <- NA
         }
         rownames(meta) <- NULL
         cat("...OK\n")
