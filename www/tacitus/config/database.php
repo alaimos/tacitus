@@ -66,10 +66,10 @@ return [
             'port'     => env('MONGO_PORT', 27017),
             'database' => env('MONGO_DATABASE'),
             'username' => env('MONGO_USERNAME'),
-            'password' => env('MONGO_PASSWORD')/*,
+            'password' => env('MONGO_PASSWORD'),
             'options'  => [
-                'database' => 'admin' // sets the authentication database required by mongo 3
-            ]*/
+                'database' => env('MONGO_AUTH_DATABASE', env('MONGO_DATABASE')), // sets the authentication database required by mongo 3
+            ]
         ],
 
     ],

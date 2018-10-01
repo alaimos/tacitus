@@ -8,18 +8,20 @@ class erlang::params {
 
   case $::osfamily {
     'Debian' : {
+      $os = downcase($::operatingsystem)
+
       $key_signature            = '434975BD900CCBE4F7EE1B1ED208507CA14F4FCA'
       $package_name             = 'erlang-nox'
       $local_repo_location      = undef
-      $remote_repo_key_location = 'http://packages.erlang-solutions.com/debian/erlang_solutions.asc'
-      $remote_repo_location     = 'http://packages.erlang-solutions.com/debian'
+      $remote_repo_key_location = "http://packages.erlang-solutions.com/${os}/erlang_solutions.asc"
+      $remote_repo_location     = "http://packages.erlang-solutions.com/${os}"
       $repos                    = 'contrib'
     }
     'RedHat', 'SUSE', 'Archlinux' : {
       $key_signature  = undef
       $package_name   = 'erlang'
 
-      if $::operatingsystemrelease =~ /^5/ {
+      if $::operatingsystemrelease and $::operatingsystemrelease =~ /^5/ {
         $local_repo_location  = '/etc/yum.repos.d/epel-erlang.repo'
         $remote_repo_location = 'https://repos.fedorapeople.org/repos/peter/erlang/epel-erlang.repo'
       } else {

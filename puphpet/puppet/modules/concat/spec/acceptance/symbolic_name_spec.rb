@@ -21,13 +21,17 @@ describe 'symbolic name' do
   EOS
 
   it 'applies the manifest twice with no stderr' do
-    apply_manifest(pp, :catch_failures => true)
-    apply_manifest(pp, :catch_changes => true)
+    apply_manifest(pp, catch_failures: true)
+    apply_manifest(pp, catch_changes: true)
   end
 
   describe file("#{basedir}/file") do
-    it { should be_file }
-    it { should contain '1' }
-    it { should contain '2' }
+    it { is_expected.to be_file }
+    its(:content) do
+      is_expected.to match '1'
+    end
+    its(:content) do
+      is_expected.to match '2'
+    end
   end
 end

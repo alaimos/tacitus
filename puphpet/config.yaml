@@ -3,8 +3,8 @@ vagrantfile:
     vm:
         provider:
             local:
-                box: puphpet/ubuntu1404-x64
-                box_url: puphpet/ubuntu1404-x64
+                box: bento/ubuntu-16.04
+                box_url: 'false'
                 box_version: '0'
                 chosen_virtualizer: virtualbox
                 virtualizers:
@@ -15,20 +15,20 @@ vagrantfile:
                     vmware:
                         numvcpus: 1
                     parallels:
-                        use_linked_clone: 0
+                        linked_clone: 0
                         check_guest_tools: 0
                         update_guest_tools: 0
                 machines:
-                    vflm_w0aryidjvpfh:
+                    machine1:
                         id: tacitus
                         hostname: tacitus.puphpet
                         network:
                             private_network: 192.168.56.106
                             forwarded_port:
-                                vflmnfp_dlfylu3ns4d7:
+                                port1:
                                     host: '6288'
                                     guest: '22'
-                                vflmnfp_d23jori23jrj:
+                                port_bty:
                                     host: '8888'
                                     guest: '80'
                         memory: '2048'
@@ -36,12 +36,16 @@ vagrantfile:
         provision:
             puppet:
                 manifests_path: puphpet/puppet/manifests
-                module_path: puphpet/puppet/modules
+                module_path:
+                    - puphpet/puppet/modules
+                    - puphpet/puppet/manifests
                 options:
                     - '--verbose'
-                    - '--hiera_config /vagrant/puphpet/puppet/hiera.yaml'
+                    - '--hiera_config /opt/puphpet/puppet/hiera.yaml'
         synced_folder:
-            vflsf_vyuei317o55y:
+            folder1:
+                owner: vagrant
+                group: vagrant
                 source: ./www
                 target: /var/www
                 sync_type: default
@@ -61,8 +65,6 @@ vagrantfile:
                         - .vagrant/
                         - .git/
                     auto: 'true'
-                owner: vagrant
-                group: www-data
         usable_port_range:
             start: 10200
             stop: 10500
@@ -88,11 +90,15 @@ vagrantfile:
 server:
     install: '1'
     packages:
+        - bash-completion
         - htop
+        - vim
         - libcurl4-openssl-dev
         - pkg-config
         - libssl-dev
         - libsslcommon2-dev
+        - libzip-dev
+        - build-essential
 users_groups:
     install: '1'
     groups: {  }
@@ -109,12 +115,19 @@ locale:
 firewall:
     install: '1'
     rules: {  }
+resolv:
+    install: '1'
+    nameservers:
+        - 8.8.8.8
+        - 8.8.4.4
+    domainname: ''
+    searchpath: {  }
 cron:
     install: '1'
     jobs:
-        cj_6has30tk4jrx:
+        job_mk4:
             name: artisan-schedule
-            user: 'root'
+            user: root
             command: 'php /var/www/tacitus/artisan schedule:run >> /dev/null 2>&1'
             minute: '*'
             hour: '*'
@@ -124,62 +137,54 @@ cron:
 nginx:
     install: '0'
     settings:
+        version: present
         default_vhost: 1
-        proxy_buffer_size: 128k
         proxy_buffers: '4 256k'
+        proxy_buffer_size: 128k
         proxy_connect_timeout: 600s
         proxy_send_timeout: 600s
         proxy_read_timeout: 600s
         names_hash_bucket_size: 128
     upstreams: {  }
     vhosts:
-        nxv_2cgapi92c9r9:
-            server_name: awesome.dev
+        vhost1:
+            server_name: awesome.test
             server_aliases:
-                - www.awesome.dev
+                - www.awesome.test
             www_root: /var/www/awesome
             listen_port: '80'
-            index_files:
-                - index.html
-                - index.htm
-                - index.php
             client_max_body_size: 1m
             ssl: '0'
-            ssl_cert: ''
-            ssl_key: ''
-            ssl_port: '443'
-            ssl_protocols: ''
-            ssl_ciphers: ''
-            rewrite_to_https: '1'
-            spdy: '1'
             locations:
-                nxvl_hk43otka2ou7:
+                php_html:
+                    www_root: /var/www/awesome
                     location: /
+                    autoindex: 'off'
+                    internal: 'false'
+                    index_files:
+                        - index.html
+                        - index.php
                     try_files:
                         - $uri
                         - $uri/
                         - /index.php$is_args$args
-                    fastcgi: ''
-                    fastcgi_index: ''
-                    fastcgi_split_path: ''
-                    proxy: ''
-                    proxy_redirect: ''
-                nxvl_xfvozpgsd732:
+                php_php:
+                    www_root: /var/www/awesome
                     location: '~ \.php$'
+                    autoindex: 'off'
+                    internal: 'false'
+                    index_files:
+                        - index.php
                     try_files:
                         - $uri
                         - $uri/
-                        - /index.php$is_args$args
-                    fastcgi: '127.0.0.1:9000'
-                    fastcgi_index: index.php
-                    fastcgi_split_path: '^(.+\.php)(/.*)$'
-                    fast_cgi_params_extra:
-                        - 'SCRIPT_FILENAME $request_filename'
-                        - 'APP_ENV dev'
                     set:
                         - '$path_info $fastcgi_path_info'
-                    proxy: ''
-                    proxy_redirect: ''
+                    fastcgi: '127.0.0.1:9000'
+                    fastcgi_index: index.php
+                    fastcgi_split_path: '^(.+?\.php)(/.*)$'
+                    fast_cgi_params_extra:
+                        - 'SCRIPT_FILENAME $document_root$fastcgi_script_name'
     proxies: {  }
 apache:
     install: '1'
@@ -195,25 +200,26 @@ apache:
         - proxy_fcgi
         - rewrite
     vhosts:
-        av_mw4ghgplnhl8:
-            servername: tacitus.local
+        vhost1:
+            servername: tacitus.test
+            serveraliases:
+                - www.tacitus.test
             docroot: /var/www/tacitus/public
             port: '80'
-            setenv:
-                - 'APP_ENV dev'
             setenvif:
                 - 'Authorization "(.*)" HTTP_AUTHORIZATION=$1'
-            custom_fragment: ''
             ssl: '0'
-            ssl_cert: ''
-            ssl_key: ''
-            ssl_chain: ''
-            ssl_certs_dir: ''
+            ssl_cert: LETSENCRYPT
+            ssl_key: LETSENCRYPT
+            ssl_chain: LETSENCRYPT
+            ssl_certs_dir: LETSENCRYPT
             ssl_protocol: ''
             ssl_cipher: ''
             directories:
-                avd_4154i0hl3dou:
+                php_html:
+                    provider: directory
                     path: /var/www/tacitus/public
+                    directoryindex: 'index.php index.html'
                     options:
                         - Indexes
                         - FollowSymlinks
@@ -222,27 +228,25 @@ apache:
                         - All
                     require:
                         - 'all granted'
-                    custom_fragment: ''
-                    files_match:
-                        avdfm_qy7ovng5slsv:
-                            path: \.php$
-                            sethandler: 'proxy:fcgi://127.0.0.1:9000'
-                            custom_fragment: ''
-                            provider: filesmatch
-                    provider: directory
+                php_php:
+                    provider: filesmatch
+                    path: \.php$
+                    sethandler: 'proxy:fcgi://127.0.0.1:9000'
 letsencrypt:
     install: '1'
     settings:
         email: ''
+        webserver_service: ''
     domains: {  }
 php:
     install: '1'
     settings:
-        version: '56'
+        version: '7.0'
     modules:
         php:
             - cli
             - intl
+            - xml
             - bcmath
             - curl
             - gd
@@ -250,7 +254,6 @@ php:
             - mbstring
             - mcrypt
             - opcache
-            - xml
         pear: {  }
         pecl:
             - zip
@@ -263,13 +266,13 @@ php:
     fpm_ini:
         error_log: /vagrant/logs/php_error.log
     fpm_pools:
-        phpfp_i0f4edagl45n:
+        pool1:
             ini:
                 prefix: www
                 listen: '127.0.0.1:9000'
                 security.limit_extensions: .php
-                user: www-user
-                group: www-data
+                user: vagrant
+                group: vagrant
     composer: '1'
     composer_home: ''
 xdebug:
@@ -295,25 +298,22 @@ blackfire:
             agent_timeout: '0.25'
             log_file: ''
             log_level: '1'
-xhprof:
-    install: '0'
 wpcli:
     install: '0'
-    version: v0.21.1
 drush:
     install: '0'
     version: 8.0.5
 ruby:
     install: '1'
     versions:
-        rv_rgei2gy7q7yy:
+        ruby1:
             default: '1'
             bundler: '1'
-            version: 1.9.3
+            version: '2.4'
             gems:
-                - deep_merge@1.0.1
-                - activesupport@4.2.6
-                - vine@0.2
+                - deep_merge@1.2.1
+                - activesupport@5.1.4
+                - vine@0.4
 python:
     install: '1'
     packages: {  }
@@ -321,7 +321,7 @@ python:
 nodejs:
     install: '1'
     settings:
-        version: '5'
+        version: '6'
     npm_packages:
         - gulp
         - gulp-cli
@@ -334,38 +334,23 @@ nodejs:
         - main-bower-files
         - stream-browserify
         - laravel-elixir
-hhvm:
-    install: '0'
-    nightly: 0
-    composer: '1'
-    composer_home: ''
-    settings: {  }
-    server_ini:
-        hhvm.server.host: 127.0.0.1
-        hhvm.server.port: '9000'
-        hhvm.log.use_log_file: '1'
-        hhvm.log.file: /var/log/hhvm/error.log
-    php_ini:
-        display_errors: 'On'
-        error_reporting: '-1'
-        date.timezone: UTC
 mariadb:
     install: '1'
     settings:
         version: '10.1'
         root_password: '123'
         override_options: {  }
-    adminer: 0
     users:
-        mariadbnu_qi4920fxi8zg:
+        user1:
             name: tacitus
             password: '123'
     databases:
-        mariadbnd_bvmdl6pj537s:
+        database1:
             name: tacitus
+            collate: utf8_general_ci
             sql: ''
     grants:
-        mariadbng_j1toiegrmx40:
+        grant1:
             user: tacitus
             table: '*.*'
             privileges:
@@ -373,21 +358,21 @@ mariadb:
 mysql:
     install: '0'
     settings:
-        version: '5.6'
+        version: '5.7'
         root_password: '123'
         override_options: {  }
-    adminer: 0
     users:
-        mysqlnu_dne2rkqg3dv9:
-            name: tacitus
+        user1:
+            name: dbuser
             password: '123'
     databases:
-        mysqlnd_gcswgpujtlc9:
-            name: tacitus
+        database1:
+            name: dbname
+            collate: utf8_general_ci
             sql: ''
     grants:
-        mysqlng_rw0i1xniw01k:
-            user: tacitus
+        grant1:
+            user: dbuser
             table: '*.*'
             privileges:
                 - ALL
@@ -396,33 +381,48 @@ postgresql:
     settings:
         global:
             encoding: UTF8
-            version: '9.4'
+            version: '9.6'
         server:
             postgres_password: '123'
-    databases: {  }
-    users: {  }
-    grants: {  }
-    adminer: 0
+    databases:
+        database1:
+            dbname: dbname
+            owner: dbuser
+    users:
+        user1:
+            username: dbuser
+            password: '123'
+            superuser: '1'
+    grants:
+        grant1:
+            role: dbuser
+            db: dbname
+            privilege:
+                - ALL
 mongodb:
     install: '1'
     settings:
         bind_ip: 127.0.0.1
         port: '27017'
     globals:
-        version: 2.6.0
+        version: 3.6.2
     databases:
-        mongodbnuad_nh6wutcyismb:
+        database1:
             name: tacitus
             user: tacitus
             password: '123'
 redis:
-    install: '1'
+    install: '0'
     settings:
         port: '6379'
 sqlite:
     install: '0'
-    adminer: 0
-    databases: {  }
+    databases:
+        database1:
+            name: dbname
+            owner: www-data
+            group: www-data
+            sql_file: ''
 mailhog:
     install: '1'
     settings:
@@ -446,20 +446,24 @@ rabbitmq:
     install: '0'
     settings:
         port: '5672'
-    users: {  }
+    users:
+        user1:
+            admin: '1'
+            name: admin
+            password: '123'
+            tags:
+                - admin
     vhosts: {  }
     plugins: {  }
 elastic_search:
     install: '0'
     settings:
-        version: 2.3.1
+        version: 6.1.2
         java_install: true
     instances:
-        esi_q7qdq8cmq14w:
+        instance1:
             name: es-01
-solr:
-    install: '0'
-    settings:
-        version: 4.10.2
-        port: '8984'
+            jvm_options:
+                - '-Xms2G'
+                - '-Xmx2G'
 

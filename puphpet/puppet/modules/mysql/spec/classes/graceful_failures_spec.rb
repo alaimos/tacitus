@@ -1,15 +1,16 @@
 require 'spec_helper'
 
 describe 'mysql::server' do
-  on_pe_unsupported_platforms.each do |pe_version,pe_platforms|
-    pe_platforms.each do |pe_platform,facts|
-      describe "on #{pe_version} #{pe_platform}" do
-        let(:facts) { facts }
+  context 'on an unsupported OS' do
+    let(:facts) do
+      {
+        osfamily: 'UNSUPPORTED',
+        operatingsystem: 'UNSUPPORTED',
+      }
+    end
 
-        context 'should gracefully fail' do
-          it { expect { is_expected.to compile}.to raise_error(Puppet::Error, /Unsupported platform:/) }
-        end
-      end
+    it 'gracefully fails' do
+      is_expected.to compile.and_raise_error(%r{Unsupported platform:})
     end
   end
 end

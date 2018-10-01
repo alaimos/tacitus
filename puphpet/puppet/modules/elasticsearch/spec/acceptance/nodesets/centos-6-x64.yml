@@ -5,12 +5,13 @@ HOSTS:
       - database
       - dashboard
     platform: el-6-x86_64
-    image: electrical/centos:6.4
+    image: centos:6.7
     hypervisor: docker
-    docker_cmd: '["/sbin/init"]'
-    docker_image_commands:
-      - 'yum install -y wget ntpdate rubygems ruby-augeas ruby-devel augeas-devel'
-      - 'touch /etc/sysconfig/network'
+    docker_cmd: ["/sbin/init"]
     docker_preserve_image: true
+    docker_image_commands:
+      - yum install -y wget tar which java-1.8.0-openjdk-headless
+      - rm /etc/init/tty.conf
+      - echo -e "elasticsearch hard nproc 4096\nelasticsearch soft nproc 4096" >> /etc/security/limits.conf
 CONFIG:
-  type: foss
+  log_level: warn

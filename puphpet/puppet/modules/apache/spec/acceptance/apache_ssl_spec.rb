@@ -1,14 +1,7 @@
 require 'spec_helper_acceptance'
 require_relative './version.rb'
 
-case fact('osfamily')
-when 'RedHat'
-  vhostd = '/etc/httpd/conf.d'
-when 'Debian'
-  vhostd = '/etc/apache2/sites-available'
-end
-
-describe 'apache ssl', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily')) do
+describe 'apache ssl' do
 
   describe 'ssl parameters' do
     it 'runs without error' do
@@ -26,18 +19,19 @@ describe 'apache ssl', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily'
         }
       EOS
       apply_manifest(pp, :catch_failures => true)
+      apply_manifest(pp, :catch_changes => true)
     end
 
-    describe file("#{vhostd}/15-default-ssl.conf") do
+    describe file("#{$vhost_dir}/15-default-ssl.conf") do
       it { is_expected.to be_file }
       it { is_expected.to contain 'SSLCertificateFile      "/tmp/ssl_cert"' }
       it { is_expected.to contain 'SSLCertificateKeyFile   "/tmp/ssl_key"' }
       it { is_expected.to contain 'SSLCertificateChainFile "/tmp/ssl_chain"' }
-      it { is_expected.to contain 'SSLCACertificateFile    "/tmp/ssl_ca"' }
-      it { is_expected.to contain 'SSLCARevocationPath     "/tmp/ssl_crl_path"' }
-      it { is_expected.to contain 'SSLCARevocationFile     "/tmp/ssl_crl"' }
+      it { is_expected.not_to contain 'SSLCACertificateFile    "/tmp/ssl_ca"' }
+      it { is_expected.not_to contain 'SSLCARevocationPath     "/tmp/ssl_crl_path"' }
+      it { is_expected.not_to contain 'SSLCARevocationFile     "/tmp/ssl_crl"' }
       if $apache_version == '2.4'
-        it { is_expected.to contain 'SSLCARevocationCheck    "chain"' }
+        it { is_expected.not_to contain 'SSLCARevocationCheck    "chain"' }
       else
         it { is_expected.not_to contain 'SSLCARevocationCheck' }
       end
@@ -69,17 +63,20 @@ describe 'apache ssl', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily'
           ssl_verify_depth     => 'test',
           ssl_options          => ['test', 'test1'],
           ssl_proxyengine      => true,
+          ssl_proxy_protocol   => 'TLSv1.2',
         }
       EOS
       apply_manifest(pp, :catch_failures => true)
+      apply_manifest(pp, :catch_changes => true)
     end
 
-    describe file("#{vhostd}/25-test_ssl.conf") do
+    describe file("#{$vhost_dir}/25-test_ssl.conf") do
       it { is_expected.to be_file }
       it { is_expected.to contain 'SSLCertificateFile      "/tmp/ssl_cert"' }
       it { is_expected.to contain 'SSLCertificateKeyFile   "/tmp/ssl_key"' }
       it { is_expected.to contain 'SSLCertificateChainFile "/tmp/ssl_chain"' }
       it { is_expected.to contain 'SSLCACertificateFile    "/tmp/ssl_ca"' }
+      it { is_expected.to contain 'SSLCACertificatePath    "/tmp"' }
       it { is_expected.to contain 'SSLCARevocationPath     "/tmp/ssl_crl_path"' }
       it { is_expected.to contain 'SSLCARevocationFile     "/tmp/ssl_crl"' }
       it { is_expected.to contain 'SSLProxyEngine On' }
@@ -94,6 +91,65 @@ describe 'apache ssl', :unless => UNSUPPORTED_PLATFORMS.include?(fact('osfamily'
       else
         it { is_expected.not_to contain 'SSLCARevocationCheck' }
       end
+    end
+  end
+
+  describe 'vhost ssl ssl_ca only' do
+    it 'runs without error' do
+      pp = <<-EOS
+        class { 'apache':
+          service_ensure       => stopped,
+        }
+
+        apache::vhost { 'test_ssl_ca_only':
+          docroot              => '/tmp/test',
+          ssl                  => true,
+          ssl_cert             => '/tmp/ssl_cert',
+          ssl_key              => '/tmp/ssl_key',
+          ssl_ca               => '/tmp/ssl_ca',
+          ssl_verify_client    => 'test',
+        }
+      EOS
+      apply_manifest(pp, :catch_failures => true)
+      apply_manifest(pp, :catch_changes => true)
+    end
+
+    describe file("#{$vhost_dir}/25-test_ssl_ca_only.conf") do
+      it { is_expected.to be_file }
+      it { is_expected.to contain 'SSLCertificateFile      "/tmp/ssl_cert"' }
+      it { is_expected.to contain 'SSLCertificateKeyFile   "/tmp/ssl_key"' }
+      it { is_expected.to contain 'SSLCACertificateFile    "/tmp/ssl_ca"' }
+      it { is_expected.not_to contain 'SSLCACertificatePath' }
+    end
+  end
+
+  describe 'vhost ssl ssl_certs_dir' do
+    it 'runs without error' do
+      pp = <<-EOS
+        class { 'apache':
+          service_ensure       => stopped,
+        }
+
+        apache::vhost { 'test_ssl_certs_dir_only':
+          docroot              => '/tmp/test',
+          ssl                  => true,
+          ssl_cert             => '/tmp/ssl_cert',
+          ssl_key              => '/tmp/ssl_key',
+          ssl_certs_dir        => '/tmp',
+          ssl_verify_client    => 'test',
+        }
+      EOS
+      apply_manifest(pp, :catch_failures => true)
+      apply_manifest(pp, :catch_changes => true)
+    end
+
+    describe file("#{$vhost_dir}/25-test_ssl_certs_dir_only.conf") do
+      it { is_expected.to be_file }
+      it { is_expected.to contain 'SSLCertificateFile      "/tmp/ssl_cert"' }
+      it { is_expected.to contain 'SSLCertificateKeyFile   "/tmp/ssl_key"' }
+      it { is_expected.to contain 'SSLCACertificatePath    "/tmp"' }
+      it { is_expected.to contain 'SSLVerifyClient         test' }
+      it { is_expected.not_to contain 'SSLCACertificateFile' }
     end
   end
 

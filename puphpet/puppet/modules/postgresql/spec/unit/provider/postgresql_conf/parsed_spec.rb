@@ -9,7 +9,7 @@ describe provider_class do
     conf_class = Puppet::Type.type(:postgresql_conf)
     provider = conf_class.provider(:parsed)
     conffile = tmpfilename('postgresql.conf')
-    provider.any_instance.stub(:target).and_return conffile
+    allow_any_instance_of(provider).to receive(:target).and_return conffile
     provider
   }
 
@@ -122,6 +122,24 @@ describe provider_class do
     it 'shouldn\'t quote numbers' do
       expect(provider.to_line( {:name=>"wal_segments", :value=>"32", :comment=>nil, :record_type=>:parsed })).to eq(
         "wal_segments = 32"
+      )
+    end
+
+    it "should allow numbers" do
+      expect(provider.to_line( {:name=>"integer", :value=>42, :comment=>nil, :record_type=>:parsed })).to eq(
+        "integer = 42"
+      )
+    end
+
+    it "should allow floats" do
+      expect(provider.to_line( {:name=>"float", :value=>2.71828182845, :comment=>nil, :record_type=>:parsed })).to eq(
+        "float = 2.71828182845"
+      )
+    end
+
+    it "quotes addresses" do
+      expect(provider.to_line( {:name=>"listen_addresses", :value=>"0.0.0.0", :comment=>nil, :record_type=>:parsed })).to eq(
+        "listen_addresses = '0.0.0.0'"
       )
     end
   end

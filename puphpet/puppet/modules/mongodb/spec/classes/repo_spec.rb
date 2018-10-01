@@ -1,15 +1,8 @@
 require 'spec_helper'
 
-describe 'mongodb::repo', :type => :class do
-
+describe 'mongodb::repo', type: :class do
   context 'when deploying on Debian' do
-    let :facts do
-      {
-        :osfamily        => 'Debian',
-        :operatingsystem => 'Debian',
-        :lsbdistid       => 'Debian',
-      }
-    end
+    with_debian_facts
 
     it {
       is_expected.to contain_class('mongodb::repo::apt')
@@ -17,12 +10,7 @@ describe 'mongodb::repo', :type => :class do
   end
 
   context 'when deploying on CentOS' do
-    let :facts do
-      {
-        :osfamily        => 'RedHat',
-        :operatingsystem => 'CentOS',
-      }
-    end
+    with_centos_facts
 
     it {
       is_expected.to contain_class('mongodb::repo::yum')
@@ -30,29 +18,38 @@ describe 'mongodb::repo', :type => :class do
   end
 
   context 'when yumrepo has a proxy set' do
-    let :facts do
-      {
-        :osfamily        => 'RedHat',
-        :operatingsystem => 'RedHat',
-      }
-    end
+    with_redhat_facts
+
     let :params do
       {
-        :proxy => 'http://proxy-server:8080',
-        :proxy_username => 'proxyuser1',
-        :proxy_password => 'proxypassword1',
+        proxy: 'http://proxy-server:8080',
+        proxy_username: 'proxyuser1',
+        proxy_password: 'proxypassword1'
       }
     end
+
     it {
       is_expected.to contain_class('mongodb::repo::yum')
     }
     it do
-      should contain_yumrepo('mongodb').with({
-        'enabled' => '1',
-        'proxy' => 'http://proxy-server:8080',
-        'proxy_username' => 'proxyuser1',
-        'proxy_password' => 'proxypassword1',
-        })
+      is_expected.to contain_yumrepo('mongodb').with('enabled' => '1',
+                                                     'proxy' => 'http://proxy-server:8080',
+                                                     'proxy_username' => 'proxyuser1',
+                                                     'proxy_password' => 'proxypassword1')
     end
+  end
+
+  context 'when deploying on CentOS with version >= 3.0' do
+    with_centos_facts
+
+    let :params do
+      {
+        version: '3.4.7-1.el7'
+      }
+    end
+
+    it {
+      is_expected.to contain_class('mongodb::repo::yum')
+    }
   end
 end

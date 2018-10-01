@@ -3,7 +3,6 @@ class postgresql::server (
   $postgres_password          = undef,
 
   $package_name               = $postgresql::params::server_package_name,
-  $client_package_name        = $postgresql::params::client_package_name,
   $package_ensure             = $postgresql::params::package_ensure,
 
   $plperl_package_name        = $postgresql::params::plperl_package_name,
@@ -13,11 +12,12 @@ class postgresql::server (
   $service_enable             = $postgresql::params::service_enable,
   $service_manage             = $postgresql::params::service_manage,
   $service_name               = $postgresql::params::service_name,
+  $service_restart_on_change  = $postgresql::params::service_restart_on_change,
   $service_provider           = $postgresql::params::service_provider,
   $service_reload             = $postgresql::params::service_reload,
   $service_status             = $postgresql::params::service_status,
   $default_database           = $postgresql::params::default_database,
-
+  $default_connect_settings   = $postgresql::globals::default_connect_settings,
   $listen_addresses           = $postgresql::params::listen_addresses,
   $port                       = $postgresql::params::port,
   $ip_mask_deny_postgres_user = $postgresql::params::ip_mask_deny_postgres_user,
@@ -37,6 +37,8 @@ class postgresql::server (
   $xlogdir                    = $postgresql::params::xlogdir,
   $logdir                     = $postgresql::params::logdir,
 
+  $log_line_prefix            = $postgresql::params::log_line_prefix,
+
   $pg_hba_conf_defaults       = $postgresql::params::pg_hba_conf_defaults,
 
   $user                       = $postgresql::params::user,
@@ -46,11 +48,13 @@ class postgresql::server (
 
   $encoding                   = $postgresql::params::encoding,
   $locale                     = $postgresql::params::locale,
+  $data_checksums             = $postgresql::params::data_checksums,
+  $timezone                   = $postgresql::params::timezone,
 
   $manage_pg_hba_conf         = $postgresql::params::manage_pg_hba_conf,
   $manage_pg_ident_conf       = $postgresql::params::manage_pg_ident_conf,
   $manage_recovery_conf       = $postgresql::params::manage_recovery_conf,
-
+  $module_workdir             = $postgresql::params::module_workdir,
   #Deprecated
   $version                    = undef,
 ) inherits postgresql::params {
@@ -63,14 +67,18 @@ class postgresql::server (
     $_version = $postgresql::params::version
   }
 
+  if $createdb_path != undef{
+    warning('Passing "createdb_path" to postgresql::server is deprecated, it can be removed safely for the same behaviour')
+  }
+
   # Reload has its own ordering, specified by other defines
   class { "${pg}::reload": require => Class["${pg}::install"] }
 
-  anchor { "${pg}::start": }->
-  class { "${pg}::install": }->
-  class { "${pg}::initdb": }->
-  class { "${pg}::config": }->
-  class { "${pg}::service": }->
-  class { "${pg}::passwd": }->
-  anchor { "${pg}::end": }
+  anchor { "${pg}::start": }
+  -> class { "${pg}::install": }
+  -> class { "${pg}::initdb": }
+  -> class { "${pg}::config": }
+  -> class { "${pg}::service": }
+  -> class { "${pg}::passwd": }
+  -> anchor { "${pg}::end": }
 }

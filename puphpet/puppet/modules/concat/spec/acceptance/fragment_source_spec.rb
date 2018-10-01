@@ -2,16 +2,16 @@ require 'spec_helper_acceptance'
 
 case fact('osfamily')
 when 'AIX'
-  username  = 'root'
+  username = 'root'
   groupname = 'system'
 when 'Darwin'
-  username  = 'root'
+  username = 'root'
   groupname = 'wheel'
 when 'windows'
-  username  = 'Administrator'
+  username = 'Administrator'
   groupname = 'Administrators'
 else
-  username  = 'root'
+  username = 'root'
   groupname = 'root'
 end
 
@@ -44,15 +44,24 @@ describe 'concat::fragment source' do
     EOS
 
     it 'applies the manifest twice with no stderr' do
-      apply_manifest(pp, :catch_failures => true)
-      apply_manifest(pp, :catch_changes => true)
+      apply_manifest(pp, catch_failures: true)
+      apply_manifest(pp, catch_changes: true)
     end
 
     describe file("#{basedir}/foo") do
-      it { should be_file }
-      it { should contain 'file1 contents' }
-      it { should contain 'string1 contents' }
-      it { should contain 'file2 contents' }
+      it { is_expected.to be_file }
+
+      its(:content) do
+        is_expected.to match 'file1 contents'
+      end
+
+      its(:content) do
+        is_expected.to match 'string1 contents'
+      end
+
+      its(:content) do
+        is_expected.to match 'file2 contents'
+      end
     end
   end # should read file fragments from local system
 
@@ -101,23 +110,35 @@ describe 'concat::fragment source' do
     EOS
 
     it 'applies the manifest twice with no stderr' do
-      apply_manifest(pp, :catch_failures => true)
-      apply_manifest(pp, :catch_changes => true)
+      apply_manifest(pp, catch_failures: true)
+      apply_manifest(pp, catch_changes: true)
     end
     describe file("#{basedir}/result_file1") do
-      it { should be_file }
-      it { should contain 'file1 contents' }
-      it { should_not contain 'file2 contents' }
+      it { is_expected.to be_file }
+      its(:content) do
+        is_expected.to match 'file1 contents'
+      end
+      its(:content) do
+        is_expected.not_to match 'file2 contents'
+      end
     end
     describe file("#{basedir}/result_file2") do
-      it { should be_file }
-      it { should contain 'file2 contents' }
-      it { should_not contain 'file1 contents' }
+      it { is_expected.to be_file }
+      its(:content) do
+        is_expected.to match 'file2 contents'
+      end
+      its(:content) do
+        is_expected.not_to match 'file1 contents'
+      end
     end
     describe file("#{basedir}/result_file3") do
-      it { should be_file }
-      it { should contain 'file1 contents' }
-      it { should_not contain 'file2 contents' }
+      it { is_expected.to be_file }
+      its(:content) do
+        is_expected.to match 'file1 contents'
+      end
+      its(:content) do
+        is_expected.not_to match 'file2 contents'
+      end
     end
   end
 
@@ -137,13 +158,11 @@ describe 'concat::fragment source' do
     EOS
 
     it 'applies the manifest with resource failures' do
-      apply_manifest(pp, :expect_failures => true)
+      expect(apply_manifest(pp, catch_failures: true).stderr).to match(%r{Failed to generate additional resources using 'eval_generate'})
     end
     describe file("#{basedir}/fail_no_source") do
-      #FIXME: Serverspec::Type::File doesn't support exists? for some reason. so... hack.
-      it { should_not be_file }
-      it { should_not be_directory }
+      # FIXME: Serverspec::Type::File doesn't support exists? for some reason. so... hack.
+      it { is_expected.not_to be_directory }
     end
   end
 end
-

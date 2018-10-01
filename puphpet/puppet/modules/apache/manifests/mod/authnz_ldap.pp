@@ -1,16 +1,20 @@
 class apache::mod::authnz_ldap (
-  $verifyServerCert = true,
+  Boolean $verify_server_cert = true,
+  $package_name               = undef,
 ) {
-  include '::apache::mod::ldap'
-  ::apache::mod { 'authnz_ldap': }
 
-  validate_bool($verifyServerCert)
+  include ::apache
+  include '::apache::mod::ldap'
+  ::apache::mod { 'authnz_ldap':
+    package => $package_name,
+  }
 
   # Template uses:
-  # - $verifyServerCert
+  # - $verify_server_cert
   file { 'authnz_ldap.conf':
     ensure  => file,
     path    => "${::apache::mod_dir}/authnz_ldap.conf",
+    mode    => $::apache::file_mode,
     content => template('apache/mod/authnz_ldap.conf.erb'),
     require => Exec["mkdir ${::apache::mod_dir}"],
     before  => File[$::apache::mod_dir],

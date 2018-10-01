@@ -1,5 +1,5 @@
 #!/bin/bash
-service php5.6-fpm start
+#service php5.6-fpm start
 
 ### setup mongo pid file
 

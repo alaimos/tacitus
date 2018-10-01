@@ -12,12 +12,21 @@ class mysql::server::backup (
   $delete_before_dump = false,
   $backupdatabases    = [],
   $file_per_database  = false,
+  $include_routines   = false,
+  $include_triggers   = false,
   $ensure             = 'present',
   $time               = ['23', '5'],
+  $prescript          = false,
   $postscript         = false,
   $execpath           = '/usr/bin:/usr/sbin:/bin:/sbin',
   $provider           = 'mysqldump',
+  $maxallowedpacket   = '1M',
+  $optional_args      = [],
 ) {
+
+  if $prescript and $provider =~ /(mysqldump|mysqlbackup)/ {
+    warning(translate("The 'prescript' option is not currently implemented for the %{provider} backup provider.", {'provider' => $provider}))
+  }
 
   create_resources('class', {
     "mysql::backup::${provider}" => {
@@ -33,10 +42,15 @@ class mysql::server::backup (
       'delete_before_dump' => $delete_before_dump,
       'backupdatabases'    => $backupdatabases,
       'file_per_database'  => $file_per_database,
+      'include_routines'   => $include_routines,
+      'include_triggers'   => $include_triggers,
       'ensure'             => $ensure,
       'time'               => $time,
+      'prescript'          => $prescript,
       'postscript'         => $postscript,
       'execpath'           => $execpath,
+      'maxallowedpacket'   => $maxallowedpacket,
+      'optional_args'      => $optional_args,
     }
   })
 

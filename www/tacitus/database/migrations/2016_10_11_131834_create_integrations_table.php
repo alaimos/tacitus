@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateIntegrationsTable extends Migration
 {
@@ -25,7 +25,7 @@ class CreateIntegrationsTable extends Migration
             $table->foreign('platform_id')->references('id')->on('platforms')->onDelete('cascade')->onUpdate('cascade');
             $table->integer('mapping_id')->unsigned()->index()->nullable()->default(null);
             $table->foreign('mapping_id')->references('id')->on('platform_mappings')
-                ->onDelete('cascade')->onUpdate('cascade');
+                  ->onDelete('cascade')->onUpdate('cascade');
             $table->timestamps();
         });
     }

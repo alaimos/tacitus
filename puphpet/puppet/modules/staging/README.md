@@ -1,16 +1,18 @@
 # Staging module for Puppet
 
+[![Build Status](https://travis-ci.org/voxpupuli/puppet-staging.png?branch=master)](https://travis-ci.org/voxpupuli/puppet-staging)
+[![Code Coverage](https://coveralls.io/repos/github/voxpupuli/puppet-staging/badge.svg?branch=master)](https://coveralls.io/github/voxpupuli/puppet-staging)
+[![Puppet Forge](https://img.shields.io/puppetforge/v/puppet/staging.svg)](https://forge.puppetlabs.com/puppet/staging)
+[![Puppet Forge - downloads](https://img.shields.io/puppetforge/dt/puppet/staging.svg)](https://forge.puppetlabs.com/puppet/staging)
+[![Puppet Forge - endorsement](https://img.shields.io/puppetforge/e/puppet/staging.svg)](https://forge.puppetlabs.com/puppet/staging)
+[![Puppet Forge - scores](https://img.shields.io/puppetforge/f/puppet/staging.svg)](https://forge.puppetlabs.com/puppet/staging)
+
 Manages staging directory, along with download/extraction of compressed files.
-
-[![Build Status](https://secure.travis-ci.org/nanliu/puppet-staging.png?branch=master)](http://travis-ci.org/nanliu/puppet-staging)
-
-WARNING: Version 0.2.0 no longer uses hiera functions. The same behavior should be available in Puppet 3.0.
-
-NOTE: Version 1.0.0 will be the last feature release. New functionality such as checksum will be implemented in a type/provider module [puppet-archive](https://www.github.com/nanliu/puppet-archive).
 
 ## Usage
 
 Specify a different default staging path (must be declared before using resource):
+
 ```puppet
 class { 'staging':
   path  => '/var/staging',
@@ -20,6 +22,7 @@ class { 'staging':
 ```
 
 Staging files from various sources:
+
 ```puppet
 staging::file { 'sample':
   source => 'puppet://modules/staging/sample',
@@ -31,6 +34,7 @@ staging::file { 'apache-tomcat-6.0.35':
 ```
 
 Staging and extracting files:
+
 ```puppet
 staging::file { 'sample.tar.gz':
   source => 'puppet:///modules/staging/sample.tar.gz'
@@ -44,6 +48,7 @@ staging::extract { 'sample.tar.gz':
 ```
 
 Deploying a file (combining staging and extract):
+
 ```puppet
 staging::deploy { 'sample.tar.gz':
   source => 'puppet:///modules/staging/sample.tar.gz',
@@ -59,7 +64,11 @@ Staging files currently support the following source:
 * s3:// (requires aws cli to be installed and configured.)
 * local (though this doesn't serve any real purpose.)
 
-## Contributor
+## Author
+
+Primarily authored by Nan Liu
+
+## Contributors
 
 * Adrien Thebo
 * gizero

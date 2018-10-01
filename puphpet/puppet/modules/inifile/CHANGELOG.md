@@ -1,3 +1,113 @@
+## Supported Release 2.1.1
+### Summary
+This release is in order to implement Rubocop within the module and includes a wide array of formatting changes throughout the code and the enabling of rubocop checks to be run against all pull requests against the module.
+
+### Changed
+- Rubocop checks will now be run against any PRs made towards the module.
+- The module has undergone a substantial reformatting in order to comply with the designated standards.
+
+## Supported Release 2.1.0
+### Summary
+This is a clean release prior to the implementation of rubocop within the module.
+
+### Added
+- Several Modulesync updates have been made.
+- Indent Character can now be set.
+- Support for Debian 9 has been added.
+
+### Removed
+- Support for Ubuntu 1004 and 1204 has been removed.
+- Support for SLES 10 SP4 has been removed.
+- Support for Debian 6 has been removed.
+- Support for Solaris 12 has been removed.
+- Support for Windows Server 2003 R2 has been removed.
+
+## Supported Release 2.0.0
+### Summary
+This is a major release that includes a few bugfixes as well as some general module updates.
+
+**This release drops Puppet 3 support**
+
+### Changed
+- Moved lower Puppet version requirement to 4.7.0, MODULES-4830
+
+### Fixed
+- Fix path validation on windows MODULES-4170
+- Fix headings in README
+- Fix for mimicking commented settings MODULES-4932
+- Fix for Backwards compatible ini_file.set_value MODULES-5172
+
+## Supported Release 1.6.0
+### Summary
+This release expands functionality around sub-settings and adds the `refreshonly` parameter so the user can specify whether a resource should or should not respond to a refresh event.
+
+### Features
+- `refreshonly` decide whether or not a value should be updated as part of a refresh
+- `insert_type` choose where the sub-setting is placed in the final string
+- `subsetting_key_val_separator` specify a key/value separator for sub-settings
+
+### Bugfixes
+- MODULES-3145 Cast values to strings before passing to provider
+
+
+## Supported Release 1.5.0
+### Summary
+This release adds the long-awaited `show_diff` parameter for diffing the complete file on changes (or can also just show the md5 sums).
+
+### Features
+- Added `show_diff` parameter to show diffs on changes.
+- Remove empty ini sections when the last line in the section is removed.
+
+### Bugfixes
+- Workaround `create_ini_settings()` duplicate resources puppet bug PUP-4709
+
+## Supported Release 1.4.3
+###Summary
+
+Small release for support of newer PE versions. This increments the version of PE in the metadata.json file.
+
+## 2015-09-01 - Supported Release 1.4.2
+### Summary
+This release adds some bugfixes.
+
+####Bugfixes
+- MODULES-2212 Add use_exact_match parameter for subsettings
+- MODULES-1908 Munge the setting to ensure we always strip the whitespace
+- MODULES-2369 Support a space as a key_val_separator
+
+## 2015-07-15 - Supported Release 1.4.1
+### Summary
+This release bumps the metadata for PE up.
+
+##2015-07-07 - Supported Releases 1.4.0
+###Summary
+
+This is primarily a release which includes acceptance tests updates, but also includes some minor bug fixes and improvements
+
+####Features
+- Solaris 12 Support
+- Acceptance testing improvements
+
+####Bugfixes
+- MODULES-1599 Match only on space and tab whitespace after k/v separator
+
+##2015-06-09 - Supported Releases 1.3.0
+###Summary
+
+This is primarily a feature release, but also includes test fixes, documentation updates and synchronization of files with modulesync.
+
+####Features
+- Synchronized files using modulesync
+- Improved documentation
+- Allow changing key value separator beyond indentation
+- Adding the ability to change regex match for $section in inifile
+
+####Bugfixes
+- pin beaker-rspec for windows testing
+- pin rspec gems for testing
+- Adds default values for section
+- Fixed names containing spaces
+
 ##2014-11-11 - Supported Releases 1.2.0
 ###Summary
 

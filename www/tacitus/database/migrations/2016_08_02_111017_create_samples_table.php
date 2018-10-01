@@ -1,7 +1,7 @@
 <?php
 
-use Jenssegers\Mongodb\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Jenssegers\Mongodb\Schema\Blueprint;
 
 class CreateSamplesTable extends Migration
 {
@@ -17,7 +17,7 @@ class CreateSamplesTable extends Migration
             $table->string('name');
             $table->integer('position');
             $table->integer('dataset_id')->unsigned();
-            $table->index('dataset_id', ['name' => 'samples_dataset_id_index']);
+            $table->index('dataset_id', 'samples_dataset_id_index');
             $table->foreign('dataset_id')->references('id')->on('datasets')->onDelete('cascade')->onUpdate('cascade');
         });
     }

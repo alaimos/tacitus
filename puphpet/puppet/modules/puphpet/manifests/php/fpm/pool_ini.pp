@@ -1,32 +1,10 @@
 # Defines where we can expect PHP-FPM ini files and paths to be located.
 #
-# debian 7.x
-#    5.6
-#        /etc/php5/fpm/pool.d/www.conf
-#    5.5
-#        /etc/php5/fpm/pool.d/www.conf
-#    5.4
-#        /etc/php5/fpm/pool.d/www.conf
-# ubuntu 14.04
-#    5.6
-#        /etc/php5/fpm/pool.d/www.conf
-#    5.5
-#        /etc/php5/fpm/pool.d/www.conf
-#    5.4
-#        N/A
-# ubuntu 12.04
-#    5.6
-#        N/A
-#    5.5
-#        /etc/php5/fpm/pool.d/www.conf
-#    5.4
-#        /etc/php5/fpm/pool.d/www.conf
-# centos 6.x
-#    5.6
-#        /etc/php-fpm.d/www.conf
-#    5.5
-#        /etc/php-fpm.d/www.conf
-#    5.4
+# ubuntu
+#    7.1
+#        /etc/php/7.1/fpm/pool.d/www.conf
+# centos
+#    7.1
 #        /etc/php-fpm.d/www.conf
 #
 define puphpet::php::fpm::pool_ini (
@@ -38,45 +16,10 @@ define puphpet::php::fpm::pool_ini (
   $php_fpm_service
   ) {
 
-  if $fpm_version in ['7.0', '70', '7'] {
-    case $::operatingsystem {
-      # Debian and Ubuntu slightly differ
-      'debian': {
-        $dir_name = 'php7'
-      }
-      'ubuntu': {
-        $dir_name = 'php/7.0'
-      }
-      'redhat', 'centos': {
-        $dir_name = 'php'
-      }
-    }
-  } elsif $fpm_version in ['5.6', '56'] {
-    case $::operatingsystem {
-      'debian': {
-        $dir_name = 'php5'
-      }
-      'ubuntu': {
-        $dir_name = 'php/5.6'
-      }
-      'redhat', 'centos': {
-        $dir_name = 'php5'
-      }
-    }
-  } else {
-    $dir_name = 'php5'
+  $conf_filename = $::osfamily ? {
+    'debian' => "/etc/php/${fpm_version}/fpm/pool.d/www.conf",
+    'redhat' => '/etc/php-fpm.d/www.conf',
   }
-
-  case $::osfamily {
-    'debian': {
-      $pool_dir = "/etc/${dir_name}/fpm/pool.d"
-    }
-    'redhat': {
-      $pool_dir = '/etc/php-fpm.d'
-    }
-  }
-
-  $conf_filename = delete("${pool_dir}/${pool_name}.conf", ' ')
 
   if '=' in $value {
     $changes = $ensure ? {

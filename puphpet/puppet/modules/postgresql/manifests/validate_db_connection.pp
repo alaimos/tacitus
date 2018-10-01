@@ -9,6 +9,7 @@ define postgresql::validate_db_connection(
   $database_password = undef,
   $database_username = undef,
   $database_port     = undef,
+  $connect_settings  = undef,
   $run_as            = undef,
   $sleep             = 2,
   $tries             = 10,
@@ -17,7 +18,10 @@ define postgresql::validate_db_connection(
   include postgresql::client
   include postgresql::params
 
+  warning('postgresql::validate_db_connection is deprecated, please use postgresql_conn_validator.')
+
   $psql_path = $postgresql::params::psql_path
+  $module_workdir = $postgresql::params::module_workdir
   $validcon_script_path = $postgresql::client::validcon_script_path
 
   $cmd_init = "${psql_path} --tuples-only --quiet "
@@ -37,7 +41,7 @@ define postgresql::validate_db_connection(
     undef   => "--dbname ${postgresql::params::default_database} ",
     default => "--dbname ${database_name} ",
   }
-  $env = $database_password ? {
+  $pass_env = $database_password ? {
     undef   => undef,
     default => "PGPASSWORD=${database_password}",
   }
@@ -48,11 +52,25 @@ define postgresql::validate_db_connection(
   # time it takes to run each psql command.
   $timeout = (($sleep + 2) * $tries)
 
+  # Combine $database_password and $connect_settings into an array of environment
+  # variables, ensure $database_password is last, allowing it to override a password
+  # from the $connect_settings hash
+  if $connect_settings != undef {
+    if $pass_env != undef {
+      $env = concat(join_keys_to_values( $connect_settings, '='), $pass_env)
+    } else {
+      $env = join_keys_to_values( $connect_settings, '=')
+    }
+  } else {
+    $env = $pass_env
+  }
+
   $exec_name = "validate postgres connection for ${database_username}@${database_host}:${database_port}/${database_name}"
+
   exec { $exec_name:
     command     => "echo 'Unable to connect to defined database using: ${cmd}' && false",
     unless      => $validate_cmd,
-    cwd         => '/tmp',
+    cwd         => $module_workdir,
     environment => $env,
     logoutput   => 'on_failure',
     user        => $run_as,

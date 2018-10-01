@@ -1,7 +1,7 @@
 <?php
 
-use Jenssegers\Mongodb\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Jenssegers\Mongodb\Schema\Blueprint;
 
 class CreateDataTable extends Migration
 {
@@ -15,7 +15,7 @@ class CreateDataTable extends Migration
         Schema::connection('mongodb')->create('data', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('sample_id')->unsigned();
-            $table->index('sample_id', ['name' => 'data_sample_id_index']);
+            $table->index('sample_id', 'data_sample_id_index');
             $table->foreign('sample_id')->references('id')->on('samples')->onDelete('cascade')->onUpdate('cascade');
             $table->string('probe');
             $table->double('value');

@@ -1,77 +1,57 @@
-class puphpet::params {
+class puphpet::params (
+  $extra_config_files = []
+) {
 
-  #########################################################
-  # PHP
-  #########################################################
-  $php_fpm_conf = $::osfamily ? {
-    'Debian' => '/etc/php5/fpm/pool.d/www.conf',
-    'Redhat' => '/etc/php-fpm.d/www.conf',
+  $puphpet_core_dir  = pick(getvar('::puphpet_core_dir'), '/opt/puphpet')
+  $puphpet_state_dir = pick(getvar('::puphpet_state_dir'), '/opt/puphpet-state')
+  $ssh_username      = pick(getvar('::ssh_username'), 'root')
+  $provisioner_type  = pick(getvar('::provisioner_type'), 'remote')
+
+  $puphpet_manifest_dir = "${puphpet_core_dir}/puppet/modules/puphpet"
+
+  $base_configs = [
+    "${puphpet_core_dir}/config.yaml",
+    "${puphpet_core_dir}/config-${provisioner_type}.yaml",
+  ]
+
+  $custom_config = ["${puphpet_core_dir}/config-custom.yaml"]
+
+  $yaml = merge_yaml($base_configs, $extra_config_files, $custom_config)
+
+  $strategy = {
+    'strategy'          => 'deep',
+    'merge_hash_arrays' => true
   }
 
-  $php_cgi_package = $::osfamily ? {
-    'Debian' => 'php5-cgi',
-    'Redhat' => 'php-cgi'
-  }
-
-  $hhvm_package_name = 'hhvm'
-  $hhvm_package_name_nightly = $::osfamily ? {
-    'Debian' => 'hhvm-nightly',
-    'Redhat' => 'hhvm'
-  }
-
-  $xhprof_package = $::osfamily ? {
-    'Debian' => $::operatingsystem ? {
-      'ubuntu' => false,
-      'debian' => 'php5-xhprof'
-    },
-    'Redhat' => 'xhprof'
-  }
-
-  #########################################################
-  # NGINX
-  #########################################################
-
-  $nginx_default_conf_location = $::osfamily ? {
-    'Debian' => '/etc/nginx/conf.d/default.conf',
-    'Redhat' => '/etc/nginx/conf.d/default.conf'
-  }
-
-  $nginx_www_location = $::osfamily ? {
-    'Debian' => '/var/www',
-    'Redhat' => '/var/www'
-  }
-
-  $nginx_webroot_location = $::osfamily ? {
-    'Debian' => '/var/www/html',
-    'Redhat' => '/var/www/html'
-  }
-
-  #########################################################
-  # MARIADB
-  #########################################################
-
-  $mariadb_package_client_name = $::osfamily ? {
-    'Debian' => 'mariadb-client',
-    'Redhat' => 'MariaDB-client',
-  }
-
-  $mariadb_package_server_name = $::osfamily ? {
-    'Debian' => 'mariadb-server',
-    'Redhat' => 'MariaDB-server',
-  }
-
-  #########################################################
-  # MISC
-  #########################################################
-
-  $ssl_cert_location = $::osfamily ? {
-    'Debian' => '/etc/ssl/certs/ssl-cert-snakeoil.pem',
-    'Redhat' => '/etc/ssl/certs/ssl-cert-snakeoil'
-  }
-
-  $ssl_key_location = $::osfamily ? {
-    'Debian' => '/etc/ssl/private/ssl-cert-snakeoil.key',
-    'Redhat' => '/etc/ssl/certs/ssl-cert-snakeoil'
+  $hiera = {
+    vm             => lookup('vagrantfile',     Hash, $strategy, {}),
+    apache         => $yaml['apache'],
+    beanstalkd     => lookup('beanstalkd',      Hash, $strategy, {}),
+    blackfire      => lookup('blackfire',       Hash, $strategy, {}),
+    cron           => lookup('cron',            Hash, $strategy, {}),
+    drush          => lookup('drush',           Hash, $strategy, {}),
+    elasticsearch  => lookup('elastic_search',  Hash, $strategy, {}),
+    firewall       => lookup('firewall',        Hash, $strategy, {}),
+    letsencrypt    => lookup('letsencrypt',     Hash, $strategy, {}),
+    locales        => lookup('locale',          Hash, $strategy, {}),
+    mailhog        => lookup('mailhog',         Hash, $strategy, {}),
+    mariadb        => lookup('mariadb',         Hash, $strategy, {}),
+    mongodb        => lookup('mongodb',         Hash, $strategy, {}),
+    mysql          => lookup('mysql',           Hash, $strategy, {}),
+    nginx          => $yaml['nginx'],
+    nodejs         => lookup('nodejs',          Hash, $strategy, {}),
+    php            => lookup('php',             Hash, $strategy, {}),
+    postgresql     => lookup('postgresql',      Hash, $strategy, {}),
+    python         => lookup('python',          Hash, $strategy, {}),
+    rabbitmq       => lookup('rabbitmq',        Hash, $strategy, {}),
+    redis          => lookup('redis',           Hash, $strategy, {}),
+    resolv         => lookup('resolv',          Hash, $strategy, {}),
+    ruby           => lookup('ruby',            Hash, $strategy, {}),
+    server         => lookup('server',          Hash, $strategy, {}),
+    sqlite         => lookup('sqlite',          Hash, $strategy, {}),
+    users_groups   => lookup('users_groups',    Hash, $strategy, {}),
+    wpcli          => lookup('wpcli',           Hash, $strategy, {}),
+    xdebug         => lookup('xdebug',          Hash, $strategy, {}),
   }
 
 }

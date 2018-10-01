@@ -4,47 +4,6 @@ class apt::params {
     fail('This module only works on Debian or derivatives like Ubuntu')
   }
 
-  # prior to puppet 3.5.0, defined couldn't test if a variable was defined
-  # strict variables wasn't added until 3.5.0, so this should be fine.
-  if ! $::settings::strict_variables {
-    $xfacts = {
-      'lsbdistcodename'     => $::lsbdistcodename,
-      'lsbdistrelease'      => $::lsbdistrelease,
-      'lsbmajdistrelease'   => $::lsbmajdistrelease,
-      'lsbdistdescription'  => $::lsbdistdescription,
-      'lsbminordistrelease' => $::lsbminordistrelease,
-      'lsbdistid'           => $::lsbdistid,
-    }
-  } else {
-    # Strict variables facts lookup compatibility
-    $xfacts = {
-      'lsbdistcodename' => defined('$lsbdistcodename') ? {
-        true    => $::lsbdistcodename,
-        default => undef,
-      },
-      'lsbdistrelease' => defined('$lsbdistrelease') ? {
-        true    => $::lsbdistrelease,
-        default => undef,
-      },
-      'lsbmajdistrelease' => defined('$lsbmajdistrelease') ? {
-        true    => $::lsbmajdistrelease,
-        default => undef,
-      },
-      'lsbdistdescription' => defined('$lsbdistdescription') ? {
-        true    => $::lsbdistdescription,
-        default => undef,
-      },
-      'lsbminordistrelease' => defined('$lsbminordistrelease') ? {
-        true    => $::lsbminordistrelease,
-        default => undef,
-      },
-      'lsbdistid' => defined('$lsbdistid') ? {
-        true    => $::lsbdistid,
-        default => undef,
-      },
-    }
-  }
-
   $root           = '/etc/apt'
   $provider       = '/usr/bin/apt-get'
   $sources_list   = "${root}/sources.list"
@@ -53,6 +12,15 @@ class apt::params {
   $preferences    = "${root}/preferences"
   $preferences_d  = "${root}/preferences.d"
   $keyserver      = 'keyserver.ubuntu.com'
+  $confs          = {}
+  $update         = {}
+  $purge          = {}
+  $proxy          = {}
+  $sources        = {}
+  $keys           = {}
+  $ppas           = {}
+  $pins           = {}
+  $settings       = {}
 
   $config_files = {
     'conf'   => {
@@ -71,6 +39,7 @@ class apt::params {
 
   $update_defaults = {
     'frequency' => 'reluctantly',
+    'loglevel'  => undef,
     'timeout'   => undef,
     'tries'     => undef,
   }
@@ -80,6 +49,7 @@ class apt::params {
     'host'   => undef,
     'port'   => 8080,
     'https'  => false,
+    'direct' => false,
   }
 
   $purge_defaults = {
@@ -101,19 +71,12 @@ class apt::params {
     'src' => false,
   }
 
-  case $xfacts['lsbdistid'] {
-    'debian': {
-      case $xfacts['lsbdistcodename'] {
-        'squeeze': {
-          $backports = {
-            'location' => 'http://httpredir.debian.org/debian-backports',
-            'key'      => 'A1BD8E9D78F7FE5C3E65D8AF8B48AD6246925553',
-            'repos'    => 'main contrib non-free',
-          }
-        }
+  case $facts['os']['name']{
+    'Debian': {
+      case $facts['os']['release']['full'] {
         default: {
           $backports = {
-            'location' => 'http://httpredir.debian.org/debian',
+            'location' => 'http://deb.debian.org/debian',
             'key'      => 'A1BD8E9D78F7FE5C3E65D8AF8B48AD6246925553',
             'repos'    => 'main contrib non-free',
           }
@@ -124,23 +87,23 @@ class apt::params {
       $ppa_package = undef
 
     }
-    'ubuntu': {
+    'Ubuntu': {
       $backports = {
         'location' => 'http://archive.ubuntu.com/ubuntu',
         'key'      => '630239CC130E1A7FD81A27B140976EAF437D05B5',
         'repos'    => 'main universe multiverse restricted',
       }
 
-      case $xfacts['lsbdistcodename'] {
-        'lucid': {
+      case $facts['os']['release']['full'] {
+        '10.04': {
           $ppa_options        = undef
           $ppa_package        = 'python-software-properties'
         }
-        'precise': {
+        '12.04': {
           $ppa_options        = '-y'
           $ppa_package        = 'python-software-properties'
         }
-        'trusty', 'utopic', 'vivid': {
+        '14.04', '14.10', '15.04', '15.10', '16.04': {
           $ppa_options        = '-y'
           $ppa_package        = 'software-properties-common'
         }
@@ -151,7 +114,7 @@ class apt::params {
       }
     }
     undef: {
-      fail('Unable to determine lsbdistid, please install lsb-release first')
+      fail('Unable to determine value for fact os["name"]')
     }
     default: {
       $ppa_options = undef

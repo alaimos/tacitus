@@ -1,5 +1,14 @@
 Puppet::Type.newtype(:rabbitmq_user_permissions) do
-  desc 'Type for managing rabbitmq user permissions'
+  desc <<-DESC
+Type for managing rabbitmq user permissions
+
+@example Define some rabbitmq_user_permissions
+ rabbitmq_user_permissions { 'dan@myvhost':
+   configure_permission => '.*',
+   read_permission      => '.*',
+   write_permission     => '.*',
+ }
+DESC
 
   ensurable do
     defaultto(:present)
@@ -13,9 +22,9 @@ Puppet::Type.newtype(:rabbitmq_user_permissions) do
 
   autorequire(:service) { 'rabbitmq-server' }
 
-  newparam(:name, :namevar => true) do
+  newparam(:name, namevar: true) do
     desc 'combination of user@vhost to grant privileges to'
-    newvalues(/^\S+@\S+$/)
+    newvalues(%r{^\S+@\S+$})
   end
 
   newproperty(:configure_permission) do
@@ -47,13 +56,9 @@ Puppet::Type.newtype(:rabbitmq_user_permissions) do
     [self[:name].split('@')[0]]
   end
 
-  # I may want to dissalow whitespace
   def validate_permissions(value)
-    begin
-      Regexp.new(value)
-    rescue RegexpError
-      raise ArgumentError, "Invalid regexp #{value}"
-    end
+    Regexp.new(value)
+  rescue RegexpError
+    raise ArgumentError, "Invalid regexp #{value}"
   end
-
 end

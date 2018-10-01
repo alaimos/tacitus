@@ -69,7 +69,7 @@ class composer(
   $php_bin         = $composer::params::php_bin,
   $suhosin_enabled = $composer::params::suhosin_enabled,
   $auto_update     = $composer::params::auto_update,
-  $projects        = hiera_hash('composer::execs', {}),
+  $projects        = lookup('composer::execs', Hash, {'strategy' => 'deep', 'merge_hash_arrays' => true}, {}),
   $github_token    = undef,
   $user            = undef,
 ) inherits ::composer::params {
@@ -78,12 +78,17 @@ class composer(
   require ::git
 
   # Validate input vars
-  validate_string(
-    $target_dir, $composer_file, $download_method,
-    $tmp_path, $php_package, $curl_package, $wget_package,
-    $composer_home, $php_bin
-  )
-  validate_bool($suhosin_enabled, $auto_update)
+  validate_legacy(String, 'validate_string', $target_dir)
+  validate_legacy(String, 'validate_string', $composer_file)
+  validate_legacy(String, 'validate_string', $download_method)
+  validate_legacy(String, 'validate_string', $tmp_path)
+  validate_legacy(String, 'validate_string', $php_package)
+  validate_legacy(String, 'validate_string', $curl_package)
+  validate_legacy(String, 'validate_string', $wget_package)
+  validate_legacy(String, 'validate_string', $composer_home)
+  validate_legacy(String, 'validate_string', $php_bin)
+  validate_legacy(Boolean, 'validate_bool', $suhosin_enabled)
+  validate_legacy(Boolean, 'validate_bool', $auto_update)
 
   # Set the exec path for composer target dir
   Exec { path => "/bin:/usr/bin/:/sbin:/usr/sbin:${target_dir}" }
@@ -96,7 +101,7 @@ class composer(
   # download composer
   case $download_method {
     'curl': {
-      $download_command = "curl -sS https://getcomposer.org/installer | ${composer::php_bin}"
+      $download_command = "curl -sS https://getcomposer.org/installer | ${composer::php_bin} -- --install-dir=${tmp_path} --filename=${composer_file}"
       $download_require = $suhosin_enabled ? {
         false    => [ Package['curl', $php_package] ],
         default  => [
@@ -107,7 +112,7 @@ class composer(
       $method_package = $curl_package
     }
     'wget': {
-      $download_command = 'wget https://getcomposer.org/composer.phar -O composer.phar'
+      $download_command = "wget https://getcomposer.org/composer.phar -O ${tmp_path}/${composer_file}"
       $download_require = $suhosin_enabled ? {
         false   => [ Package['wget', $php_package] ],
         default => [
@@ -136,21 +141,23 @@ class composer(
     }
   }
 
-  if defined(File["${target_dir}/${composer_file}"]) == false {
-    exec { 'download_composer':
-      command   => $download_command,
-      cwd       => $tmp_path,
-      require   => $download_require,
-      creates   => "${tmp_path}/composer.phar",
-      logoutput => $logoutput,
-    }
-    # move file to target_dir
-    file { "${target_dir}/${composer_file}":
-      ensure  => present,
-      source  => "${tmp_path}/composer.phar",
-      require => [ Exec['download_composer'], File[$target_dir] ],
-      mode    => '0755',
-    }
+  # download composer if target_file doesn't exist
+  exec { "download_composer":
+    command     => $download_command,
+    cwd         => $tmp_path,
+    require     => $download_require,
+    creates     => "${tmp_path}/${composer_file}",
+    logoutput   => $logoutput,
+    onlyif      => "test ! -f ${target_dir}/${composer_file}",
+    path        => [ '/bin', '/usr/bin' ],
+    notify      => Exec["move_composer_${target_dir}"],
+    environment => ["COMPOSER_HOME=${composer::composer_home}"]
+  }
+
+  # move downloaded file to target_dir
+  exec { "move_composer_${target_dir}":
+    command     => "mv ${tmp_path}/${composer_file} ${target_dir}/${composer_file}; chmod 0755 ${target_dir}/${composer_file}",
+    refreshonly => true,
   }
 
   if $auto_update == true {
@@ -194,6 +201,22 @@ class composer(
         }
       }
 
+      'FreeBSD': {
+        # set /usr/local/etc/php/suhosin.ini/suhosin.executor.include.whitelist = phar
+        augeas { 'whitelist_phar':
+          context => '/files/usr/local/etc/php/suhosin.ini/suhosin',
+          changes => 'set suhosin.executor.include.whitelist phar',
+          require => Package[$php_package],
+        }
+
+        # set /usr/local/etc/php.ini/PHP/allow_url_fopen = On
+        augeas { 'allow_url_fopen':
+          context => '/files/usr/local/etc/php.ini/PHP',
+          changes => 'set allow_url_fopen On',
+          require => Package[$php_package],
+        }
+      }
+
       default: {}
     }
   }
@@ -214,10 +237,12 @@ class composer(
     }
   }
 
-  if $projects or $::execs {
+  $execs = getvar('::execs')
+
+  if $projects or !empty($execs) {
     class {'composer::project_factory' :
       projects => $projects,
-      execs    => $::execs,
+      execs    => $execs,
     }
   }
 }

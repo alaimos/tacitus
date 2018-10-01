@@ -6,18 +6,23 @@ define staging::extract (
   $unless      = undef, #: alternative way to conditionally check whether to extract file.
   $onlyif      = undef, #: alternative way to conditionally check whether to extract file.
   $user        = undef, #: extract file as this user.
-  $group       = undef, #:  extract file as this group.
+  $group       = undef, #: extract file as this group.
   $environment = undef, #: environment variables.
   $strip       = undef, #: extract file with the --strip=X option. Only works with GNU tar.
+  $unzip_opts  = '',    #: additional options to pass the unzip command.
   $subdir      = $caller_module_name #: subdir per module in staging directory.
 ) {
 
-  include staging
+  include ::staging
 
   if $source {
     $source_path = $source
   } else {
-    $source_path = "${staging::path}/${subdir}/${name}"
+    if $subdir == '' { # eg when $caller_module_name is blank
+      $source_path = "${staging::_path}/${name}"
+    } else {
+      $source_path = "${staging::_path}/${subdir}/${name}"
+    }
   }
 
   # Use user supplied creates path, set default value if creates, unless or
@@ -63,7 +68,7 @@ define staging::extract (
   }
 
   if $strip {
-    if $::osfamily == 'Solaris' or $name !~ /(.tar|.tgz|.tar.gz|.tar.bz2)$/ {
+    if $::osfamily == 'Solaris' or $name !~ /(.tar|.tgz|.tar.gz|.tbz2|.tar.bz2)$/ {
       warning('strip is only supported with GNU tar, ignoring the parameter')
       $strip_opt = ''
     } else {
@@ -86,16 +91,28 @@ define staging::extract (
       }
     }
 
-    /.tar.bz2$/: {
+    /(.tbz2|.tar.bz2)$/: {
       $command = "tar xjf ${source_path}${strip_opt}"
     }
 
     /.zip$/: {
-      $command = "unzip ${source_path}"
+      $command = "unzip ${unzip_opts} ${source_path}"
     }
 
     /(.war|.jar)$/: {
       $command = "jar xf ${source_path}"
+    }
+
+    /.deb$/: {
+      if $::osfamily == 'Debian' {
+        $command = "dpkg --extract ${source_path} ."
+      } else {
+        fail('The .deb filetype is only supported on Debian family systems.')
+      }
+    }
+
+    /.Z$/: {
+      $command = "uncompress ${source_path}"
     }
 
     default: {
