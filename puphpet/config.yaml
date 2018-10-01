@@ -322,18 +322,7 @@ nodejs:
     install: '1'
     settings:
         version: '6'
-    npm_packages:
-        - gulp
-        - gulp-cli
-        - gulp-ext-replace
-        - gulp-imagemin
-        - gulp-postcss
-        - gulp-sourcemaps
-        - gulp-uglify
-        - gulp-bower
-        - main-bower-files
-        - stream-browserify
-        - laravel-elixir
+    npm_packages: {  } 
 mariadb:
     install: '1'
     settings:
