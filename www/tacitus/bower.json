@@ -33,7 +33,7 @@
 	"datatables-fixedcolumns": "~3.2",
 	"datatables-buttons": "~1.2",
     "jszip": "~3.1",
-    "pdfmake-dist": "~0.1",
+    "pdfmake": "~0.1",
     "select2": "~4.0.0"
   }
 }
