@@ -2199,7 +2199,7 @@
 }
 
 /*!
- * font-awesome-animation - v0.0.10
+ * font-awesome-animation - v0.0.9
  * https://github.com/l-lin/font-awesome-animation
  * License: MIT
  */
@@ -11323,6 +11323,7 @@ table.dataTable {
 table.dataTable td,
 table.dataTable th {
   -webkit-box-sizing: content-box;
+  -moz-box-sizing: content-box;
   box-sizing: content-box;
 }
 table.dataTable td.dataTables_empty,
@@ -11432,25 +11433,22 @@ div.dataTables_scrollHead table.dataTable {
   margin-bottom: 0 !important;
 }
 
-div.dataTables_scrollBody > table {
+div.dataTables_scrollBody table {
   border-top: none;
   margin-top: 0 !important;
   margin-bottom: 0 !important;
 }
-div.dataTables_scrollBody > table > thead .sorting:after,
-div.dataTables_scrollBody > table > thead .sorting_asc:after,
-div.dataTables_scrollBody > table > thead .sorting_desc:after {
+div.dataTables_scrollBody table thead .sorting:after,
+div.dataTables_scrollBody table thead .sorting_asc:after,
+div.dataTables_scrollBody table thead .sorting_desc:after {
   display: none;
 }
-div.dataTables_scrollBody > table > tbody > tr:first-child > th,
-div.dataTables_scrollBody > table > tbody > tr:first-child > td {
+div.dataTables_scrollBody table tbody tr:first-child th,
+div.dataTables_scrollBody table tbody tr:first-child td {
   border-top: none;
 }
 
-div.dataTables_scrollFoot > .dataTables_scrollFootInner {
-  box-sizing: content-box;
-}
-div.dataTables_scrollFoot > .dataTables_scrollFootInner > table {
+div.dataTables_scrollFoot table {
   margin-top: 0 !important;
   border-top: none;
 }

@@ -1,8 +1,10 @@
 #!/bin/bash
-echo "------------ START INSTALL TYPINGS ------------"
+echo "------------ START NPM PACKAGES   ------------"
 
-### install typings
+sudo npm install -g bower
+sudo npm install -g node-sass
+sudo npm install -g gulp@3.9.1
+sudo npm install -g gulp-bower
+sudo npm install -g laravel-elixir@5.0.0
 
-# sudo npm install -g typings
-
-echo "------------ END INSTALL TYPINGS ------------"
+echo "------------ END INSTALL PACKAGES ------------"

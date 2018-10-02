@@ -15,9 +15,7 @@ echo debconf shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-
 echo debconf shared/accepted-oracle-license-v1-1 seen true | /usr/bin/debconf-set-selections
 
 # run installer
-sudo apt-get install -y oracle-java8-installer > /dev/null
-sudo update-alternatives --auto java
-sudo update-alternatives --auto javac
+sudo apt-get install -y oracle-java8-installer oracle-java8-set-default
 
 ## add to environment
 export JAVA_HOME=/usr/lib/jvm/java-8-oracle
