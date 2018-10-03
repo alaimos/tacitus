@@ -135,6 +135,9 @@
                 return markup;
             }, // omitted for brevity, see the source of this page
             templateSelection: function (selection) {
+                if (selection.title == undefined || selection.title == "") {
+                    return selection.text;
+                }
                 return (selection.title + ' - ' + selection.organism) || selection.text;
             }
         });

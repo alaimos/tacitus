@@ -192,7 +192,12 @@ class DatasetSelection extends Job implements ShouldQueue
             $probe = Probe::whereDatasetId($dataset->id)->limit(1)->skip($i)->first();
             $tmp = [$probe->name];
             foreach ($keyToName as $key => $dt) {
-                $tmp[] = $probe->data[$dt[1]];
+                $key = $dt[1];
+                if (!isset($probe->data[$key])) {
+                    $tmp[] = "NA";
+                } else {
+                    $tmp[] = $probe->data[$key];
+                }
             }
             @fputcsv($fp, $tmp, "\t", '"', '\\');
             $this->logProgress(($i + 1), $probes);
@@ -211,7 +216,7 @@ class DatasetSelection extends Job implements ShouldQueue
     public function handle()
     {
         $user = $this->jobData->user;
-        if ($this->attempts() > 1) {
+        if ($this->attempts() > 2) {
             $this->delete();
         } else {
             $this->jobData->status = JobData::PROCESSING;
@@ -236,6 +241,7 @@ class DatasetSelection extends Job implements ShouldQueue
                     $errorClass = join('', array_slice(explode('\\', get_class($e)), -1));
                     $this->log('Unable to complete job. Error "' . $errorClass . '" with message "' . $e->getMessage()
                                . "\".\n");
+                    $this->log('Exception trace: ' . $e->getTraceAsString());
                     if ($sampleSelection !== null && $sampleSelection instanceof SampleSelection) {
                         $sampleSelection->status = SampleSelection::FAILED;
                     }

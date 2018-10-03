@@ -51,6 +51,8 @@ class TestImport extends Command
         $jobData->save();*/
         $id = ($this->hasArgument('id')) ? intval($this->argument('id')) : 66;
         $jobData = JobData::whereId($id)->first();
+        $jobData->log = '';
+        $jobData->save();
         $this->dispatchNow(Factory::getQueueJob($jobData));
         return 0;
         $registry = new ParserFactoryRegistry();
