@@ -22,10 +22,12 @@ use Laratrust\Traits\LaratrustUserTrait;
  * @property string                                                                                     $remember_token
  * @property \Carbon\Carbon                                                                             $created_at
  * @property \Carbon\Carbon                                                                             $updated_at
+ * @property string                                                                                     $affiliation
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Dataset[]                        $datasets
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Job[]                            $jobs
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\Role[]                           $roles
  * @property-read \Fenos\Notifynder\Models\NotifynderCollection|\Fenos\Notifynder\Models\Notification[] $notifications
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\GalaxyCredential[]               $galaxyCredentials
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereName($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereEmail($value)
@@ -34,9 +36,8 @@ use Laratrust\Traits\LaratrustUserTrait;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereRoleIs($role = '')
- * @mixin \Eloquent
- * @property string                                                                                     $affiliation
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereAffiliation($value)
+ * @mixin \Eloquent
  */
 class User extends Authenticatable
 {
@@ -77,6 +78,14 @@ class User extends Authenticatable
         return $this->hasMany('App\Models\Job', 'user_id', 'id');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+    public function galaxyCredentials()
+    {
+        return $this->hasMany('App\Models\GalaxyCredential', 'user_id', 'id');
+    }
+
 
     /**
      * Returns some statistics about the user. System will be added if the user is an administrator
@@ -85,21 +94,21 @@ class User extends Authenticatable
      */
     public function statistics()
     {
-        $stats = [];
-        $stats['jobs'] = [
+        $stats                  = [];
+        $stats['jobs']          = [
             'all'        => Job::whereUserId($this->id)->count(),
             'queued'     => Job::whereUserId($this->id)->whereStatus(Job::QUEUED)->count(),
             'processing' => Job::whereUserId($this->id)->whereStatus(Job::PROCESSING)->count(),
             'failed'     => Job::whereUserId($this->id)->whereStatus(Job::FAILED)->count(),
             'completed'  => Job::whereUserId($this->id)->whereStatus(Job::COMPLETED)->count(),
         ];
-        $stats['datasets'] = [
+        $stats['datasets']      = [
             'all'     => Dataset::whereUserId($this->id)->count(),
             'pending' => Dataset::whereUserId($this->id)->whereStatus(Dataset::PENDING)->count(),
             'ready'   => Dataset::whereUserId($this->id)->whereStatus(Dataset::READY)->count(),
             'failed'  => Dataset::whereUserId($this->id)->whereStatus(Dataset::FAILED)->count(),
         ];
-        $stats['selections'] = [
+        $stats['selections']    = [
             'all'     => SampleSelection::whereUserId($this->id)->count(),
             'pending' => SampleSelection::whereUserId($this->id)->whereStatus(SampleSelection::PENDING)->count(),
             'ready'   => SampleSelection::whereUserId($this->id)->whereStatus(SampleSelection::READY)->count(),
