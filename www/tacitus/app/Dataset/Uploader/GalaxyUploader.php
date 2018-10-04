@@ -1,32 +1,37 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: alaim
- * Date: 04/10/2018
- * Time: 10:19
+ * TACITuS - Transcriptomic dAta Collector, InTegrator, and Selector
+ *
+ * @author S. Alaimo, Ph.D. <alaimos at gmail dot com>
  */
 
-namespace App\Dataset\Uploader;
+namespace {
+    require_once __DIR__ . '/../../Blend/galaxy.inc';
+}
+
+namespace App\Dataset\Uploader {
 
 
-use App\Dataset\Traits\InteractsWithJobData;
-use App\Dataset\Traits\InteractsWithLogCallback;
+    use App\Dataset\Traits\InteractsWithJobData;
+    use App\Dataset\Traits\InteractsWithLogCallback;
 
-class GalaxyUploader implements UploaderInterface
-{
-
-    use InteractsWithJobData;
-    use InteractsWithLogCallback;
-
-    /**
-     * Run dataset upload
-     *
-     * @return boolean
-     * @throws \App\Dataset\Uploader\Exception\UploaderException
-     */
-    public function upload()
+    class GalaxyUploader implements UploaderInterface
     {
-        // TODO: Implement upload() method.
+
+        use InteractsWithJobData;
+        use InteractsWithLogCallback;
+
+        /**
+         * Run dataset upload
+         *
+         * @return boolean
+         * @throws \App\Dataset\Uploader\Exception\UploaderException
+         */
+        public function upload()
+        {
+            // TODO: Implement upload() method.
+        }
+
     }
 
 }
