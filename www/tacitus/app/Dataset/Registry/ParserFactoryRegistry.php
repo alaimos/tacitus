@@ -37,7 +37,9 @@ class ParserFactoryRegistry
      */
     public function __construct()
     {
-        $this->initializeClassesList()->initializeSourcesList()->initializeHandlerClasses();
+        $this->initializeClassesList()
+             ->initializeSourcesList()
+             ->initializeHandlerClasses();
     }
 
     /**

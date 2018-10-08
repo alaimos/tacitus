@@ -144,54 +144,156 @@
     <!-- /.row -->
     <div class="row">
         <div class="col-md-8 col-md-offset-2">
-            <div class="panel panel-info">
-                <div class="panel-heading">
-                    <i class="fa fa-user fa-fw"></i>
-                    Account details
-                </div>
-                <div class="panel-body">
-                    <dl class="dl-horizontal">
-                        <dt>Name</dt>
-                        <dd>{{$user->name}}</dd>
-                        <dt>Affiliation</dt>
-                        <dd>{{$user->affiliation}}</dd>
-                        <dt>E-Mail</dt>
-                        <dd>{{$user->email}}</dd>
-                        <dt>Registered</dt>
-                        <dd>{{$user->created_at->diffForHumans()}}</dd>
-                    </dl>
-                </div>
-                <div class="panel-footer">
-                    <div class="row">
-                        <div class="col-md-6">
-                            @if ($isCurrent)
-                                <a href="{{ route('user::change-password') }}" role="button" class="btn btn-success">
-                                    <i class="fa fa-key fa-fw"></i>Change password
-                                </a>
-                            @elseif(!$isCurrent && $isAdmin)
-                                <a href="{{ route('user::change-password', $user) }}"
-                                   role="button" class="btn btn-success">
-                                    <i class="fa fa-key fa-fw"></i>Change password
-                                </a>
-                            @endif
+                <div class="panel-group">
+                    <div class="panel panel-info">
+                        <div class="panel-heading">
+                            <i class="fa fa-user fa-fw"></i>
+                            Account details
                         </div>
-                        <div class="col-md-6 text-right">
-                            @if ($isCurrent)
-                                <a href="{{ route('user::edit-profile') }}" role="button" class="btn btn-success">
-                                    <i class="fa fa-user fa-fw"></i> Edit Profile
-                                </a>
-                            @elseif(!$isCurrent && $isAdmin)
-                                <a href="{{ route('user::edit-profile', $user) }}" role="button"
-                                   class="btn btn-success">
-                                    <i class="fa fa-user fa-fw"></i> Edit Profile
-                                </a>
-                            @endif
+                        <div class="panel-body">
+                            <dl class="dl-horizontal">
+                                <dt>Name</dt>
+                                <dd>{{$user->name}}</dd>
+                                <dt>Affiliation</dt>
+                                <dd>{{$user->affiliation}}</dd>
+                                <dt>E-Mail</dt>
+                                <dd>{{$user->email}}</dd>
+                                <dt>Registered</dt>
+                                <dd>{{$user->created_at->diffForHumans()}}</dd>
+                            </dl>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    @if ($isCurrent)
+                                        <a href="{{ route('user::change-password') }}" role="button" class="btn btn-success">
+                                            <i class="fa fa-key fa-fw"></i>Change password
+                                        </a>
+                                    @elseif(!$isCurrent && $isAdmin)
+                                        <a href="{{ route('user::change-password', $user) }}"
+                                           role="button" class="btn btn-success">
+                                            <i class="fa fa-key fa-fw"></i>Change password
+                                        </a>
+                                    @endif
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    @if ($isCurrent)
+                                        <a href="{{ route('user::edit-profile') }}" role="button" class="btn btn-success">
+                                            <i class="fa fa-user fa-fw"></i> Edit Profile
+                                        </a>
+                                    @elseif(!$isCurrent && $isAdmin)
+                                        <a href="{{ route('user::edit-profile', $user) }}" role="button"
+                                           class="btn btn-success">
+                                            <i class="fa fa-user fa-fw"></i> Edit Profile
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <br><br>
+                    <div class="panel panel-info">
+                        <a name="galaxy_table"></a>
+                        <div class="panel-heading">
+                            <i class="fa fa-folder-open"></i>
+                            Galaxy details
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-md-12 alert-container">
+                                    @include('sun::flash')
+                                </div>
+                            </div>
+                            <!-- /.row -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <table class="table table-condensed table-responsive table-hover table-striped no-wrap"
+                                           id="galaxy-records-table">
+                                        <thead>
+                                        <tr>
+                                            <th>Id</th>
+                                            <th>Name</th>
+                                            <th>Hostname</th>
+                                            <th>Port</th>
+                                            <th>Uses https</th>
+                                            <th>Action</th>
+                                        </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-footer">
+                            <div class="row">
+                                <div class="col-md-12 text-right">
+                                    @if ($isCurrent)
+                                        <a href="{{route('add-credential',['user' => $user])}}" role="button" class="btn btn-success">
+                                            <i class="fa fa-plus-circle"></i>
+                                            Add credentials
+                                        </a>
+                                    @elseif(!$isCurrent && $isAdmin)
+                                        <a href="{{route('add-credential',['user' => $user])}}" role="button" class="btn btn-success">
+                                            <i class="fa fa-plus-circle"></i>
+                                            Add credentials
+                                        </a>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
                     </div>
 
                 </div>
-            </div>
         </div>
     </div>
     <!-- /.row -->
 @endsection
+
+
+
+@push('head-scripts')
+    <script src="{{ url('js/pdfmake.min.js') }}"></script>
+    <script src="{{ url('js/vfs_fonts.js') }}"></script>
+    <script src="{{ url('js/jszip.min.js') }}"></script>
+@endpush
+@push('scripts')
+    <script>
+        var simple_checkbox = function ( data, type, full, meta ) {
+            var is_checked = data == true ? "checked" : "";
+            return '<input type="checkbox" class="checkbox" ' + is_checked + ' disabled/>';
+        }
+
+        $(function () {
+            $('#galaxy-records-table').dataTable({
+                pageLength: 5,
+                lengthMenu: [ 5, 10, 25, 50, 100 ],
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                ajax: {
+                    headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
+                    url: '{{ route('galaxy-list-data',['id' => $user->id] )}}',
+                    method: 'POST'
+                },
+                columnDefs: [
+                    {
+                        "targets": 4,
+                        "className": "text-center",
+                    }
+                ],
+                columns: [
+                    {data: 'id', name: 'id'},
+                    {data: 'name', name: 'name'},
+                    {data: 'hostname', name: 'hostname'},
+                    {data: 'port', name: 'port'},
+                    {data: 'use_https', render: simple_checkbox},
+                    {data: 'action', name: 'action', orderable: false, searchable: false}
+                ],
+                language: {
+                    processing: '<i class="fa fa-spinner faa-spin fa-3x fa-fw animated"></i><span class="sr-only">Loading...</span>'
+
+                }
+            });
+        });
+    </script>
+@endpush

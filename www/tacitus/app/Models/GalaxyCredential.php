@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 /**
  * App\Models\GalaxyCredential
@@ -51,16 +52,21 @@ class GalaxyCredential extends Model
     /**
      * Get all credentials
      *
+     * @param int $id
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public static function listCredentials()
+    public static function listCredentials($id = null)
     {
         $current = current_user();
         if ($current === null) {
             return abort(401, 'You are not allowed to list credentials.');
         }
-        return self::whereUserId(current_user());
+        if ($id === null){
+            $id = current_user()->id;
+        }
+        return self::whereUserId($id);
     }
 
     /**
