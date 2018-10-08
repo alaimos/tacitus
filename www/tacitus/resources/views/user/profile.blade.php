@@ -212,7 +212,7 @@
                                            id="galaxy-records-table">
                                         <thead>
                                         <tr>
-                                            <th>Id</th>
+                                            <th>#</th>
                                             <th>Name</th>
                                             <th>Hostname</th>
                                             <th>Port</th>
@@ -262,7 +262,6 @@
             var is_checked = data == true ? "checked" : "";
             return '<input type="checkbox" class="checkbox" ' + is_checked + ' disabled/>';
         }
-
         $(function () {
             $('#galaxy-records-table').dataTable({
                 pageLength: 5,
@@ -272,17 +271,23 @@
                 serverSide: true,
                 ajax: {
                     headers: {'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')},
-                    url: '{{ route('galaxy-list-data',['id' => $user->id] )}}',
+                    url: '{{ route('galaxy-list-data',['user' => $user] )}}',
                     method: 'POST'
                 },
                 columnDefs: [
+                    {
+                        "searchable": false,
+                        "orderable": false,
+                        "targets": 0
+                    },
                     {
                         "targets": 4,
                         "className": "text-center",
                     }
                 ],
                 columns: [
-                    {data: 'id', name: 'id'},
+                    /*{data: 'id', name: 'id'},*/
+                    {data: 'DT_Row_Index', name: 'index'},
                     {data: 'name', name: 'name'},
                     {data: 'hostname', name: 'hostname'},
                     {data: 'port', name: 'port'},
@@ -294,6 +299,7 @@
 
                 }
             });
+
         });
     </script>
 @endpush

@@ -22,7 +22,7 @@ class GalaxyController extends Controller
      */
     public static function registerRoutes(Router $router)
     {
-        $router->any('/galaxy/data/{id?}',
+        $router->any('/galaxy/data/{user?}',
             ['as' => 'galaxy-list-data', 'uses' => 'GalaxyController@selectionsData']);
         $router->get('/galaxy/add/credential/{user?}',
             ['as' => 'add-credential',   'uses' => 'GalaxyController@createCredential']);
@@ -37,18 +37,23 @@ class GalaxyController extends Controller
     /**
      * Process datatables ajax request for the list of user galaxy credential.
      *
-     * @param int $id
+     * @param User $user
      * Note: if $id is null, then the current user's id is selected into GalaxyCredentials class
      *
      * @return \Illuminate\Http\JsonResponse
      */
-    public function selectionsData($id = null)
+    public function selectionsData(User $user = null)
     {
         if (!user_can(Permissions::VIEW_SELECTIONS)) {
             abort(403);
         }
         /** @var \Yajra\Datatables\Engines\QueryBuilderEngine $table */
-        $table = Datatables::of(GalaxyCredential::listCredentials($id)->select('id','name','hostname','port','use_https'));
+        if (!$user->exists){
+            $user = current_user();
+        }
+        $table = Datatables::of(GalaxyCredential::listCredentials($user->id)
+            ->select('id','name','hostname','port','use_https'))
+            ->addIndexColumn();
         $table->addColumn('action', function (GalaxyCredential $credential) {
             return view('galaxy.add_galaxy_cred_column',
                 [
@@ -108,6 +113,8 @@ class GalaxyController extends Controller
         if (!$user->exists) {
             $user = current_user();
         }
+        $isCurrent = current_user()->id == $user->id;
+        $isAdmin   = user_can(Permissions::ADMINISTER);
         $galaxy_credential = new GalaxyCredential([
              'name'        => $request->get('name'),
              'hostname'    => $request->get('hostname'),
@@ -119,7 +126,7 @@ class GalaxyController extends Controller
         $galaxy_credential->save();
 
         Flash::success('Credentials created successfully!');
-        return redirect()->route('user::profile');
+        return redirect()->to(route('user::profile',((!$isCurrent && $isAdmin) ? $user : [])).'#galaxy_table');
     }
 
     /**
@@ -186,9 +193,10 @@ class GalaxyController extends Controller
             abort(500, 'You are not allowed to delete this credential');
         }
 
+        $user = User::whereId($credential->user_id)->first();
         $credential->delete();
         Flash::success('User deleted successfully!');
-        return redirect()->route('user::profile');
+        return redirect()->to(route('user::profile',((!$isCurrent && $isAdmin) ? $user : [])).'#galaxy_table');
 
     }
 }

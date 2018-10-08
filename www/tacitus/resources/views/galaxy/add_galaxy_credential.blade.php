@@ -6,7 +6,7 @@
             <h1 class="page-header">
                 Galaxy credentials register
                 <span class="pull-right">
-                    <a href="{{route('user::profile').'#galaxy_table' }}" class="btn btn-info">
+                    <a href="{{route('user::profile', ((!$isCurrent && $isAdmin) ? $user : [])).'#galaxy_table' }}" class="btn btn-info">
                         <i class="fa fa-arrow-left fa-fw" aria-hidden="true"></i> Go Back
                     </a>
                 </span>
