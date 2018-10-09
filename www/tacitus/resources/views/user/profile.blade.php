@@ -242,14 +242,21 @@
                             </div>
                         </div>
                     </div>
-
                 </div>
         </div>
     </div>
     <!-- /.row -->
+
+    <!-- Modal -->
+    <div id="galaxy_edit_modal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-md-12">
+            <!-- Modal content-->
+            <div class="modal-content">
+            </div>
+        </div>
+    </div>
+
 @endsection
-
-
 
 @push('head-scripts')
     <script src="{{ url('js/pdfmake.min.js') }}"></script>
@@ -301,5 +308,6 @@
             });
 
         });
+
     </script>
 @endpush

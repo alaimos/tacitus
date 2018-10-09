@@ -30,7 +30,8 @@ class GalaxyController extends Controller
             ['as' => 'add-doCredential', 'uses' => 'GalaxyController@doCreateCredential']);
         $router->get('/galaxy/{credential}/delete',
             ['as' => 'credential-delete','uses' => 'GalaxyController@destroy']);
-
+        $router->get('/galaxy/edit/{credential?}',
+            ['as' => 'edit-credential',  'uses' => 'GalaxyController@edit']);
     }
 
 
@@ -83,7 +84,6 @@ class GalaxyController extends Controller
      */
     public function createCredential(User $user)
     {
-
         /*add the corresponding permission*/
         return view('galaxy.add_galaxy_credential',
             [
@@ -154,12 +154,16 @@ class GalaxyController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param  int  $id
+     * @param  GalaxyCredential $credential
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(GalaxyCredential $credential)
     {
-        //
+        Log::info($credential->id);
+        return view('galaxy.edit_galaxy_credential',
+            [
+                'credential' => $credential
+            ]);
     }
 
     /**
