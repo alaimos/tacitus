@@ -2,16 +2,13 @@
     <button type="button" class="close" aria-label="Close" data-dismiss="modal">
         <span aria-hidden="true" class="white-text">&times;</span>
     </button>
-    <h4 class="modal-title modal-title white-text w-100 font-weight-bold py-2">Galaxy Credential
-    {{$credential->id}}
-    </h4>
+    <h4 class="modal-title modal-title white-text w-100 font-weight-bold py-2">Edit Galaxy Account</h4>
 </div>
 <div class="modal-body">
     <div class="row">
         <div class="col-md-12">
             <div class="panel-body">
-                <form class="form-horizontal" role="form" method="POST"
-                      action="#">
+                <form class="form-horizontal galaxy-form" role="form" method="POST" action="#">
                     {{ csrf_field() }}
                     <div class="form-group{{ $errors->has('name') ? ' has-error' : '' }}">
                         {!! Form::label('name', 'Name', ['class' => 'col-md-4 control-label']) !!}
@@ -74,7 +71,6 @@
                             {!! Form::checkbox('use_https','value',$credential->use_https,['class' => 'form-check-input'])!!}
                         </div>
                     </div>
-
                 </form>
             </div>
 
@@ -82,9 +78,8 @@
     </div>
 </div>
 <div class="modal-footer">
-    <button type="submit" class="btn btn-primary" data-dismiss="modal">
-        <i class="fa fa-btn fa-pencil" aria-hidden="true"></i>
-        Save credential
-    </button>
+    <a href="Javascript:;" class="btn btn-primary" data-dismiss="modal" onclick="$('.galaxy-form').submit();">
+        <i class="fa fa-btn fa-pencil" aria-hidden="true"></i> Save credential
+    </a>
 </div>
 
