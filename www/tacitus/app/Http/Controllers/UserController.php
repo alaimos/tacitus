@@ -154,7 +154,7 @@ class UserController extends Controller
      *
      * @param User|null $user
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|void
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function profile(User $user = null)
     {
@@ -216,7 +216,7 @@ class UserController extends Controller
      *
      * @param User|null $user
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|void
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function editProfile(User $user = null)
     {
@@ -319,7 +319,7 @@ class UserController extends Controller
     /**
      * Show user creation form
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View|void
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function createUser()
     {

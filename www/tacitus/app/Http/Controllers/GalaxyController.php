@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use App\Models\User;
 use Illuminate\Support\Facades\Log;
-use App\Http\Requests;
+
 
 class GalaxyController extends Controller
 {
@@ -32,6 +32,8 @@ class GalaxyController extends Controller
             ['as' => 'credential-delete','uses' => 'GalaxyController@destroy']);
         $router->get('/galaxy/edit/{credential?}',
             ['as' => 'edit-credential',  'uses' => 'GalaxyController@edit']);
+        $router->post('/galaxy/update/{credential?}',
+            ['as' => 'update-credential','uses' => 'GalaxyController@update']);
     }
 
 
@@ -53,7 +55,7 @@ class GalaxyController extends Controller
             $user = current_user();
         }
         $table = Datatables::of(GalaxyCredential::listCredentials($user->id)
-            ->select('id','name','hostname','port','use_https'))
+            /*->select('id','name','hostname','port','use_https','user_id')*/)
             ->addIndexColumn();
         $table->addColumn('action', function (GalaxyCredential $credential) {
             return view('galaxy.add_galaxy_cred_column',
@@ -62,17 +64,6 @@ class GalaxyController extends Controller
                 ]);
         });
         return $table->make(true);
-    }
-
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
     }
 
     /**
@@ -120,25 +111,15 @@ class GalaxyController extends Controller
              'hostname'    => $request->get('hostname'),
              'port'        => $request->get('port'),
              'use_https'   => $request->get('use_https') === 'true'? true:false,
+             'api_key'     => $request->get('api_key'),
              'user_id'     => $user->id
          ]);
-        $galaxy_credential->setApiKeyAttribute($request->get('api_key'));
         $galaxy_credential->save();
 
         Flash::success('Credentials created successfully!');
         return redirect()->to(route('user::profile',((!$isCurrent && $isAdmin) ? $user : [])).'#galaxy_table');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
     /**
      * Display the specified resource.
@@ -159,7 +140,6 @@ class GalaxyController extends Controller
      */
     public function edit(GalaxyCredential $credential)
     {
-        Log::info($credential->id);
         return view('galaxy.edit_galaxy_credential',
             [
                 'credential' => $credential
@@ -170,12 +150,29 @@ class GalaxyController extends Controller
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  GalaxyCredential $credential
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, GalaxyCredential $credential)
     {
-        //
+        $current_user = current_user();
+        $isAdmin      = user_can(Permissions::ADMINISTER);
+        $isCurrent    = $current_user->id == $credential->user_id;
+
+        if(!$isAdmin && !$isCurrent){
+            abort(503, 'You are not allowed to update this credential');
+        }
+
+        if($request->get('name')     !== '') {$credential->name     = $request->get('name');}
+        if($request->get('port')     !== '') {$credential->port     = $request->get('port');}
+        if($request->get('api_key')  !== '') {$credential->api_key  = $request->get('api_key');}
+        if($request->get('hostname') !== '') {$credential->hostname = $request->get('hostname');}
+        $credential->use_https = $request->get('use_https') !== null? true:false;
+        $credential->save();
+
+        $user = ($isAdmin) ?  User::whereId($credential->user_id)->first():$current_user;
+        Flash::success('Credentials updated successfully!');
+        return redirect()->to(route('user::profile',((!$isCurrent && $isAdmin) ? $user : [])).'#galaxy_table');
     }
 
     /**
@@ -203,4 +200,5 @@ class GalaxyController extends Controller
         return redirect()->to(route('user::profile',((!$isCurrent && $isAdmin) ? $user : [])).'#galaxy_table');
 
     }
+
 }

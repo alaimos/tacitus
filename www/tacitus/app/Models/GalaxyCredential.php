@@ -74,23 +74,27 @@ class GalaxyCredential extends Model
      *
      * @param string $value
      *
-     * @return string
+     * @return string|null
      */
     public function getApiKeyAttribute($value)
     {
+        if (empty($value)) {
+            return null;
+        }
         return decrypt($value);
     }
+
 
     /**
      * Mutator for the API Key attribute
      *
      * @param string $value
      *
-     * @return string
+     * @return void
      */
     public function setApiKeyAttribute($value)
     {
-        return encrypt($value);
+        $this->attributes['api_key'] = encrypt($value);
     }
 
     /**

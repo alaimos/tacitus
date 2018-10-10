@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GalaxyCredential;
 use App\Models\SampleSelection;
 use App\Utils\Permissions;
 use Datatables;
@@ -9,6 +10,7 @@ use Flash;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Log;
 
 class SelectionController extends Controller
 {
@@ -20,7 +22,8 @@ class SelectionController extends Controller
      */
     public static function registerRoutes(Router $router)
     {
-        $router->get('/selections', ['as' => 'selections-lists', 'uses' => 'SelectionController@selectionsList']);
+        $router->get('/selections',
+            ['as' => 'selections-lists', 'uses' => 'SelectionController@selectionsList']);
         $router->any('/selections/data',
             ['as' => 'selections-lists-data', 'uses' => 'SelectionController@selectionsData']);
         $router->any('/selections/list',
@@ -28,7 +31,12 @@ class SelectionController extends Controller
         $router->get('/selections/{selection}/download/{type}',
             ['as' => 'selections-download', 'uses' => 'SelectionController@download']);
         $router->get('/selections/{selection}/delete',
-            ['as' => 'selections-delete', 'uses' => 'SelectionController@delete']);
+            ['as' => 'selections-delete',   'uses' => 'SelectionController@delete']);
+
+        $router->get('/selections/{selection}/upload',
+            ['as' => 'selection-upload',    'uses' => 'SelectionController@upload']);
+        $router->post('/selections/galaxyCredentials',
+            ['as' => 'galaxyCredential-selection', 'uses' => 'SelectionController@credentialToUpload']);
     }
 
     /**
@@ -142,4 +150,34 @@ class SelectionController extends Controller
         Flash::success('Selection deleted successfully.');
         return back();
     }
+
+
+    /**
+     * Process datatables ajax request for the list of user galaxy credential.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function credentialToUpload()
+    {
+        Log::info("credental to upload");
+        /** @var \Yajra\Datatables\Engines\QueryBuilderEngine $table */
+        $table = Datatables::of(GalaxyCredential::listCredentials(current_user()->id))->addIndexColumn();
+        return $table->make(true);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  SampleSelection $selection
+     * @return \Illuminate\Http\Response
+     *
+     */
+    public function upload(SampleSelection $selection)
+    {
+        return view('selections.upload_selection_onGalaxy',
+            [
+                'selection' => $selection
+            ]);
+    }
+
 }
