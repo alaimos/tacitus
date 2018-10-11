@@ -145,6 +145,15 @@
                 }
             });
 
+            $('.panel-info').on('click','div',function () {
+                if($(this).hasClass('panel-footer')){
+                    if($(this).children().find('a').hasClass('disabled')){
+                        alert("You need to select one of your galaxy accounts. \n" +
+                              "Please click on the corresponding row of the table");
+                    };
+                }
+            });
+
         });
     </script>
 @endpush
