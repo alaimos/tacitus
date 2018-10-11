@@ -8,7 +8,7 @@
         <i class="fa fa-download" aria-hidden="true"></i> Download Data
     </a>
 @endif
-<a href="#"
+<a href="{{route('mapped-selection-upload', ['selection' => $mappedSelection]) }}"
    class="btn btn-xs btn-primary">
     <i class="fa fa-upload" aria-hidden="true"></i> Upload to Galaxy
 </a>

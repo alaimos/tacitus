@@ -8,6 +8,7 @@
 namespace App\Http\Controllers;
 
 use App\Jobs\Factory as JobFactory;
+use App\Models\GalaxyCredential;
 use App\Models\Job as JobData;
 use App\Models\MappedSampleSelection;
 use App\Models\SampleSelection;
@@ -18,6 +19,8 @@ use Flash;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+
+use Illuminate\Support\Facades\Log;
 
 class MappedSelectionController extends Controller
 {
@@ -43,6 +46,13 @@ class MappedSelectionController extends Controller
             ['as' => 'mapped-selections-download', 'uses' => 'MappedSelectionController@download']);
         $router->get('/selections/mapped/{selection}/delete',
             ['as' => 'mapped-selections-delete', 'uses' => 'MappedSelectionController@delete']);
+
+        $router->get('/selections/mapped/{selection}/upload',
+            ['as' => 'mapped-selection-upload', 'uses' => 'MappedSelectionController@upload']);
+        $router->post('/selections/mapped/{selection}/upload',
+            ['as' => 'mapped-selection-do-upload', 'uses' => 'MappedSelectionController@doUpload']);
+        $router->post('/selections/mapped/galaxyCredentials',
+            ['as' => 'galaxyCredential-mappedSelection', 'uses' => 'MappedSelectionController@listGalaxyCredential']);
 
     }
 
@@ -219,4 +229,95 @@ class MappedSelectionController extends Controller
         Flash::success('Selection deleted successfully.');
         return back();
     }
+
+    /**
+     * Process datatables ajax request for the list of user galaxy credential.
+     *
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function listGalaxyCredential()
+    {
+        if (!user_can(Permissions::VIEW_SELECTIONS)) {
+            abort(403);
+        }
+        /** @var \Yajra\Datatables\Engines\QueryBuilderEngine $table */
+        $table = Datatables::of(GalaxyCredential::listCredentials(current_user()->id))->addIndexColumn();
+        return $table->make(true);
+    }
+
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  MappedSampleSelection $selection
+     *
+     * @return \Illuminate\Http\Response
+     *
+     */
+    public function upload(MappedSampleSelection $selection)
+    {
+        if (!user_can(Permissions::DOWNLOAD_SELECTIONS)) {
+            abort(403);
+        }
+        if (!$selection || !$selection->exists) {
+            abort(404, 'Unable to find the selection.');
+        }
+        if (!$selection->canDownload()) {
+            abort(401, 'You are not allowed to upload this selection.');
+        }
+
+        Log::info($selection->mapping);
+        return view('selections.mapped.upload_mappedSelection_onGalaxy',
+            [
+                'mappedSelection' => $selection,
+            ]);
+    }
+
+    /**
+     * Submit the upload job
+     *
+     * @param  MappedSampleSelection $selection
+     *
+     * @return \Illuminate\Http\Response
+     *
+     */
+    public function doUpload(Request $request, MappedSampleSelection $selection)
+    {
+        if (!user_can(Permissions::DOWNLOAD_SELECTIONS)) {
+            abort(403);
+        }
+        if (!$selection || !$selection->exists) {
+            abort(404, 'Unable to find the mapped selection.');
+        }
+        if (!$selection->canDownload()) {
+            abort(401, 'You are not allowed to upload this mapped selection.');
+        }
+        $server = $request->get('galaxy-server');
+        if (empty($server)) {
+            abort(500, 'You must specify a galaxy server server');
+        }
+        $credential = GalaxyCredential::whereId($server)->first();
+        if (empty($credential) || !$credential->exists) {
+            abort(500, 'You must specify a galaxy server server');
+        }
+
+        $jobData = new JobData([
+            'job_type' => 'galaxy_upload_job',
+            'status'   => JobData::QUEUED,
+            'job_data' => [
+                'name'          => $selection->selection->name . ' mapped to ' . $selection-> mapping->name,
+                'data_file'     => $selection->getDataFilename(),
+                'metadata_file' => $selection->getMetadataFilename(),
+                'credential'    => $credential->id,
+            ],
+            'log'      => '',
+        ]);
+        $jobData->user()->associate(\Auth::user());
+        $jobData->save();
+        $job = JobFactory::getQueueJob($jobData);
+        $this->dispatch($job);
+        Flash::success('Your upload request has been submitted. Please check the Jobs panel to verify its status.');
+        return redirect()->route('mapped-selections-lists');
+    }
+
 }

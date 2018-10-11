@@ -8,6 +8,12 @@
         <i class="fa fa-download" aria-hidden="true"></i> Download Data
     </a>
 @endif
+
+<a href="{{route('selection-upload', ['selection' => $selection]) }}"
+   class="btn btn-xs btn-primary upload-selectionGalaxy-button">
+    <i class="fa fa-upload" aria-hidden="true"></i> Upload to Galaxy
+</a>
+
 @if($integration->canDelete())
     <a href="{{ route('integration-delete', ['integration' => $integration]) }}" class="btn btn-xs btn-danger">
         <i class="fa fa-trash" aria-hidden="true"></i> Delete

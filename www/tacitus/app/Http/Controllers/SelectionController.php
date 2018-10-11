@@ -178,6 +178,7 @@ class SelectionController extends Controller
      * @return \Illuminate\Http\Response
      *
      */
+
     public function upload(SampleSelection $selection)
     {
         if (!user_can(Permissions::DOWNLOAD_SELECTIONS)) {
