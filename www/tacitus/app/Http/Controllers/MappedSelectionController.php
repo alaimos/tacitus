@@ -266,7 +266,6 @@ class MappedSelectionController extends Controller
             abort(401, 'You are not allowed to upload this selection.');
         }
 
-        Log::info($selection->mapping);
         return view('selections.mapped.upload_mappedSelection_onGalaxy',
             [
                 'mappedSelection' => $selection,

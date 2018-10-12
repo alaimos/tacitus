@@ -9,7 +9,7 @@
     </a>
 @endif
 
-<a href="{{route('selection-upload', ['selection' => $selection]) }}"
+<a href="{{route('integration-upload', ['integration' => $integration])}}"
    class="btn btn-xs btn-primary upload-selectionGalaxy-button">
     <i class="fa fa-upload" aria-hidden="true"></i> Upload to Galaxy
 </a>

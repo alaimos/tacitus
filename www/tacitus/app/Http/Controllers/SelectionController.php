@@ -171,7 +171,7 @@ class SelectionController extends Controller
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for uploading the specified resource.
      *
      * @param  SampleSelection $selection
      *
