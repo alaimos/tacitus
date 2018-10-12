@@ -75,6 +75,88 @@ namespace App\Dataset\Uploader {
         }
 
         /**
+         * Create the configuration file to run the preparation script
+         *
+         * @param string $dataFile
+         * @param string $metaFile
+         *
+         * @return array
+         */
+        protected function createConfigFile($dataFile, $metaFile)
+        {
+            $job = $this->getJobData();
+            $dir = $job->getJobDirectory();
+            $config = [
+                'input_data'  => $dataFile,
+                'input_meta'  => $metaFile,
+                'output_data' => $dir . '/' . basename($dataFile),
+                'output_meta' => $dir . '/' . basename($metaFile),
+            ];
+            $configFile = $dir . '/config.json';
+            file_put_contents($configFile, json_encode($config));
+            return [$configFile, $config['output_data'], $config['output_meta']];
+        }
+
+        /**
+         * Get the results of the preparation script
+         *
+         * @param string $fileName
+         *
+         * @return boolean
+         */
+        protected function getPreparationResult($fileName)
+        {
+            if (!file_exists($fileName)) {
+                throw new UploaderException("Unable to find status file");
+            }
+            $result = json_decode(trim(file_get_contents($fileName)), true);
+            @unlink($fileName);
+            if (!is_array($result) || !isset($result['ok'])) {
+                throw new UploaderException("Unable to complete integrator execution.");
+            }
+            if (!$result['ok']) {
+                throw new UploaderException("Unable to complete integrator execution. Error Message: "
+                                            . $result['message']);
+            }
+            return $result['ok'];
+        }
+
+        /**
+         * Runs the preparation procedure
+         *
+         * @param string $dataFile
+         * @param string $metaFile
+         *
+         * @return array|null
+         */
+        protected function runPreparation($dataFile, $metaFile)
+        {
+            $job = $this->getJobData();
+            $dir = $job->getJobDirectory();
+            $this->log('Running preparation procedure');
+            $this->log('...Writing config file');
+            list($configFile, $tmpDataFile, $tmpMetadataFile) = $this->createConfigFile($dataFile, $metaFile);
+            $this->log('...Running procedure');
+            $script = resource_path('scripts/prepareGalaxy.R');
+            $statusFile = $dir . '/status.json';
+            $command = 'Rscript ' . $script . ' -c ' . escapeshellarg($configFile) . ' -s '
+                       . escapeshellarg($statusFile);
+            $output = null;
+            exec($command, $output);
+            if ($this->getPreparationResult($statusFile)) {
+                @chmod($tmpDataFile, 0777);
+                @chmod($tmpMetadataFile, 0777);
+                $this->log("...OK\n");
+                @unlink($configFile);
+                @unlink($statusFile);
+                $this->log(implode("\n\t", $output) . "\n");
+                return [$tmpDataFile, $tmpMetadataFile];
+            }
+            return ['', ''];
+        }
+
+
+        /**
          * Run dataset upload
          *
          * @return boolean
@@ -100,6 +182,10 @@ namespace App\Dataset\Uploader {
             if (empty($name)) {
                 throw new UploaderException('A name for the uploader dataset should be specified');
             }
+            list($data, $meta) = $this->runPreparation($dataFile, $metaFile);
+            if (empty($data) || empty($meta)) {
+                throw new UploaderException('An unknown error occurred while preparing data files');
+            }
             $galaxy = new GalaxyInstance($credential->hostname, $credential->port, $credential->use_https);
             $galaxy->setAPIKey($credential->api_key);
             $this->log("Creating Galaxy History");
@@ -108,11 +194,13 @@ namespace App\Dataset\Uploader {
             $tools = new \GalaxyTools($galaxy);
             $params = ['tool_id' => 'upload1', 'history_id' => $historyId];
             $this->log("Uploading data file");
-            $this->realFileUpload($tools, $dataFile, $params);
+            $this->realFileUpload($tools, $data, $params);
             $this->log("...OK\n");
             $this->log("Uploading metadata file");
-            $this->realFileUpload($tools, $metaFile, $params);
+            $this->realFileUpload($tools, $meta, $params);
             $this->log("...OK\n");
+            @unlink($data);
+            @unlink($meta);
             return true;
         }
 

@@ -31,8 +31,8 @@ vagrantfile:
                                 port_bty:
                                     host: '8888'
                                     guest: '80'
-                        memory: '2048'
-                        cpus: '2'
+                        memory: '8192'
+                        cpus: '4'
         provision:
             puppet:
                 manifests_path: puphpet/puppet/manifests
