@@ -112,9 +112,11 @@
 
                 }
             });
-            t.on('click', '.download-button', function () {
+            t.on('click', '.download-button', function (e) {
                 downloadUrl = $(this).attr('href');
                 confirmModal.modal('show');
+                e.stopPropagation();
+                e.preventDefault();
             });
             confirmModal.find('.btn-confirm-modal-no').click(function () {
                 confirmModal.modal('hide');
