@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Response\ConvertFileResponse;
 use App\Jobs\Factory as JobFactory;
 use App\Models\GalaxyCredential;
 use App\Models\Job as JobData;
@@ -12,6 +13,7 @@ use Flash;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
+use Illuminate\Support\Str;
 
 class SelectionController extends Controller
 {
@@ -24,22 +26,22 @@ class SelectionController extends Controller
     public static function registerRoutes(Router $router)
     {
         $router->get('/selections',
-            ['as' => 'selections-lists', 'uses' => 'SelectionController@selectionsList']);
+                     ['as' => 'selections-lists', 'uses' => 'SelectionController@selectionsList']);
         $router->any('/selections/data',
-            ['as' => 'selections-lists-data', 'uses' => 'SelectionController@selectionsData']);
+                     ['as' => 'selections-lists-data', 'uses' => 'SelectionController@selectionsData']);
         $router->any('/selections/list',
-            ['as' => 'selections-lists-json', 'uses' => 'SelectionController@listSelectionsJson']);
+                     ['as' => 'selections-lists-json', 'uses' => 'SelectionController@listSelectionsJson']);
         $router->get('/selections/{selection}/download/{type}',
-            ['as' => 'selections-download', 'uses' => 'SelectionController@download']);
+                     ['as' => 'selections-download', 'uses' => 'SelectionController@download']);
         $router->get('/selections/{selection}/delete',
-            ['as' => 'selections-delete', 'uses' => 'SelectionController@delete']);
+                     ['as' => 'selections-delete', 'uses' => 'SelectionController@delete']);
 
         $router->get('/selections/{selection}/upload',
-            ['as' => 'selection-upload', 'uses' => 'SelectionController@upload']);
+                     ['as' => 'selection-upload', 'uses' => 'SelectionController@upload']);
         $router->post('/selections/{selection}/upload',
-            ['as' => 'selection-do-upload', 'uses' => 'SelectionController@doUpload']);
+                      ['as' => 'selection-do-upload', 'uses' => 'SelectionController@doUpload']);
         $router->post('/selections/galaxyCredentials',
-            ['as' => 'galaxyCredential-selection', 'uses' => 'SelectionController@listGalaxyCredential']);
+                      ['as' => 'galaxyCredential-selection', 'uses' => 'SelectionController@listGalaxyCredential']);
     }
 
     /**
@@ -84,9 +86,9 @@ class SelectionController extends Controller
      */
     public function listSelectionsJson(Request $request)
     {
-        $q = $request->get('q');
+        $q       = $request->get('q');
         $perPage = (int)$request->get('perPage', 30);
-        $query = SampleSelection::listSelections();
+        $query   = SampleSelection::listSelections();
         if (!empty($q)) {
             $query->where(function (Builder $query) use ($q) {
                 $query->where('name', 'like', '%' . $q . '%');
@@ -98,12 +100,13 @@ class SelectionController extends Controller
     /**
      * Download a file from a selection
      *
-     * @param SampleSelection $selection
-     * @param string          $type
+     * @param \Illuminate\Http\Request $request
+     * @param SampleSelection          $selection
+     * @param string                   $type
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public function download(SampleSelection $selection, $type)
+    public function download(Request $request, SampleSelection $selection, $type)
     {
         if (!user_can(Permissions::DOWNLOAD_SELECTIONS)) {
             abort(403);
@@ -126,9 +129,18 @@ class SelectionController extends Controller
                 abort(500, 'Invalid type specified.');
                 break;
         }
-        return response()->download($fileName, basename($fileName), [
-            'Content-Type' => 'application/octet-stream',
-        ]);
+        $newSeparator = $request->get('new-separator');
+        if (!empty($newSeparator)) {
+            $response = new ConvertFileResponse($fileName, 200, [
+                'Content-Type' => 'application/octet-stream',
+            ], true, 'attachment', false, true, "\t", $newSeparator);
+            $name     = basename($fileName);
+            return $response->setContentDisposition('attachment', $name, str_replace('%', '', Str::ascii($name)));
+        } else {
+            return response()->download($fileName, basename($fileName), [
+                'Content-Type' => 'application/octet-stream',
+            ]);
+        }
     }
 
     /**
@@ -191,9 +203,9 @@ class SelectionController extends Controller
             abort(401, 'You are not allowed to upload this selection.');
         }
         return view('selections.upload_selection_onGalaxy',
-            [
-                'selection' => $selection,
-            ]);
+                    [
+                        'selection' => $selection,
+                    ]);
     }
 
 
@@ -225,16 +237,16 @@ class SelectionController extends Controller
             abort(500, 'You must specify a galaxy server server');
         }
         $jobData = new JobData([
-            'job_type' => 'galaxy_upload_job',
-            'status'   => JobData::QUEUED,
-            'job_data' => [
-                'name'          => $selection->name,
-                'data_file'     => $selection->getDataFilename(),
-                'metadata_file' => $selection->getMetadataFilename(),
-                'credential'    => $credential->id,
-            ],
-            'log'      => '',
-        ]);
+                                   'job_type' => 'galaxy_upload_job',
+                                   'status'   => JobData::QUEUED,
+                                   'job_data' => [
+                                       'name'          => $selection->name,
+                                       'data_file'     => $selection->getDataFilename(),
+                                       'metadata_file' => $selection->getMetadataFilename(),
+                                       'credential'    => $credential->id,
+                                   ],
+                                   'log'      => '',
+                               ]);
         $jobData->user()->associate(\Auth::user());
         $jobData->save();
         $job = JobFactory::getQueueJob($jobData);
