@@ -1,10 +1,10 @@
 @if($mappedSelection->canDownload())
     <a href="{{ route('mapped-selections-download', ['selection' => $mappedSelection, 'type' => 'metadata']) }}"
-       class="btn btn-xs btn-primary">
+       class="btn btn-xs btn-primary download-button">
         <i class="fa fa-download" aria-hidden="true"></i> Download Metadata
     </a>
     <a href="{{ route('mapped-selections-download', ['selection' => $mappedSelection, 'type' => 'data']) }}"
-       class="btn btn-xs btn-primary">
+       class="btn btn-xs btn-primary download-button">
         <i class="fa fa-download" aria-hidden="true"></i> Download Data
     </a>
 @endif

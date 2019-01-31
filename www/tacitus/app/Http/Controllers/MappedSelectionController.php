@@ -7,6 +7,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Response\ConvertFileResponse;
 use App\Jobs\Factory as JobFactory;
 use App\Models\GalaxyCredential;
 use App\Models\Job as JobData;
@@ -21,6 +22,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class MappedSelectionController extends Controller
 {
@@ -174,12 +176,13 @@ class MappedSelectionController extends Controller
     /**
      * Download a file from a mapped selection
      *
+     * @param \Illuminate\Http\Request $request
      * @param MappedSampleSelection $selection
      * @param string                $type
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public function download(MappedSampleSelection $selection, $type)
+    public function download(Request $request, MappedSampleSelection $selection, $type)
     {
         if (!user_can(Permissions::DOWNLOAD_SELECTIONS)) {
             abort(403);
@@ -202,9 +205,20 @@ class MappedSelectionController extends Controller
                 abort(500, 'Invalid type specified.');
                 break;
         }
-        return response()->download($fileName, basename($fileName), [
-            'Content-Type' => 'application/octet-stream',
-        ]);
+
+        $newSeparator = $request->get('new-separator');
+        if (!empty($newSeparator)) {
+            $response = new ConvertFileResponse($fileName, 200, [
+                'Content-Type' => 'application/octet-stream',
+            ], true, 'attachment', false, true, "\t", $newSeparator);
+            $name     = basename($fileName);
+            return $response->setContentDisposition('attachment', $name, str_replace('%', '', Str::ascii($name)));
+        } else {
+            return response()->download($fileName, basename($fileName), [
+                'Content-Type' => 'application/octet-stream',
+            ]);
+        }
+
     }
 
     /**

@@ -1,10 +1,10 @@
 @if($integration->canDownload())
     <a href="{{ route('integration-download', ['integration' => $integration, 'type' => 'metadata']) }}"
-       class="btn btn-xs btn-primary">
+       class="btn btn-xs btn-primary download-button">
         <i class="fa fa-download" aria-hidden="true"></i> Download Metadata
     </a>
     <a href="{{ route('integration-download', ['integration' => $integration, 'type' => 'data']) }}"
-       class="btn btn-xs btn-primary">
+       class="btn btn-xs btn-primary download-button">
         <i class="fa fa-download" aria-hidden="true"></i> Download Data
     </a>
 @endif

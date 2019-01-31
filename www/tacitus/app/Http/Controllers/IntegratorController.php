@@ -7,6 +7,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Response\ConvertFileResponse;
 use App\Jobs\Factory as JobFactory;
 use App\Models\GalaxyCredential;
 use App\Models\Integration;
@@ -19,6 +20,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class IntegratorController extends Controller
 {
@@ -149,12 +151,13 @@ class IntegratorController extends Controller
     /**
      * Download a file from an integration
      *
+     * @param \Illuminate\Http\Request $request
      * @param Integration $integration
      * @param string      $type
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public function download(Integration $integration, $type)
+    public function download(Request $request, Integration $integration, $type)
     {
         if (!user_can(Permissions::INTEGRATE_DATASETS)) {
             abort(403);
@@ -177,9 +180,19 @@ class IntegratorController extends Controller
                 abort(500, 'Invalid type specified.');
                 break;
         }
-        return response()->download($fileName, basename($fileName), [
-            'Content-Type' => 'application/octet-stream',
-        ]);
+
+        $newSeparator = $request->get('new-separator');
+        if (!empty($newSeparator)) {
+            $response = new ConvertFileResponse($fileName, 200, [
+                'Content-Type' => 'application/octet-stream',
+            ], true, 'attachment', false, true, "\t", $newSeparator);
+            $name     = basename($fileName);
+            return $response->setContentDisposition('attachment', $name, str_replace('%', '', Str::ascii($name)));
+        } else {
+            return response()->download($fileName, basename($fileName), [
+                'Content-Type' => 'application/octet-stream',
+            ]);
+        }
     }
 
     /**
