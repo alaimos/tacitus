@@ -235,10 +235,10 @@ class IntegratorController extends Controller
             abort(403);
         }
         if (!$integration || !$integration->exists) {
-            abort(404, 'Unable to find the selection.');
+            abort(404, 'Unable to find the integration.');
         }
         if (!$integration->canDownload()) {
-            abort(401, 'You are not allowed to upload this selection.');
+            abort(401, 'You are not allowed to upload this integration.');
         }
 
         return view('integrator.upload_integration_onGalaxy',
