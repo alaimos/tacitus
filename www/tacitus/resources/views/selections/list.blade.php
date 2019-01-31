@@ -61,7 +61,8 @@
                         <div class="modal-body">
                             <form>
                                 <div class="form-group">
-                                    <input type="text" class="form-control txt-separator-modal-separator" placeholder="," maxlength="1">
+                                    <input type="text" class="form-control txt-separator-modal-separator" style="font-weight: bold; font-size: 16px;" value=","
+                                           maxlength="1">
                                 </div>
                             </form>
                         </div>
