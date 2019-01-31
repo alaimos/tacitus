@@ -68,7 +68,7 @@
                             </form>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-default btn-separator-modal-download">Download</button>
+                            <button type="button" class="btn btn-primary btn-separator-modal-download">Download</button>
                         </div>
                     </div>
                 </div>
