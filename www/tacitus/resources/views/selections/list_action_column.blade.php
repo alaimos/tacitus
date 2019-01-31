@@ -4,11 +4,11 @@
 </a>
 @if($selection->canDownload())
     <a href="{{ route('selections-download', ['selection' => $selection, 'type' => 'metadata']) }}"
-       class="btn btn-xs btn-primary">
+       class="btn btn-xs btn-primary download-button">
         <i class="fa fa-download" aria-hidden="true"></i> Download Metadata
     </a>
     <a href="{{ route('selections-download', ['selection' => $selection, 'type' => 'data']) }}"
-       class="btn btn-xs btn-primary">
+       class="btn btn-xs btn-primary download-button">
         <i class="fa fa-download" aria-hidden="true"></i> Download Data
     </a>
 @endif
