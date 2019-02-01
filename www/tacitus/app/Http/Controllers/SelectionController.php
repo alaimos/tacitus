@@ -134,7 +134,7 @@ class SelectionController extends Controller
             $response = new ConvertFileResponse($fileName, 200, [
                 'Content-Type' => 'application/octet-stream',
             ], true, 'attachment', false, true, "\t", $newSeparator);
-            $name     = basename($fileName);
+            $name     = basename($fileName, '.tsv') . '.csv';
             return $response->setContentDisposition('attachment', $name, str_replace('%', '', Str::ascii($name)));
         } else {
             return response()->download($fileName, basename($fileName), [
@@ -149,6 +149,7 @@ class SelectionController extends Controller
      * @param SampleSelection $selection
      *
      * @return mixed
+     * @throws \Exception
      */
     public function delete(SampleSelection $selection)
     {
