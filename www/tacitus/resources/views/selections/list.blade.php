@@ -47,7 +47,7 @@
                                     <button type="button" class="btn btn-primary btn-lg btn-block btn-confirm-modal-tsv">TSV</button>
                                     <button type="button" class="btn btn-success btn-lg btn-block btn-confirm-modal-csv">CSV</button>
                                 </div>
-                                <fieldset class="display-on-csv hidden">
+                                <fieldset class="display-on-csv">
                                     <legend>Choose separator and click &quot;Download&quot; to continue</legend>
                                     <div class="form-group">
                                         <label for="txt-confirm-modal-separator">Separator character</label>
@@ -79,7 +79,8 @@
     <script>
         $(function () {
             var t = $('#selections-table'), downloadUrl = null;
-            var confirmModal = $('#confirm-modal');
+            var confirmModal = $('#confirm-modal'), dCSV = $('.display-on-csv');
+            dCSV.hide();
             t.dataTable({
                 dom: "<'row'<'col-sm-3'l><'col-sm-6 text-center'B><'col-sm-3'f>>" +
                     "<'row'<'col-sm-12'tr>>" +
@@ -122,13 +123,13 @@
             confirmModal.find('.btn-confirm-modal-csv').click(function (e) {
                 e.stopPropagation();
                 e.preventDefault();
-                $('.display-on-csv').slideDown();
+                dCSV.slideDown();
             });
             confirmModal.find('.btn-confirm-modal-download-csv').click(function (e) {
                 e.stopPropagation();
                 e.preventDefault();
                 var sep = confirmModal.find('.txt-confirm-modal-separator').val();
-                $('.display-on-csv').hide();
+                dCSV.hide();
                 confirmModal.modal('hide');
                 location.href = downloadUrl + '?new-separator=' + encodeURI(sep);
             });
