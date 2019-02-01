@@ -48,7 +48,7 @@
                                     <button type="button" class="btn btn-success btn-lg btn-block btn-confirm-modal-csv">CSV</button>
                                 </div>
                                 <fieldset class="display-on-csv">
-                                    <legend>Choose separator and click &quot;Download&quot; to continue</legend>
+                                    <legend>&nbsp;</legend>
                                     <div class="form-group">
                                         <label for="txt-confirm-modal-separator">Separator character</label>
                                         <input type="text" class="form-control txt-confirm-modal-separator"
@@ -58,7 +58,7 @@
                                     </div>
                                     <div class="text-center">
                                         <button type="button" class="btn btn-primary btn-confirm-modal-download-csv">
-                                            <i class="fa fa-fw fa-download"></i> Download
+                                            <i class="fa fa-fw fa-download"></i> Download CSV
                                         </button>
                                     </div>
                                 </fieldset>
