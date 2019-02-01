@@ -20,8 +20,6 @@ use Flash;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
-
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class MappedSelectionController extends Controller
@@ -35,26 +33,26 @@ class MappedSelectionController extends Controller
     public static function registerRoutes(Router $router)
     {
         $router->get('/selections/{selection}/map',
-            ['as' => 'mapped-selections-submit', 'uses' => 'MappedSelectionController@submitMappingForm']);
+                     ['as' => 'mapped-selections-submit', 'uses' => 'MappedSelectionController@submitMappingForm']);
         $router->post('/selections/{selection}/map',
-            ['as' => 'mapped-selections-do-submit', 'uses' => 'MappedSelectionController@submitMapping']);
+                      ['as' => 'mapped-selections-do-submit', 'uses' => 'MappedSelectionController@submitMapping']);
         $router->get('/selections/mapped',
-            ['as' => 'mapped-selections-lists', 'uses' => 'MappedSelectionController@selectionsList']);
+                     ['as' => 'mapped-selections-lists', 'uses' => 'MappedSelectionController@selectionsList']);
         $router->any('/selections/mapped/data',
-            ['as' => 'mapped-selections-lists-data', 'uses' => 'MappedSelectionController@selectionsData']);
+                     ['as' => 'mapped-selections-lists-data', 'uses' => 'MappedSelectionController@selectionsData']);
         $router->any('/selections/mapped/list',
-            ['as' => 'mapped-selections-lists-json', 'uses' => 'MappedSelectionController@listSelectionsJson']);
+                     ['as' => 'mapped-selections-lists-json', 'uses' => 'MappedSelectionController@listSelectionsJson']);
         $router->get('/selections/mapped/{selection}/download/{type}',
-            ['as' => 'mapped-selections-download', 'uses' => 'MappedSelectionController@download']);
+                     ['as' => 'mapped-selections-download', 'uses' => 'MappedSelectionController@download']);
         $router->get('/selections/mapped/{selection}/delete',
-            ['as' => 'mapped-selections-delete', 'uses' => 'MappedSelectionController@delete']);
+                     ['as' => 'mapped-selections-delete', 'uses' => 'MappedSelectionController@delete']);
 
         $router->get('/selections/mapped/{selection}/upload',
-            ['as' => 'mapped-selection-upload', 'uses' => 'MappedSelectionController@upload']);
+                     ['as' => 'mapped-selection-upload', 'uses' => 'MappedSelectionController@upload']);
         $router->post('/selections/mapped/{selection}/upload',
-            ['as' => 'mapped-selection-do-upload', 'uses' => 'MappedSelectionController@doUpload']);
+                      ['as' => 'mapped-selection-do-upload', 'uses' => 'MappedSelectionController@doUpload']);
         $router->post('/selections/mapped/galaxyCredentials',
-            ['as' => 'galaxyCredential-mappedSelection', 'uses' => 'MappedSelectionController@listGalaxyCredential']);
+                      ['as' => 'galaxyCredential-mappedSelection', 'uses' => 'MappedSelectionController@listGalaxyCredential']);
 
     }
 
@@ -97,15 +95,15 @@ class MappedSelectionController extends Controller
         ]);
         try {
             $jobData = new JobData([
-                'job_type' => 'map_dataset_selection',
-                'status'   => JobData::QUEUED,
-                'job_data' => [
-                    'selection' => $selection->id,
-                    'platform'  => $request->get('platform'),
-                    'mapping'   => $request->get('mapping'),
-                ],
-                'log'      => '',
-            ]);
+                                       'job_type' => 'map_dataset_selection',
+                                       'status'   => JobData::QUEUED,
+                                       'job_data' => [
+                                           'selection' => $selection->id,
+                                           'platform'  => $request->get('platform'),
+                                           'mapping'   => $request->get('mapping'),
+                                       ],
+                                       'log'      => '',
+                                   ]);
             $jobData->user()->associate(Auth::user());
             $jobData->save();
             $job = JobFactory::getQueueJob($jobData);
@@ -139,9 +137,9 @@ class MappedSelectionController extends Controller
      */
     public function listSelectionsJson(Request $request)
     {
-        $q = $request->get('q');
+        $q       = $request->get('q');
         $perPage = (int)$request->get('perPage', 30);
-        $query = MappedSampleSelection::listSelections();
+        $query   = MappedSampleSelection::listSelections();
         if (!empty($q)) {
             $query->where(function (Builder $query) use ($q) {
                 $query->where('sample_selections.name', 'like', '%' . $q . '%')
@@ -177,8 +175,8 @@ class MappedSelectionController extends Controller
      * Download a file from a mapped selection
      *
      * @param \Illuminate\Http\Request $request
-     * @param MappedSampleSelection $selection
-     * @param string                $type
+     * @param MappedSampleSelection    $selection
+     * @param string                   $type
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
@@ -211,7 +209,7 @@ class MappedSelectionController extends Controller
             $response = new ConvertFileResponse($fileName, 200, [
                 'Content-Type' => 'application/octet-stream',
             ], true, 'attachment', false, true, "\t", $newSeparator);
-            $name     = basename($fileName);
+            $name     = basename($fileName, '.tsv') . '.csv';
             return $response->setContentDisposition('attachment', $name, str_replace('%', '', Str::ascii($name)));
         } else {
             return response()->download($fileName, basename($fileName), [
@@ -281,9 +279,9 @@ class MappedSelectionController extends Controller
         }
 
         return view('selections.mapped.upload_mappedSelection_onGalaxy',
-            [
-                'mappedSelection' => $selection,
-            ]);
+                    [
+                        'mappedSelection' => $selection,
+                    ]);
     }
 
     /**
@@ -315,16 +313,16 @@ class MappedSelectionController extends Controller
         }
 
         $jobData = new JobData([
-            'job_type' => 'galaxy_upload_job',
-            'status'   => JobData::QUEUED,
-            'job_data' => [
-                'name'          => $selection->selection->name . ' mapped to ' . $selection-> mapping->name,
-                'data_file'     => $selection->getDataFilename(),
-                'metadata_file' => $selection->getMetadataFilename(),
-                'credential'    => $credential->id,
-            ],
-            'log'      => '',
-        ]);
+                                   'job_type' => 'galaxy_upload_job',
+                                   'status'   => JobData::QUEUED,
+                                   'job_data' => [
+                                       'name'          => $selection->selection->name . ' mapped to ' . $selection->mapping->name,
+                                       'data_file'     => $selection->getDataFilename(),
+                                       'metadata_file' => $selection->getMetadataFilename(),
+                                       'credential'    => $credential->id,
+                                   ],
+                                   'log'      => '',
+                               ]);
         $jobData->user()->associate(\Auth::user());
         $jobData->save();
         $job = JobFactory::getQueueJob($jobData);

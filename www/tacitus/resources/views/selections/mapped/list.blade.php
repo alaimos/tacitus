@@ -40,108 +40,109 @@
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title" id="confirm-modal-label">Change file format</h4>
-                        </div>
-                        <div class="modal-body">
-                            <p>TACITuS uses tab-separated files.<br>&nbsp;<br><b>Do you wish to change the field separator before the download?</b></p>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-default btn-confirm-modal-no">No</button>
-                            <button type="button" class="btn btn-primary btn-confirm-modal-yes">Yes</button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="modal fade" id="separator-modal" tabindex="-1" role="dialog" aria-labelledby="separator-modal-label">
-                <div class="modal-dialog modal-sm" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title" id="separator-modal-label">Choose field separator</h4>
+                            <h4 class="modal-title" id="confirm-modal-label">Choose file format</h4>
                         </div>
                         <div class="modal-body">
                             <form>
                                 <div class="form-group">
-                                    <input type="text" class="form-control txt-separator-modal-separator" style="font-weight: bold; font-size: 16px;" value=","
-                                           maxlength="1">
+                                    <button type="button" class="btn btn-primary btn-lg btn-block btn-confirm-modal-tsv">TSV</button>
+                                    <button type="button" class="btn btn-success btn-lg btn-block btn-confirm-modal-csv">CSV</button>
                                 </div>
+                                <fieldset class="display-on-csv">
+                                    <legend>&nbsp;</legend>
+                                    <div class="form-group">
+                                        <label for="txt-confirm-modal-separator">Separator character</label>
+                                        <input type="text" class="form-control txt-confirm-modal-separator"
+                                               id="txt-confirm-modal-separator"
+                                               style="font-weight: bold; font-size: 16px;" value=","
+                                               maxlength="1">
+                                    </div>
+                                    <div class="text-center">
+                                        <button type="button" class="btn btn-primary btn-confirm-modal-download-csv">
+                                            <i class="fa fa-fw fa-download"></i> Download CSV
+                                        </button>
+                                    </div>
+                                </fieldset>
                             </form>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-primary btn-separator-modal-download">Download</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
 @endsection
 @push('head-scripts')
-<script src="{{ url('js/pdfmake.min.js') }}"></script>
-<script src="{{ url('js/vfs_fonts.js') }}"></script>
-<script src="{{ url('js/jszip.min.js') }}"></script>
+    <script src="{{ url('js/pdfmake.min.js') }}"></script>
+    <script src="{{ url('js/vfs_fonts.js') }}"></script>
+    <script src="{{ url('js/jszip.min.js') }}"></script>
 @endpush
 @push('scripts')
-<script>
-    $(function () {
-        var confirmModal = $('#confirm-modal'), separatorModal = $('#separator-modal');
-        var t = $('#selections-table'), downloadUrl = null;
-        t.dataTable({
-            dom: "<'row'<'col-sm-3'l><'col-sm-6 text-center'B><'col-sm-3'f>>" +
-            "<'row'<'col-sm-12'tr>>" +
-            "<'row'<'col-sm-5'i><'col-sm-7'p>>",
-            responsive: true,
-            processing: true,
-            serverSide: true,
-            buttons: [
-                'copyHtml5',
-                'excelHtml5',
-                'csvHtml5',
-                'print'
-            ],
-            ajax: {
-                url: '{{ route('mapped-selections-lists-data') }}',
-                method: 'POST'
-            },
-            columns: [
-                {data: 'id', name: 'mapped_sample_selections.id'},
-                {data: 'name', name: 'sample_selections.name'},
-                {data: 'mapping', name: 'platform_mappings.name'},
-                {data: 'created_at', name: 'mapped_sample_selections.created_at'},
-                {data: 'action', name: 'action', orderable: false, searchable: false}
-            ],
-            columnDefs: [
-                {responsivePriority: 1, targets: 0},
-                {responsivePriority: 1, targets: 1},
-                {responsivePriority: 1, targets: 2},
-                {responsivePriority: 3, targets: 3},
-                {responsivePriority: 2, targets: 4}
-            ],
-            language: {
-                processing: '<i class="fa fa-spinner faa-spin fa-3x fa-fw animated"></i><span class="sr-only">Loading...</span>'
+    <script>
+        $(function () {
+            var t = $('#selections-table'), downloadUrl = null;
+            var confirmModal = $('#confirm-modal'), dCSV = $('.display-on-csv');
+            dCSV.hide();
+            t.dataTable({
+                dom: "<'row'<'col-sm-3'l><'col-sm-6 text-center'B><'col-sm-3'f>>" +
+                    "<'row'<'col-sm-12'tr>>" +
+                    "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+                responsive: true,
+                processing: true,
+                serverSide: true,
+                buttons: [
+                    'copyHtml5',
+                    'excelHtml5',
+                    'csvHtml5',
+                    'print'
+                ],
+                ajax: {
+                    url: '{{ route('mapped-selections-lists-data') }}',
+                    method: 'POST'
+                },
+                columns: [
+                    {data: 'id', name: 'mapped_sample_selections.id'},
+                    {data: 'name', name: 'sample_selections.name'},
+                    {data: 'mapping', name: 'platform_mappings.name'},
+                    {data: 'created_at', name: 'mapped_sample_selections.created_at'},
+                    {data: 'action', name: 'action', orderable: false, searchable: false}
+                ],
+                columnDefs: [
+                    {responsivePriority: 1, targets: 0},
+                    {responsivePriority: 1, targets: 1},
+                    {responsivePriority: 1, targets: 2},
+                    {responsivePriority: 3, targets: 3},
+                    {responsivePriority: 2, targets: 4}
+                ],
+                language: {
+                    processing: '<i class="fa fa-spinner faa-spin fa-3x fa-fw animated"></i><span class="sr-only">Loading...</span>'
 
-            }
+                }
+            });
+            t.on('click', '.download-button', function (e) {
+                downloadUrl = $(this).attr('href');
+                confirmModal.modal('show');
+                e.stopPropagation();
+                e.preventDefault();
+            });
+            confirmModal.find('.btn-confirm-modal-tsv').click(function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                confirmModal.modal('hide');
+                location.href = downloadUrl;
+            });
+            confirmModal.find('.btn-confirm-modal-csv').click(function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                dCSV.slideDown();
+            });
+            confirmModal.find('.btn-confirm-modal-download-csv').click(function (e) {
+                e.stopPropagation();
+                e.preventDefault();
+                var sep = confirmModal.find('.txt-confirm-modal-separator').val();
+                dCSV.hide();
+                confirmModal.modal('hide');
+                location.href = downloadUrl + '?new-separator=' + encodeURI(sep);
+            });
         });
-        t.on('click', '.download-button', function (e) {
-            downloadUrl = $(this).attr('href');
-            confirmModal.modal('show');
-            e.stopPropagation();
-            e.preventDefault();
-        });
-        confirmModal.find('.btn-confirm-modal-no').click(function () {
-            confirmModal.modal('hide');
-            location.href = downloadUrl;
-        });
-        confirmModal.find('.btn-confirm-modal-yes').click(function () {
-            confirmModal.modal('hide');
-            separatorModal.modal('show');
-        });
-        separatorModal.find('.btn-separator-modal-download').click(function () {
-            var sep = separatorModal.find('.txt-separator-modal-separator').val();
-            separatorModal.modal('hide');
-            location.href = downloadUrl + '?new-separator=' + encodeURI(sep);
-        });
-    });
-</script>
+    </script>
 @endpush

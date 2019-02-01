@@ -18,7 +18,6 @@ use Datatables;
 use Flash;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
-
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
@@ -33,24 +32,24 @@ class IntegratorController extends Controller
     public static function registerRoutes(Router $router)
     {
         $router->get('/integrations/submit',
-            ['as' => 'integration-submit', 'uses' => 'IntegratorController@submitForm']);
+                     ['as' => 'integration-submit', 'uses' => 'IntegratorController@submitForm']);
         $router->post('/integrations/submit',
-            ['as' => 'integration-do-submit', 'uses' => 'IntegratorController@submitIntegrationJob']);
+                      ['as' => 'integration-do-submit', 'uses' => 'IntegratorController@submitIntegrationJob']);
         $router->get('/integrations',
-            ['as' => 'integrations-lists', 'uses' => 'IntegratorController@integrationsList']);
+                     ['as' => 'integrations-lists', 'uses' => 'IntegratorController@integrationsList']);
         $router->any('/integrations/data',
-            ['as' => 'integrations-lists-data', 'uses' => 'IntegratorController@integrationsData']);
+                     ['as' => 'integrations-lists-data', 'uses' => 'IntegratorController@integrationsData']);
         $router->get('/integrations/{integration}/download/{type}',
-            ['as' => 'integration-download', 'uses' => 'IntegratorController@download']);
+                     ['as' => 'integration-download', 'uses' => 'IntegratorController@download']);
         $router->get('/integrations/{integration}/delete',
-            ['as' => 'integration-delete', 'uses' => 'IntegratorController@delete']);
+                     ['as' => 'integration-delete', 'uses' => 'IntegratorController@delete']);
 
         $router->get('/integrations/{integration}/upload',
-            ['as' => 'integration-upload', 'uses' => 'IntegratorController@upload']);
+                     ['as' => 'integration-upload', 'uses' => 'IntegratorController@upload']);
         $router->post('/integrations/{integration}/upload',
-            ['as' => 'integration-do-upload', 'uses' => 'IntegratorController@doUpload']);
+                      ['as' => 'integration-do-upload', 'uses' => 'IntegratorController@doUpload']);
         $router->post('/integrations/galaxyCredentials',
-            ['as' => 'galaxyCredential-integration', 'uses' => 'IntegratorController@listGalaxyCredential']);
+                      ['as' => 'galaxyCredential-integration', 'uses' => 'IntegratorController@listGalaxyCredential']);
 
     }
 
@@ -83,7 +82,7 @@ class IntegratorController extends Controller
             'selections'          => 'required_without:mapped_selections|array',
             'mapped_selections'   => 'required_without:selections|array',
             'method'              => 'required|in:' . implode(',',
-                    array_keys(Integration::getSupportedIntegrationAlgorithms())),
+                                                              array_keys(Integration::getSupportedIntegrationAlgorithms())),
             'digits'              => 'required|numeric',
             'na_strings'          => 'required',
             'enable_post_mapping' => 'sometimes|required|boolean',
@@ -91,22 +90,22 @@ class IntegratorController extends Controller
             'mapping'             => 'required_with:enable_post_mapping|exists:platform_mappings,id',
         ]);
         $mappingEnabled = boolval($request->get('enable_post_mapping', false));
-        $jobData = new JobData([
-            'job_type' => 'integrate_selections',
-            'status'   => JobData::QUEUED,
-            'job_data' => [
-                'name'                => $request->get('name'),
-                'selections'          => array_map("intval", (array)$request->get('selections')),
-                'mapped_selections'   => array_map("intval", (array)$request->get('mapped_selections')),
-                'method'              => $request->get('method'),
-                'digits'              => (int)$request->get('digits'),
-                'na_strings'          => $request->get('na_strings'),
-                'enable_post_mapping' => $mappingEnabled,
-                'platform'            => ($mappingEnabled) ? (int)$request->get('platform') : null,
-                'mapping'             => ($mappingEnabled) ? (int)$request->get('mapping') : null,
-            ],
-            'log'      => '',
-        ]);
+        $jobData        = new JobData([
+                                          'job_type' => 'integrate_selections',
+                                          'status'   => JobData::QUEUED,
+                                          'job_data' => [
+                                              'name'                => $request->get('name'),
+                                              'selections'          => array_map("intval", (array)$request->get('selections')),
+                                              'mapped_selections'   => array_map("intval", (array)$request->get('mapped_selections')),
+                                              'method'              => $request->get('method'),
+                                              'digits'              => (int)$request->get('digits'),
+                                              'na_strings'          => $request->get('na_strings'),
+                                              'enable_post_mapping' => $mappingEnabled,
+                                              'platform'            => ($mappingEnabled) ? (int)$request->get('platform') : null,
+                                              'mapping'             => ($mappingEnabled) ? (int)$request->get('mapping') : null,
+                                          ],
+                                          'log'      => '',
+                                      ]);
         $jobData->user()->associate(Auth::user());
         $jobData->save();
         $job = JobFactory::getQueueJob($jobData);
@@ -152,8 +151,8 @@ class IntegratorController extends Controller
      * Download a file from an integration
      *
      * @param \Illuminate\Http\Request $request
-     * @param Integration $integration
-     * @param string      $type
+     * @param Integration              $integration
+     * @param string                   $type
      *
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
@@ -186,7 +185,7 @@ class IntegratorController extends Controller
             $response = new ConvertFileResponse($fileName, 200, [
                 'Content-Type' => 'application/octet-stream',
             ], true, 'attachment', false, true, "\t", $newSeparator);
-            $name     = basename($fileName);
+            $name     = basename($fileName, '.tsv') . '.csv';
             return $response->setContentDisposition('attachment', $name, str_replace('%', '', Str::ascii($name)));
         } else {
             return response()->download($fileName, basename($fileName), [
@@ -255,9 +254,9 @@ class IntegratorController extends Controller
         }
 
         return view('integrator.upload_integration_onGalaxy',
-            [
-                'integration' => $integration,
-            ]);
+                    [
+                        'integration' => $integration,
+                    ]);
     }
 
     /**
@@ -288,16 +287,16 @@ class IntegratorController extends Controller
             abort(500, 'You must specify a galaxy server server');
         }
         $jobData = new JobData([
-            'job_type' => 'galaxy_upload_job',
-            'status'   => JobData::QUEUED,
-            'job_data' => [
-                'name'          => 'Integration ' . $integration->name,
-                'data_file'     => $integration->getDataFilename(),
-                'metadata_file' => $integration->getMetadataFilename(),
-                'credential'    => $credential->id,
-            ],
-            'log'      => '',
-        ]);
+                                   'job_type' => 'galaxy_upload_job',
+                                   'status'   => JobData::QUEUED,
+                                   'job_data' => [
+                                       'name'          => 'Integration ' . $integration->name,
+                                       'data_file'     => $integration->getDataFilename(),
+                                       'metadata_file' => $integration->getMetadataFilename(),
+                                       'credential'    => $credential->id,
+                                   ],
+                                   'log'      => '',
+                               ]);
         $jobData->user()->associate(\Auth::user());
         $jobData->save();
         $job = JobFactory::getQueueJob($jobData);
