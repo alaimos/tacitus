@@ -19,4 +19,10 @@ To setup your own TACITuS development environment follow these steps:
 **Important:** Processing queues are not active in development environment. 
 They must be activated manually using the command `run.queue` each time you wish to 
 process a job.
- 
+
+### Development environment accounts
+
+- Admin account username: admin@tacitus
+- Normal account username: user@tacitus
+- Password for both accounts: 1234
+
