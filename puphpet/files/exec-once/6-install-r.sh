@@ -6,12 +6,12 @@ add-apt-repository -y ppa:marutter/c2d4u
 
 # Make sure the system is up-to-date
 apt-get update
-apt-get upgrade -y 
+apt-get dist-upgrade -y 
 
 # Install development dependencies, dependencies needed for --check-as-cran,
 # or libraries that R packages use (libcurl, gdal)
 apt-get install -y build-essential r-base
-apt-get install -y build-essential python3-dev
+apt-get install -y python3-dev
 apt-get install -y \
   cloc \
   gdal-bin \
@@ -26,7 +26,7 @@ apt-get install -y \
   postgresql \
   postgresql-client \
   python3-pip \
-  python3.4-dev \
+  python3.5-dev \
   texinfo \
   texlive-fonts-recommended \
   texlive-humanities \
@@ -36,10 +36,11 @@ apt-get install -y \
 
 # Install base R
 apt-get install -y r-base r-base-dev
+apt-get update
+apt-get dist-upgrade -y 
 
 # Install binary R packages 
 apt-get install -y \
-  r-cran-XML \
   r-cran-bh \
   r-cran-caret \
   r-cran-classint \
@@ -56,9 +57,6 @@ apt-get install -y \
   r-cran-magrittr \
   r-cran-maptools \
   r-cran-microbenchmark \
-  r-cran-opennlp \
-  r-cran-opennlpdata \
-  r-cran-opennlpmodels.en \
   r-cran-pander \
   r-cran-rcpp \
   r-cran-readxl \
