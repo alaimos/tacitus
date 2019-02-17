@@ -53,4 +53,4 @@ alias mv='mv -iv'
 alias grep='grep --color=auto -in'
 alias ..='cd ..'
 alias run.queue='cd /var/www/tacitus/;php artisan queue:work --queue=importer,selections,analysis,maintenance'
-alias run.install="cd /var/www/tacitus/;cp .env.example .env;composer update; php artisan key:generate; php artisan migrate --seed; composer update; npm install --no-bin-links; php artisan notifynder:create:category \"notification\" '<i class=\"fa fa-{extra.icon} fa-fw\"></i> {extra.message}'"
+alias run.install="cd /var/www/tacitus/;cp .env.example .env;composer update; php artisan key:generate; php artisan migrate --seed; composer update; php artisan notifynder:create:category \"notification\" '<i class=\"fa fa-{extra.icon} fa-fw\"></i> {extra.message}'"

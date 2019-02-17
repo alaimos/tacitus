@@ -5,6 +5,14 @@
     "dev": "gulp watch"
   },
   "devDependencies": {
+    "acorn": "6.1.0",
+    "accord": "0.30.0",
+    "acorn-node": "1.6.2",
+    "are-we-there-yet": "1.1.5",
+    "globule": "1.2.1",
+    "lodash": "4.17.11",
+    "has-values": "2.0.1",
+    "kind-of": "6.0.2",
     "gulp": "^3.9.1",
     "gulp-bower": "0.0.14",
     "laravel-elixir": "^5.0.0",
