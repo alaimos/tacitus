@@ -6,7 +6,7 @@ vagrantfile:
                 box: bento/ubuntu-16.04
                 box_url: 'false'
                 box_version: '0'
-                chosen_virtualizer: virtualbox
+                chosen_virtualizer: vmware_workstation
                 virtualizers:
                     virtualbox:
                         modifyvm:
@@ -23,7 +23,7 @@ vagrantfile:
                         id: tacitus
                         hostname: tacitus.puphpet
                         network:
-                            private_network: 192.168.56.106
+                            private_network: 192.168.57.106
                             forwarded_port:
                                 port1:
                                     host: '6288'
@@ -93,6 +93,7 @@ server:
         - bash-completion
         - htop
         - vim
+        - dos2unix
         - libcurl4-openssl-dev
         - pkg-config
         - libssl-dev
@@ -322,11 +323,11 @@ nodejs:
     install: '1'
     settings:
         version: '6'
-    npm_packages: {  } 
+    npm_packages: {  }
 mariadb:
     install: '1'
     settings:
-        version: '10.1'
+        version: '10.2'
         root_password: '123'
         override_options: {  }
     users:

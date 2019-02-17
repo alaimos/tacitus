@@ -20,6 +20,13 @@ class puphpet::ruby {
     key_source => 'https://rvm.io/mpapis.asc',
     key_type   => public,
   }
+  gnupg_key { "rvm_pkuczynski":
+    ensure     => present,
+    key_id     => '7D2BAF1C',
+    user       => 'root',
+    key_source => 'https://rvm.io/pkuczynski.asc',
+    key_type   => public,
+  }
   -> class { '::rvm':
     key_server   => undef,
     gnupg_key_id => false,

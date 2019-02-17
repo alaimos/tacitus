@@ -14,14 +14,14 @@ use Illuminate\Database\Eloquent\Model;
 /**
  * App\Models\Job
  *
- * @property integer               $id
- * @property string                $job_type
- * @property string                $status
- * @property array                 $job_data
- * @property string                $log
- * @property \Carbon\Carbon        $created_at
- * @property \Carbon\Carbon        $updated_at
- * @property integer               $user_id
+ * @property integer $id
+ * @property string $job_type
+ * @property string $status
+ * @property array $job_data
+ * @property string $log
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property integer $user_id
  * @property-read \App\Models\User $user
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Job whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\Job whereJobType($value)
@@ -36,10 +36,10 @@ use Illuminate\Database\Eloquent\Model;
 class Job extends Model
 {
 
-    const QUEUED     = 'queued';
+    const QUEUED = 'queued';
     const PROCESSING = 'processing';
-    const COMPLETED  = 'completed';
-    const FAILED     = 'failed';
+    const COMPLETED = 'completed';
+    const FAILED = 'failed';
 
     /**
      * The attributes that should be cast to native types.
@@ -130,7 +130,7 @@ class Job extends Model
      * Get the value of a parameter for this job
      *
      * @param string|array|null $parameter
-     * @param mixed             $default
+     * @param mixed $default
      *
      * @return mixed
      */
@@ -152,7 +152,7 @@ class Job extends Model
      * Set the value of a parameter for this job
      *
      * @param string $parameter
-     * @param mixed  $value
+     * @param mixed $value
      *
      * @return $this
      */
