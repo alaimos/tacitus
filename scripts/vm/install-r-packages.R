@@ -13,5 +13,5 @@ biocLite(c("getopt", "RCurl", "rjson"),ask=FALSE)
 install.packages("/vagrant/scripts/vm/inSilicoDb_2.4.1.tar.gz", 
                  repos = NULL, type="source")
 
-install.packages("/vagrant/scripts/vm/inSilicoMerging_1.15.9999.tar.gz", 
+install.packages("/vagrant/scripts/vm/inSilicoMerging_1.16.9999.tar.gz", 
                  repos = NULL, type="source")
