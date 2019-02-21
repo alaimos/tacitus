@@ -11,7 +11,7 @@
     </div>
 
     <div class="row">
-        <div class="col-md-7">
+        <div class="col-md-8 col-md-9">
             <p>TACITuS (Transcriptomic Data Collector, Integrator, and Selector) is a web portal that simplifies the process of collection, pre-processing,
                 selection, and integration of transcriptomics data. Therefore, users can collect data from major sources, such as NCBI GEO or ArrayExpress,
                 and integrate them with their own data into a standardized format, facilitating subsequent analyses. Our software is freely available and
@@ -140,7 +140,7 @@
                         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
         </div>
-        <div class="col-md-5">
+        <div class="col-md-4 col-lg-3">
             <ul class="nav nav-pills nav-stacked">
                 <li role="presentation"><a href="#import">Importing data</a></li>
                 <li role="presentation"><a href="#select">Selecting data</a></li>
