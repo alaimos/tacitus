@@ -141,7 +141,7 @@
             </div>
         </div>
         <div class="col-md-3 col-lg-2">
-            <nav class="sidebar-nav affix">
+            <nav class="navbar sidebar-nav affix">
                 <ul class="nav nav-pills nav-stacked">
                     <li role="presentation"><a href="#import">Importing data</a></li>
                     <li role="presentation"><a href="#select">Selecting data</a></li>
