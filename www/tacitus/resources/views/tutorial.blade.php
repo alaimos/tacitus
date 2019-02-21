@@ -11,13 +11,14 @@
     </div>
 
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-md-7">
             <p>TACITuS (Transcriptomic Data Collector, Integrator, and Selector) is a web portal that simplifies the process of collection, pre-processing,
                 selection, and integration of transcriptomics data. Therefore, users can collect data from major sources, such as NCBI GEO or ArrayExpress,
                 and integrate them with their own data into a standardized format, facilitating subsequent analyses. Our software is freely available and
                 distributed through a GPL v3 licence. TACITuS implements five major functionalities: (i) data import, (ii) data selection, (iii) identifier
                 mapping, (iv) data integration, and (v) Galaxy Export, which are shown later.</p>
 
+            <a name="import"></a>
             <h2>Importing data</h2>
 
             <p>
@@ -40,6 +41,7 @@
                         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
 
+            <a name="select"></a>
             <h2>Selecting data</h2>
 
             <p>
@@ -65,6 +67,7 @@
                         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
 
+            <a name="map"></a>
             <h2>Mapping datasets</h2>
 
             <p>
@@ -83,6 +86,7 @@
                         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
 
+            <a name="integration"></a>
             <h2>Integrating datasets</h2>
 
             <p>
@@ -115,15 +119,35 @@
                         allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
 
-            Uploading to Galaxy
-            TACITuS is equipped with a module for uploading data and metadata to the Galaxy platform. First, the user should register to a galaxy server. Then,
-            he provides the credential in the Galaxy Account panel (name, host name, port, and API key). As soon as these data are entered the upload module
-            will be enabled.
-            To upload a dataset, the user has to click on the Upload to Galaxy Button present in each panel of the website (Selections, Mapped Selections,
-            Integrations). A page will open and therefore the user can select a galaxy server. By clicking on “Upload” a background upload job will start, and
-            the user will be notified as soon as the process is completed.
-            VIDEO
+            <a name="upload"></a>
+            <h2>Uploading to Galaxy</h2>
 
+            <p>
+                TACITuS is equipped with a module for uploading data and metadata to the Galaxy platform. First, the user should register to a galaxy server.
+                Then, he provides the credential in the <strong>Galaxy Account</strong> panel (name, host name, port, and API key). As soon as these data are
+                entered the upload module will be enabled.</p>
+
+            <p>
+                To upload a dataset, the user has to click on <a href="Javascript:;" class="btn btn-xs btn-primary">
+                    <i class="fa fa-upload" aria-hidden="true"></i> Upload to Galaxy</a> present in each panel of the website (Selections, Mapped Selections,
+                Integrations). A page will open and therefore the user can select a galaxy server. By clicking on <a href="Javascript:;" class="btn btn-info">
+                    <i class="fa fa-upload"></i> Upload</a> a background upload job will start, and the user will be notified as soon as the process is
+                completed.
+            </p>
+
+            <div class="embed-responsive embed-responsive-16by9">
+                <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/UU3Al4X8htQ?rel=0" frameborder="0"
+                        allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+        <div class="col-md-5">
+            <ul class="nav nav-pills nav-stacked">
+                <li role="presentation"><a href="#import">Importing data</a></li>
+                <li role="presentation"><a href="#select">Selecting data</a></li>
+                <li role="presentation"><a href="#map">Mapping datasets</a></li>
+                <li role="presentation"><a href="#integration">Integrating datasets</a></li>
+                <li role="presentation"><a href="#upload">Uploading to Galaxy</a></li>
+            </ul>
         </div>
     </div>
 @endsection
