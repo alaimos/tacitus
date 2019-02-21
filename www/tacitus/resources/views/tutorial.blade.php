@@ -141,15 +141,13 @@
             </div>
         </div>
         <div class="col-md-3 col-lg-2">
-            <nav class="navbar sidebar-nav affix">
-                <ul class="nav nav-pills nav-stacked">
-                    <li role="presentation"><a href="#import">Importing data</a></li>
-                    <li role="presentation"><a href="#select">Selecting data</a></li>
-                    <li role="presentation"><a href="#map">Mapping datasets</a></li>
-                    <li role="presentation"><a href="#integration">Integrating datasets</a></li>
-                    <li role="presentation"><a href="#upload">Uploading to Galaxy</a></li>
-                </ul>
-            </nav>
+            <ul class="nav nav-pills nav-stacked affix">
+                <li role="presentation"><a href="#import">Importing data</a></li>
+                <li role="presentation"><a href="#select">Selecting data</a></li>
+                <li role="presentation"><a href="#map">Mapping datasets</a></li>
+                <li role="presentation"><a href="#integration">Integrating datasets</a></li>
+                <li role="presentation"><a href="#upload">Uploading to Galaxy</a></li>
+            </ul>
         </div>
     </div>
 @endsection
