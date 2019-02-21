@@ -4,6 +4,9 @@
             <li>
                 <a href="{{ url('/') }}"><i class="fa fa-dashboard fa-fw"></i> Home</a>
             </li>
+            <li>
+                <a href="{{ url('/tutorial') }}"><i class="fa fa-question-circle fa-fw"></i> Tutorial</a>
+            </li>
             @if(user_can(\App\Utils\Permissions::VIEW_DATASETS))
                 <li>
                     <a href="{{ route('datasets-lists') }}"><i class="fa fa-database fa-fw"></i> Datasets</a>
