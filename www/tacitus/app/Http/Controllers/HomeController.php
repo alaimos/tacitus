@@ -22,6 +22,7 @@ class HomeController extends Controller
     public static function registerRoutes(Router $router)
     {
         $router->get('/', 'HomeController@index');
+        $router->get('/tutorial', 'HomeController@tutorial');
     }
 
     /**
@@ -35,5 +36,15 @@ class HomeController extends Controller
             'totalUsers'    => User::count(),
             'totalDatasets' => Dataset::whereStatus(Dataset::READY)->count(),
         ]);
+    }
+
+    /**
+     * Shows the application tutorial
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function tutorial()
+    {
+        return view('tutorial');
     }
 }

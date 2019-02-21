@@ -25,7 +25,7 @@
             <p class="text-justify">
                 The system is currently in development. Therefore, due to the current shortage of storage space, all
                 datasets are saved in the database for <b>365</b> days. All analysis results will be available for <b>a
-                week</b> after the completion of each job.
+                    week</b> after the completion of each job.
             </p>
         </div>
         <div class="col-md-3">
@@ -50,11 +50,26 @@
     </div>
     <div class="row">
         <div class="col-lg-12">
+            <div class="panel panel-danger">
+                <div class="panel-heading">
+                    <i class="fa fa-newspaper-o fa-fw"></i> For testing purpose:
+                </div>
+                <div class="panel-body">
+                    <p>Please use the username <strong>test@test.ts</strong> and the password <strong>test1234</strong></p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
             <div class="panel panel-warning">
                 <div class="panel-heading">
                     <i class="fa fa-newspaper-o fa-fw"></i> Release History
                 </div>
                 <ul class="list-group">
+                    <li class="list-group-item">
+                        <b>Version 0.2.0</b>: Bug fixes. Online notifications, mapped selections and Galaxy Integration.
+                    </li>
                     <li class="list-group-item">
                         <b>Version 0.1.1</b>: Bug fixes. Notifications now are sent also by email. The administrator
                         can now change user roles. The administrator can create new users. Improved email messages.
